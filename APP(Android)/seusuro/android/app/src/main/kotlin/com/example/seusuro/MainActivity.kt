@@ -1,4 +1,4 @@
-package com.example.seusuro
+package com.medtopublic.seusuro
 
 import io.flutter.embedding.android.FlutterActivity
 

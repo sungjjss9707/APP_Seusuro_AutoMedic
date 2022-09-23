@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.seusuro">
+    package="com.medtopublic.seusuro">
    <application
         android:label="seusuro"
         android:name="${applicationName}"
