@@ -11,6 +11,7 @@ var propertyRouter = require('./routes/property');
 var paymentLogRouter = require('./routes/paymentLog');
 var make_table_Router = require('./routes/make_table');
 var drop_table_Router = require('./routes/drop_table');
+var drop_make_Router = require('./routes/drop_make');
 var testRouter = require('./routes/test');
 //var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
@@ -40,6 +41,7 @@ app.use('/property', propertyRouter);
 app.use('/paymentLog', paymentLogRouter);
 app.use('/maketable', make_table_Router);
 app.use('/droptable', drop_table_Router);
+app.use('/dropmake', drop_make_Router);
 app.use('/test', testRouter);
 //app.use('/verify', verifyRouter);
 // catch 404 and forward to error handler
