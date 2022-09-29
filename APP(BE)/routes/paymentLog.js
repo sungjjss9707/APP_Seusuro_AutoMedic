@@ -52,7 +52,7 @@ router.put('/', async function(req, res, next) {
 	var select_log_sql =  "select * from paymentLog_"+militaryUnit+" where id = ?;";
 	var select_log_param = log_id;
 	const [select_log_result] = await con.query(select_log_sql, select_log_param);
-	console.log(select_log_result.length);
+	//console.log(select_log_result.length);
 	if(select_log_result.length!=1){
 		res.send("잘못됨");
 		return;
@@ -94,9 +94,7 @@ router.put('/', async function(req, res, next) {
         var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
         arr_expirationDate.push(myexpirationDate);
     }	
-	var select_property_sql;
-	var select_property_param;
-	var select_property_result;
+	var select_property_sql, select_property_param, select_property_result;
 	var modify_amount;
     var update_property_sql, update_property_param, update_property_result;
     var insert_property_sql, insert_property_param, insert_property_result;
@@ -161,10 +159,13 @@ router.put('/', async function(req, res, next) {
                 var origin_totalAmount = select_property_result[0].totalAmount;
                 modify_amount = arr_amount[i];
                 var final_totalAmount = origin_totalAmount-modify_amount;
-                update_property_sql = "update property_"+militaryUnit+" set totalAmount = ? where id = ?;";
+                console.log(final_totalAmount);
+				update_property_sql = "update property_"+militaryUnit+" set totalAmount = ? where id = ?;";
+				console.log(final_totalAmount+"  "+arr_property_id[i]);
                 update_property_param = [final_totalAmount, arr_property_id[i]];
                 update_property_result = await myQuery(update_property_sql, update_property_param);
                 if(!update_property_result){
+					console.log("열로옴");
                     res.send("복구 인설트 실패");
 					return;
                 }
@@ -187,6 +188,7 @@ router.put('/', async function(req, res, next) {
                     if(final_amount==0){
                         delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where property_id = ? and name = ?;";
                         delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
+						delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
                         if(!delete_storagePlace_result){
                             res.send("복구 인설트 실패");
                             return;
@@ -230,14 +232,16 @@ router.put('/', async function(req, res, next) {
                 if(final_amount==0){
                     delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where property_id = ? and name = ?;";
                     delete_storagePlace_param = [arr_property_id[i], target];
+					delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
                     if(!delete_storagePlace_result){
+						//res.send(arr_property_id[i]+" "+target);
                         res.send("복구 인설트 실패");
                         return;
                     }
                 }
                 else{
                     update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where property_id = ? and name = ?;";
-                    update_storagePlace_param = [final_amount, arr_property[i], target];
+                    update_storagePlace_param = [final_amount, arr_property_id[i], target];
                     update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                     if(!update_storagePlace_result){
                         res.send("복구 인설트 실패");
@@ -263,7 +267,7 @@ router.put('/', async function(req, res, next) {
                 var final_amount = origin_amount+arr_amount[i];
                 console.log(final_amount);
                 update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where property_id = ? and name = ?;";
-                update_storagePlace_param = [final_amount, arr_property[i], arr_storagePlace[i]];
+                update_storagePlace_param = [final_amount, arr_property_id[i], arr_storagePlace[i]];
                 update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                 if(!update_storagePlace_result){
                     res.send("복구 인설트 실패");
@@ -346,10 +350,348 @@ router.put('/', async function(req, res, next) {
     	}
 	}
 	const receiptPayment = req.body.receiptPayment;
-    const target = req.body.target;
+    target = req.body.target;
     const items = req.body.items;
-    var id = req.body.id;
+	confirmor_id = req.body.confirmor;
+	var str_property_id_arr = "";
+    var str_storagePlace_arr = "";
+    var str_amount_arr = "";
+    var str_unit_arr = "";
+	var name, amount, unit, storagePlace, expirationDate, property_id
+	property_id_arr = [];
+	storagePlace_arr = [];
+	amount_arr = [];
+	unit_arr = [];
+	var name_arr = [];
+	var expirationDate_arr = [];
+    len = items.length;
+	var property_id;
+    if(receiptPayment=="수입"){
+        for(let i=0; i<items.length; ++i){
+            console.log("--------------------------");
+            name = items[i].name;
+            amount = items[i].amount;
+            unit = items[i].unit;
+            storagePlace = items[i].storagePlace;
+            expirationDate = items[i].expirationDate;
+            property_id = name+"-"+expirationDate;
+            property_id_arr.push(property_id);
+            unit_arr.push(unit);
+            storagePlace_arr.push(storagePlace);
+            amount_arr.push(amount);
+            console.log(property_id);
+            select_property_sql = "select * from property_"+militaryUnit+" where id = ?;";
+            select_property_param = property_id;
+            [select_property_result] = await con.query(select_property_sql, select_property_param);
+            if(select_property_result.length==0){   //새로 재산에 넣고 storagePlace에도 넣기
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
+                insert_property_param = [property_id,name,amount,unit,expirationDate];
+                insert_property_result = await myQuery(insert_property_sql, insert_property_param);
+                if(insert_property_result){
+                    console.log(property_id+" property 테이블 insert 성공");
+                }
+                else{
+                    console.log(property_id+" property 테이블 insert 실패");
+                }
+                storagePlace_id = property_id+"-"+storagePlace;
+                insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
+                insert_storagePlace_param = [storagePlace_id,property_id,storagePlace,amount,unit];
+                insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
+                if(insert_storagePlace_result){
+                    console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
+                }
+                else{
+                    console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+                }
+            }
+            else{   ////재산 테이블 수정 storagePlace도 수정
+                var origin_total_amount = select_property_result[0].totalAmount;
+                var finalAmount = origin_total_amount+amount;
+                console.log(finalAmount+" 씨발");
+                update_property_sql = "update property_"+militaryUnit+" set totalAmount = ?, updatedAt = now() where id = ?;";
+                update_property_param = [finalAmount, property_id];
+                update_property_result = await myQuery(update_property_sql, update_property_param);
+                if(update_property_result){
+                    console.log(property_id+" property 테이블 update 성공");
+                }
+                else{
+                    console.log(property_id+" property 테이블 update 실패");
+                }
+                storagePlace_id = property_id+"-"+storagePlace;
+                select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
+                select_storagePlace_param = storagePlace_id;
+                console.log("스토리즈 플레이스 아이디 : "+select_storagePlace_param);
+                [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+                console.log("길이 : "+select_storagePlace_result.length);
+                if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => insert
+                    console.log(storagePlace+" 에 "+property_id+" 약이 없었으니까 insert 함");
+                    insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
+                    insert_storagePlace_param = [storagePlace_id,property_id,storagePlace,amount,unit];
+                    insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
+                    if(insert_storagePlace_result){
+                        console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
+                    }
+                    else{
+                        console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+                    }
+                }
+                else{   //원래 그 약장함에 약이 있었음 => update
 
+                    var origin_amount = select_storagePlace_result[0].amount;
+                    var final_amount = origin_amount+amount;
+                    console.log(origin_amount+" "+final_amount);
+                    update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where id = ?;";
+                    update_storagePlace_param = [final_amount, storagePlace_id];
+                    update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
+                    if(update_storagePlace_result){
+                        console.log(storagePlace_id+" storagePlace 테이블 update 성공");
+                    }
+                    else{
+                        console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+                    }
+                }
+            }
+        }
+    }
+    else if(receiptPayment=="이동"){
+        for(let i=0; i<items.length; ++i){
+            console.log("--------------------------");
+            name = items[i].name;
+            amount = items[i].amount;
+            unit = items[i].unit;
+            storagePlace = items[i].storagePlace;
+            expirationDate = items[i].expirationDate;
+            property_id = name+"-"+expirationDate;
+            property_id_arr.push(property_id);
+            storagePlace_arr.push(storagePlace);
+            unit_arr.push(unit);
+            amount_arr.push(amount);
+            console.log(property_id);
+            select_property_sql = "select * from property_"+militaryUnit+" where id = ?;";
+            select_property_param = property_id;
+            [select_property_result] = await con.query(select_property_sql, select_property_param);
+            if(select_property_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{   ////재산 테이블 수정할필요가 없음 바로 storagePlace 수정
+                storagePlace_id = property_id+"-"+storagePlace;
+                select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
+                select_storagePlace_param = storagePlace_id;
+                console.log("스토리즈 플레이스 아이디 : "+select_storagePlace_param);
+                [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+                console.log("길이 : "+select_storagePlace_result.length);
+                if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
+                    res.send({status:400, message:"Bad Request", data:null});
+                    return;
+                }
+                else{
+                    var origin_amount = select_storagePlace_result[0].amount;
+                    var final_amount = origin_amount-amount;
+                    //console.log(origin_amount+" "+final_amount);
+                    if(final_amount==0){
+                        delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
+                        delete_storagePlace_param = storagePlace_id;
+                        delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
+                        if(delete_storagePlace_result){
+                            console.log(property_id+" storagePlace 테이블 삭제  성공");
+                        }
+                        else{
+                            console.log(property_id+" storagePlace 테이블 삭제 실패");
+                        }
+                    }
+                    else{
+                        update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where id = ?;";
+                        update_storagePlace_param = [final_amount, storagePlace_id];
+                        update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
+                        console.log(update_storagePlace_result);
+                        if(update_storagePlace_result){
+                            console.log(storagePlace_id+" storagePlace 테이블 update 성공");
+                        }
+                        else{
+                            console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+                        }
+                    }
+                }
+                storagePlace_id = property_id+"-"+target;
+                select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
+                select_storagePlace_param = storagePlace_id;
+                [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+                console.log(select_storagePlace_result[0]);
+                if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => insert
+                    console.log(storagePlace+" 에 "+property_id+" 약이 없었으니까 insert 함");
+                    insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
+                    insert_storagePlace_param = [storagePlace_id,property_id,target,amount,unit];
+                    insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
+                    if(insert_storagePlace_result){
+                        console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
+                    }
+                    else{
+                        console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+                    }
+                }
+                else{   //원래 그 약장함에 약이 있었음 => update
+
+                    var origin_amount = select_storagePlace_result[0].amount;
+                    var final_amount = origin_amount+amount;
+                    console.log(origin_amount+" "+final_amount);
+                    update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where id = ?;";
+                    update_storagePlace_param = [final_amount, storagePlace_id];
+                    update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
+                    if(update_storagePlace_result){
+                        console.log(storagePlace_id+" storagePlace 테이블 update 성공");
+                    }
+                    else{
+                        console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+                    }
+                }
+            }
+        }
+
+    }
+    else{
+        for(let i=0; i<items.length; ++i){
+            console.log("--------------------------");
+            name = items[i].name;
+            amount = items[i].amount;
+            unit = items[i].unit;
+            storagePlace = items[i].storagePlace;
+            expirationDate = items[i].expirationDate;
+            property_id = name+"-"+expirationDate;
+            property_id_arr.push(property_id);
+            storagePlace_arr.push(storagePlace);
+            amount_arr.push(amount);
+            unit_arr.push(unit);
+            console.log(property_id);
+            select_property_sql = "select * from property_"+militaryUnit+" where id = ?;";
+            select_property_param = property_id;
+            [select_property_result] = await con.query(select_property_sql, select_property_param);
+            if(select_property_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{   ////재산 테이블 수정 storagePlace도 수정
+                var origin_total_amount = select_property_result[0].totalAmount;
+                var finalAmount = origin_total_amount-amount;
+                if(finalAmount==0){
+                    delete_property_sql = "delete from property_"+militaryUnit+" where id = ?;";
+                    delete_property_param = property_id;
+                    delete_property_result = await myQuery(delete_property_sql, delete_property_param);
+                    if(delete_property_result){
+                        console.log(property_id+" property 테이블 삭제  성공");
+                    }
+                    else{
+                        console.log(property_id+" property 테이블 삭제 실패");
+                    }
+                }
+                else{
+                    update_property_sql = "update property_"+militaryUnit+" set totalAmount = ?, updatedAt = now() where id = ?;";
+                    update_property_param = [finalAmount, property_id];
+                    update_property_result = await myQuery(update_property_sql, update_property_param);
+                    console.log("사실여부 : "+update_property_result);
+                    if(update_property_result){
+                        console.log(property_id+" property 테이블 update 성공");
+                    }
+                    else{
+                        console.log(property_id+" property 테이블 update 실패");
+                    }
+                }
+                storagePlace_id = property_id+"-"+storagePlace;
+                select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
+                select_storagePlace_param = storagePlace_id;
+                console.log("스토리즈 플레이스 아이디 : "+select_storagePlace_param);
+                [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+                console.log("길이 : "+select_storagePlace_result.length);
+                if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
+                    res.send({status:400, message:"Bad Request", data:null});
+                    return;
+                }
+				else{   //원래 그 약장함에 약이 있었음 => update
+                    var origin_amount = select_storagePlace_result[0].amount;
+                    var final_amount = origin_amount-amount;
+                    //console.log(origin_amount+" "+final_amount);
+                    if(final_amount==0){
+                        delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
+                        delete_storagePlace_param = storagePlace_id;
+                        delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
+                        if(delete_storagePlace_result){
+                            console.log(property_id+" storagePlace 테이블 삭제  성공");
+                        }
+                        else{
+                            console.log(property_id+" storagePlace 테이블 삭제 실패");
+                        }
+                    }
+                    else{
+                        update_storagePlace_sql = "update storagePlace_"+militaryUnit+" set amount = ? where id = ?;";
+                        update_storagePlace_param = [final_amount, storagePlace_id];
+                        update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
+                        console.log(update_storagePlace_result);
+                        if(update_storagePlace_result){
+                            console.log(storagePlace_id+" storagePlace 테이블 update 성공");
+                        }
+                        else{
+                            console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+                        }
+                    }
+                }
+            }
+        }
+    }
+/*
+	for(let i=0; i<len; ++i){
+		name_arr.push(items[i].name);
+		unit_arr.push(items[i].unit);
+		amount_arr.push(items[i].amount);
+		expirationDate_arr.push(items[i].expirationDate);
+		storagePlace_arr.push(items[i].storagePlace);
+		property_id = items[i].name+"-"+items[i].expirationDate;
+		property_id_arr.push(property_id);
+    }
+*/
+    for(let i=0; i<len; ++i){
+        str_property_id_arr+=property_id_arr[i];
+        str_storagePlace_arr+=storagePlace_arr[i];
+        str_amount_arr+=String(amount_arr[i]);
+        str_unit_arr+=unit_arr[i];
+        if(i<len-1){
+            str_property_id_arr+="/";
+            str_storagePlace_arr+="/";
+            str_amount_arr+="/";
+            str_unit_arr+="/";
+        }
+    }
+	console.log(str_property_id_arr);
+	console.log(str_amount_arr);
+	console.log(str_unit_arr);
+	var delete_paymentLog_sql = "delete from paymentLog_"+militaryUnit+" where id = ?;";
+	var delete_paymentLog_param = log_id;
+	await myQuery(delete_paymentLog_sql, delete_paymentLog_param);
+	var insert_log_sql = "insert into paymentLog_"+militaryUnit+" values (?,?,?,?,?,?,?,?,?,?,?, now());";
+    var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,YearMonthDate, log_num, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr, createdAt];
+    var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
+    if(!insert_log_result){
+        res.send({status:400, message:"Bad Request", data:null});
+        return;
+    }
+    var select_user_sql = "select * from user where id = ?;";
+    var select_user_param = confirmor_id;
+    var [result] = await con.query(select_user_sql, select_user_param);
+    if(result.length==0){
+        res.send({status:400, message:"Bad Request", data:null});
+        return;
+    }
+    var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+    var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
+    var check_time_param = log_id;
+    var [time_result] = await con.query(check_time_sql, check_time_param);
+    if(time_result.length==0){
+        res.send("실패");
+        return;
+    }
+    var created_time = time_result[0].createdAt;
+    var updated_time = time_result[0].updatedAt;
+    var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
+    res.send({status:200, message:"Ok", data:data});
 });
 
 
