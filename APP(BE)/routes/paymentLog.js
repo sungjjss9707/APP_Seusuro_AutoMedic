@@ -21,6 +21,7 @@ async function myQuery(sql, param){
 
 router.put('/', async function(req, res, next) {
     con = await db.createConnection(inform);
+	await con.beginTransaction();
     var confirmor_id = req.body.confirmor;
 /*
     const accessToken = req.header('Authorization');
@@ -54,12 +55,14 @@ router.put('/', async function(req, res, next) {
 	const [select_log_result] = await con.query(select_log_sql, select_log_param);
 	//console.log(select_log_result.length);
 	if(select_log_result.length!=1){
-		res.send("잘못됨");
+		res.send({status:400, message:"Bad Request", data:null});
+		await con.rollback();
 		return;
 	}
 	var deleteLog_success = deleteLog.deleteLog(militaryUnit, confirmor_id, log_id);
 	if(!deleteLog_success){
-		res.send("삭제실패");
+		res.send({status:400, message:"Bad Request", data:null});
+		await con.rollback();
 		return;
 	}
 	var origin_receiptPayment = select_log_result[0].receiptPayment;
@@ -151,7 +154,10 @@ router.put('/', async function(req, res, next) {
                     console.log(property_id+" property 테이블 insert 성공");
                 }
                 else{
-                    console.log(property_id+" property 테이블 insert 실패");
+					console.log(property_id+" property 테이블 insert 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+					await con.rollback();
+					return;
                 }
                 storagePlace_id = property_id+"-"+storagePlace;
                 insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
@@ -162,6 +168,9 @@ router.put('/', async function(req, res, next) {
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
                 }
             }
             else{   ////재산 테이블 수정 storagePlace도 수정
@@ -176,6 +185,9 @@ router.put('/', async function(req, res, next) {
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
                 }
                 storagePlace_id = property_id+"-"+storagePlace;
                 select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
@@ -193,6 +205,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
                 else{   //원래 그 약장함에 약이 있었음 => update
@@ -208,6 +223,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
             }
@@ -231,7 +249,8 @@ router.put('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
                 return;
             }
             else{   ////재산 테이블 수정할필요가 없음 바로 storagePlace 수정
@@ -242,12 +261,18 @@ router.put('/', async function(req, res, next) {
                 [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
                 console.log("길이 : "+select_storagePlace_result.length);
                 if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
-                    res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
                     return;
                 }
                 else{
                     var origin_amount = select_storagePlace_result[0].amount;
                     var final_amount = origin_amount-amount;
+					if(final_amount<0){
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
+					}
                     //console.log(origin_amount+" "+final_amount);
                     if(final_amount==0){
                         delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
@@ -258,6 +283,9 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                         }
                     }
                     else{
@@ -270,6 +298,9 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                         }
                     }
                 }
@@ -288,6 +319,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
                 else{   //원래 그 약장함에 약이 있었음 => update
@@ -303,6 +337,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
             }
@@ -328,11 +365,17 @@ router.put('/', async function(req, res, next) {
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){
                 res.send({status:400, message:"Bad Request", data:null});
+				await con.rollback();
                 return;
             }
             else{   ////재산 테이블 수정 storagePlace도 수정
                 var origin_total_amount = select_property_result[0].totalAmount;
                 var finalAmount = origin_total_amount-amount;
+				if(finalAmount<0){
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
+				}
                 if(finalAmount==0){
                     delete_property_sql = "delete from property_"+militaryUnit+" where id = ?;";
                     delete_property_param = property_id;
@@ -342,6 +385,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(property_id+" property 테이블 삭제 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
                 else{
@@ -354,6 +400,9 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(property_id+" property 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
                 }
                 storagePlace_id = property_id+"-"+storagePlace;
@@ -364,11 +413,17 @@ router.put('/', async function(req, res, next) {
                 console.log("길이 : "+select_storagePlace_result.length);
                 if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
                     res.send({status:400, message:"Bad Request", data:null});
+					await con.rollback();
                     return;
                 }
 				else{   //원래 그 약장함에 약이 있었음 => update
                     var origin_amount = select_storagePlace_result[0].amount;
                     var final_amount = origin_amount-amount;
+					if(final_amount<0){
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
+					}
                     //console.log(origin_amount+" "+final_amount);
                     if(final_amount==0){
                         delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
@@ -379,6 +434,9 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                         }
                     }
                     else{
@@ -391,6 +449,9 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                         }
                     }
                 }
@@ -425,19 +486,26 @@ router.put('/', async function(req, res, next) {
 	console.log(str_unit_arr);
 	var delete_paymentLog_sql = "delete from paymentLog_"+militaryUnit+" where id = ?;";
 	var delete_paymentLog_param = log_id;
-	await myQuery(delete_paymentLog_sql, delete_paymentLog_param);
+	var delete_success = await myQuery(delete_paymentLog_sql, delete_paymentLog_param);
+	if(!delete_success){
+		res.send({status:400, message:"Bad Request", data:null});
+        await con.rollback();
+        return;
+	}
 	var insert_log_sql = "insert into paymentLog_"+militaryUnit+" values (?,?,?,?,?,?,?,?,?,?,?, now());";
     var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,YearMonthDate, log_num, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr, createdAt];
     var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
     if(!insert_log_result){
-        res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:400, message:"Bad Request", data:null});
+        await con.rollback();
         return;
     }
     var select_user_sql = "select * from user where id = ?;";
     var select_user_param = confirmor_id;
     var [result] = await con.query(select_user_sql, select_user_param);
     if(result.length==0){
-        res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:400, message:"Bad Request", data:null});
+        await con.rollback();
         return;
     }
     var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
@@ -445,7 +513,8 @@ router.put('/', async function(req, res, next) {
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
     if(time_result.length==0){
-        res.send("실패");
+		res.send({status:400, message:"Bad Request", data:null});
+        await con.rollback();
         return;
     }
     var created_time = time_result[0].createdAt;
@@ -655,6 +724,7 @@ router.get('/show/:id', async function(req, res, next) {
 
 router.post('/', async function(req, res, next) {
 	con = await db.createConnection(inform);
+	await con.beginTransaction();
 	const confirmor_id = req.body.confirmor;
 /*
     const accessToken = req.header('Authorization');
@@ -673,6 +743,7 @@ router.post('/', async function(req, res, next) {
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
         res.send({status:400, message:'Bad Request', data:null});
+		//await con.rollback();
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
@@ -732,6 +803,9 @@ router.post('/', async function(req, res, next) {
 				}
 				else{
 					console.log(property_id+" property 테이블 insert 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+					await con.rollback();
+					return;
 				}
 				storagePlace_id = property_id+"-"+storagePlace;
 				insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
@@ -742,6 +816,9 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
                 }
 			}
 			else{	////재산 테이블 수정 storagePlace도 수정
@@ -756,6 +833,9 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
                 }
                 storagePlace_id = property_id+"-"+storagePlace;
 				select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
@@ -773,6 +853,9 @@ router.post('/', async function(req, res, next) {
                 	}
                 	else{
                     	console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                 	}
 				}
 				else{	//원래 그 약장함에 약이 있었음 => update
@@ -788,6 +871,9 @@ router.post('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
                     }
 				}
 			}
@@ -811,7 +897,8 @@ router.post('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
                 return;
             }
             else{   ////재산 테이블 수정할필요가 없음 바로 storagePlace 수정
@@ -823,11 +910,17 @@ router.post('/', async function(req, res, next) {
                 console.log("길이 : "+select_storagePlace_result.length);
                 if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
                     res.send({status:400, message:"Bad Request", data:null});
+					await con.rollback();
 					return;
                 }
 				else{   
                     var origin_amount = select_storagePlace_result[0].amount;
                     var final_amount = origin_amount-amount;
+					if(final_amount<0){
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
+					}
                     //console.log(origin_amount+" "+final_amount);
                     if(final_amount==0){
                         delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
@@ -838,6 +931,9 @@ router.post('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                         }
                     }
                     else{
@@ -849,7 +945,9 @@ router.post('/', async function(req, res, next) {
                             console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                         }
                         else{
-                            console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+							await con.rollback();
+							return;
                         }
                     }
                 }
@@ -867,7 +965,9 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
                     }
                     else{
-                        console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                        await con.rollback();
+                        return;
                     }
                 }
                 else{   //원래 그 약장함에 약이 있었음 => update
@@ -882,7 +982,9 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     }
                     else{
-                        console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                        await con.rollback();
+                        return;
                     }
                 }
             }
@@ -908,11 +1010,17 @@ router.post('/', async function(req, res, next) {
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){ 
 				res.send({status:400, message:"Bad Request", data:null});
+				await con.rollback();
 				return;
             }
 			else{   ////재산 테이블 수정 storagePlace도 수정
                 var origin_total_amount = select_property_result[0].totalAmount;
                 var finalAmount = origin_total_amount-amount;
+				if(finalAmount<0){
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
+				}
 				if(finalAmount==0){
 					delete_property_sql = "delete from property_"+militaryUnit+" where id = ?;";
                     delete_property_param = property_id;
@@ -921,7 +1029,9 @@ router.post('/', async function(req, res, next) {
                         console.log(property_id+" property 테이블 삭제  성공");
                     }
                     else{
-                        console.log(property_id+" property 테이블 삭제 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                		await con.rollback();
+                		return;
                     }	
 				}
 				else{
@@ -933,7 +1043,9 @@ router.post('/', async function(req, res, next) {
                     	console.log(property_id+" property 테이블 update 성공");
                 	}
                 	else{
-                    	console.log(property_id+" property 테이블 update 실패");
+						res.send({status:400, message:"Bad Request", data:null});
+                		await con.rollback();
+                		return;
                 	}
 				}
                 storagePlace_id = property_id+"-"+storagePlace;
@@ -944,12 +1056,18 @@ router.post('/', async function(req, res, next) {
                 console.log("길이 : "+select_storagePlace_result.length);
                 if(select_storagePlace_result.length==0){    //원래 그 약장함에 약이 없었음 => 에러
 					res.send({status:400, message:"Bad Request", data:null});
-                	return;
+                	await con.rollback();
+					return;
 				}
 	/////////////////////
                 else{   //원래 그 약장함에 약이 있었음 => update
                     var origin_amount = select_storagePlace_result[0].amount;
                     var final_amount = origin_amount-amount;
+					if(final_amount<0){
+						res.send({status:400, message:"Bad Request", data:null});
+                    	await con.rollback();
+                    	return;
+					}
                     //console.log(origin_amount+" "+final_amount);
 					if(final_amount==0){
 						delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where id = ?;";
@@ -959,7 +1077,9 @@ router.post('/', async function(req, res, next) {
                         	console.log(property_id+" storagePlace 테이블 삭제  성공");
                     	}
                     	else{
-                        	console.log(property_id+" storagePlace 테이블 삭제 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                    		await con.rollback();
+                    		return;
                     	}
 					}
 					else{
@@ -971,7 +1091,9 @@ router.post('/', async function(req, res, next) {
                         	console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     	}
                     	else{
-                        	console.log(storagePlace_id+" storagePlace 테이블 update 실패");
+							res.send({status:400, message:"Bad Request", data:null});
+                            await con.rollback();
+                            return;
                     	}
 					}
                 }
@@ -1018,28 +1140,31 @@ router.post('/', async function(req, res, next) {
 	var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
 	if(!insert_log_result){
 		res.send({status:400, message:"Bad Request", data:null});
-		return;
+        await con.rollback();
+        return;
 	}
 	var select_user_sql = "select * from user where id = ?;";
 	var select_user_param = confirmor_id;
 	var [result] = await con.query(select_user_sql, select_user_param);
 	if(result.length==0){
 		res.send({status:400, message:"Bad Request", data:null});
-        return;
+        await con.rollback();
+		return;
 	}	
 	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
 	var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
 	if(time_result.length==0){
-        res.send("실패");
+		res.send({status:400, message:"Bad Request", data:null});
+        await con.rollback();
         return;
     }
 	var created_time = time_result[0].createdAt;
 	var updated_time = time_result[0].updatedAt;
 	var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
 	res.send({status:200, message:"Ok", data:data});
-
+	await con.commit();
 
 	//오늘날짜로 yearmonthdate 조회해서 없으면 1번부터, 있으면 마지막+1 로 아이디 만들고 나머지거 insert하기
 });

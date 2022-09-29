@@ -8,7 +8,7 @@ var inform = mysql.inform;
 var propertyMake = async function(militaryUnit){
     try{
 		var con = await db.createConnection(inform);
-		var sql = "create table property_"+militaryUnit+" ( id varchar(100), name varchar(100), totalAmount int, unit varchar(20), expirationDate datetime, createdAt datetime, updatedAt datetime, primary key(id) );";
+		var sql = "create table property_"+militaryUnit+" ( id varchar(100) not null, name varchar(100) not null, totalAmount int not null, unit varchar(20) not null, expirationDate datetime not null, createdAt datetime, updatedAt datetime, primary key(id) );";
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
@@ -20,7 +20,7 @@ var propertyMake = async function(militaryUnit){
 var paymentLogMake = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
-		var sql = "create table paymentLog_"+militaryUnit+" ( id varchar(100), receiptPayment varchar(20), confirmor_id varchar(100), target varchar(100), YearMonthDate varchar(20), log_num int, property_id_arr varchar(5000), storagePlace_arr varchar(1000), amount_arr varchar(1000), unit_arr varchar(1000),createdAt datetime, updatedAt datetime, primary key(id) );"
+		var sql = "create table paymentLog_"+militaryUnit+" ( id varchar(100) not null, receiptPayment varchar(20) not null, confirmor_id varchar(100) not null, target varchar(100), YearMonthDate varchar(20) not null, log_num int not null, property_id_arr varchar(5000) not null, storagePlace_arr varchar(1000) not null, amount_arr varchar(1000) not null, unit_arr varchar(1000) not null,createdAt datetime, updatedAt datetime, primary key(id) );"
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
@@ -32,7 +32,7 @@ var paymentLogMake = async function(militaryUnit){
 var storagePlaceMake = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
-        var sql = "create table storagePlace_"+militaryUnit+" ( id varchar(150), property_id varchar(100), name varchar(100), amount int,unit varchar(20), primary key(id) );"
+        var sql = "create table storagePlace_"+militaryUnit+" ( id varchar(150) not null, property_id varchar(100) not null, name varchar(100) not null, amount int not null,unit varchar(20) not null, primary key(id) );"
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
