@@ -20,12 +20,14 @@ async function myQuery(sql, param){
 
 var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
     con = await db.createConnection(inform);
+	//await con.beginTransaction();
 	var select_log_sql =  "select * from paymentLog_"+militaryUnit+" where id = ?;";
 	var select_log_param = log_id;
 	const [select_log_result] = await con.query(select_log_sql, select_log_param);
 	//console.log(select_log_result.length);
 	if(select_log_result.length!=1){
 		return false;
+		//return {success:false, message:"해당 로그가 없습니다"};
 	}
 	var origin_receiptPayment = select_log_result[0].receiptPayment;
     confirmor_id = select_log_result[0].confirmor_id;
@@ -85,7 +87,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 insert_property_param = [arr_property_id[i], arr_name[i], (-1)*arr_amount[i], arr_unit[i], arr_expirationDate[i]];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
+					//await con.rollback();
 					return false;
+					//return {success:false, message:"Bad Request"};
                 }
 				storagePlace_id = arr_property_id[i]+"-"+arr_storagePlace[i];
                 select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where property_id = ? and name = ?;";
@@ -96,7 +100,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                     insert_storagePlace_param = [storagePlace_id, arr_property_id[i], arr_storagePlace[i], (-1)*arr_amount[i], arr_unit[i]];
                     insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                     if(!insert_storagePlace_result){
-                        return false;
+						//await con.rollback();a
+						return false;
+					//	return {success:false, message:"Bad Request"};
                     }
                 }
                 else{
@@ -106,7 +112,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 						delete_storagePlace_sql = "delete from storagePlace_"+militaryUnit+" where property_id = ? and name = ?;";
 						delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
 						if(!delete_storagePlace_result){
-                            return false;
+					//		await con.rollback();
+							return false;
+							//return {success:false, message:"Bad Request"};
                         }
 					}
 					else{
@@ -114,7 +122,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                     	update_storagePlace_param = [final_amount, arr_property_id[i], arr_storagePlace[i]];
                     	update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                     	if(!update_storagePlace_result){
-                        	return false;
+					//		await con.rollback();
+							return false;
+							//return {success:false, message:"Bad Request"};
                     	}
 					}
                 }			
@@ -132,7 +142,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 					delete_property_result = await myQuery(delete_property_sql, delete_property_param);
 					if(!delete_property_result){
                         console.log("열로옴");
-                        return false;
+					//	await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                     }
 				}
 				else{
@@ -142,7 +154,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 	update_property_result = await myQuery(update_property_sql, update_property_param);
                 	if(!update_property_result){
                     	console.log("열로옴");
-                    	return false;
+					//	await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                 	}
 				}
 				storagePlace_id = arr_property_id[i]+"-"+arr_storagePlace[i];
@@ -154,7 +168,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                     insert_storagePlace_param = [storagePlace_id, arr_property_id[i], arr_storagePlace[i], (-1)*arr_amount[i], arr_unit[i]];
                     insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                     if(!insert_storagePlace_result){
-                        return false;
+					//	await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                     }
                 }
                 else{
@@ -165,7 +181,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                         delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
 						delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
                         if(!delete_storagePlace_result){
-                            return false;
+					//		await con.rollback();
+							return false;
+							//return {success:false, message:"Bad Request"};
                         }
                     }
                     else{
@@ -173,7 +191,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                         update_storagePlace_param = [final_amount, arr_property_id[i], arr_storagePlace[i]];
                         update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                         if(!update_storagePlace_result){
-                            return false;
+					//		await con.rollback();
+							return false;
+							//return {success:false, message:"Bad Request"};
                         }
                     }
                 }
@@ -195,7 +215,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 insert_storagePlace_param = [storagePlace_id, arr_property_id[i], target, (-1)*arr_amount[i], arr_unit[i]];
                 insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                 if(!insert_storagePlace_result){
-                    return false;
+		//			await con.rollback();
+					return false;
+					//return {success:false, message:"Bad Request"};
                 }
 			}
 			else{
@@ -207,7 +229,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 					delete_storagePlace_result = await myQuery(delete_storagePlace_sql, delete_storagePlace_param);
                     if(!delete_storagePlace_result){
 						//res.send(arr_property_id[i]+" "+target);
-                        return false;
+		//				await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                     }
                 }
                 else{
@@ -215,7 +239,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                     update_storagePlace_param = [final_amount, arr_property_id[i], target];
                     update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                     if(!update_storagePlace_result){
-                        return false;
+		//				await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                     }
                 }
 			}
@@ -228,7 +254,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 insert_storagePlace_param = [storagePlace_id, arr_property_id[i], arr_storagePlace[i], arr_amount[i], arr_unit[i]];
                 insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                 if(!insert_storagePlace_result){
-                    return false;
+		//			await con.rollback();
+					return false;
+					//return {success:false, message:"Bad Request"};
                 }
             }
             else{
@@ -239,7 +267,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 update_storagePlace_param = [final_amount, arr_property_id[i], arr_storagePlace[i]];
                 update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                 if(!update_storagePlace_result){
-                    return false;
+		//			await con.rollback();
+					return false;
+					//return {success:false, message:"Bad Request"};
                 }
             }
         }
@@ -263,17 +293,22 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 				insert_property_param = [arr_property_id[i], arr_name[i], arr_amount[i], arr_unit[i], arr_expirationDate[i]];
 				insert_property_result = await myQuery(insert_property_sql, insert_property_param);
 				if(!insert_property_result){
+		//			await con.rollback();
 					return false; 
 				}
 			//약장함에도 약 없음
+				console.log(arr_property_id[i]+" 를 "+arr_amount[i]+" 개 insert 성공");
 				storagePlace_id = arr_property_id[i]+"-"+arr_storagePlace[i];
 				insert_storagePlace_sql = "insert into storagePlace_"+militaryUnit+" values (?,?,?,?,?);";
 				insert_storagePlace_param = [storagePlace_id, arr_property_id[i], arr_storagePlace[i], arr_amount[i], arr_unit[i]];
 				insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
 				//storagePlace_id = arr_property_id[i]+"-"+arr_storagePlace[i];
 				if(!insert_storagePlace_result){
-                    return false;
+		//			await con.rollback();
+					return false;
+					//return {success:false, message:"Bad Request"};
                 }
+				console.log(arr_property_id[i]+" 를 "+arr_storagePlace[i]+" 에 "+arr_amount[i]+" 개 insert 성공");
 			}
 			else{
 				var origin_totalAmount = select_property_result[0].totalAmount;
@@ -283,7 +318,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 				update_property_param = [final_totalAmount, arr_property_id[i]];
 				update_property_result = await myQuery(update_property_sql, update_property_param);
 				if(!update_property_result){
+		//			await con.rollback();
 					return false;
+					//return {success:false, message:"Bad Request"};
                 }
 				storagePlace_id = arr_property_id[i]+"-"+arr_storagePlace[i];
 				select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where id = ?;";
@@ -294,7 +331,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 	insert_storagePlace_param = [storagePlace_id, arr_property_id[i], arr_storagePlace[i], arr_amount[i], arr_unit[i]];
                 	insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
 					if(!insert_storagePlace_result){
-                    	return false;
+		//				await con.rollback();
+						return false;
+						//return {success:false, message:"Bad Request"};
                 	}
 				}
 				else{
@@ -304,7 +343,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
                 	update_storagePlace_param = [final_amount, storagePlace_id];
                 	update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                 	if(!update_storagePlace_result){
+		//				await con.rollback();
 						return false;
+						//return {success:false, message:"Bad Request"};
                 	}
 				}
 ///////////////////////////////////////약장함도 고치기
@@ -313,7 +354,9 @@ var deleteLog = async function(militaryUnit, confirmor_id, log_id) {
 
     	}
 	}
+	//await con.commit();
 	return true;
+	//return {success:true, message:null};
 }
 
 exports.deleteLog = deleteLog;

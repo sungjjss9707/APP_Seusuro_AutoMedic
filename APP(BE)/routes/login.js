@@ -21,7 +21,6 @@ async function myQuery(sql, param){
 }
 
 router.post('/', async function(req, res, next) {
-	
     console.log("login page");
 	const email = req.body.email;
     const password = req.body.password;
@@ -31,8 +30,8 @@ router.post('/', async function(req, res, next) {
 	//console.log(sql1);
 	const [select_result1, select_field1] = await con.query(select_sql, select_param);
 	if(select_result1.length==0){
-        console.log("없는 계정입니다.");
-        res.send({status:400, message:"Bad Request"});
+        //console.log("없는 계정입니다.");
+        res.send({status:400, message:"존재하지 않는 계정입니다"});
     }
     else{
 		const real_my_encoded_pw = select_result1[0].password;
@@ -81,7 +80,7 @@ router.post('/', async function(req, res, next) {
 		}
 		else{
 			console.log("로그인 실패");
-			res.send({status:400, message:"Bad Request"});
+			res.send({status:400, message:"비밀번호가 틀립니다", data:null});
 		}
     }
 });
