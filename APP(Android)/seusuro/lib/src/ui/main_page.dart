@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/main_page_controller.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
-import 'package:seusuro/src/ui/asset/asset_page.dart';
 import 'package:seusuro/src/ui/log/log_page.dart';
 import 'package:seusuro/src/ui/mypage/mypage_page.dart';
+import 'package:seusuro/src/ui/property/property_page.dart';
 import 'package:seusuro/src/ui/search/search_page.dart';
 
 class MainPage extends StatelessWidget {
@@ -22,7 +22,7 @@ class MainPage extends StatelessWidget {
           case 0:
             return const LogPage();
           case 1:
-            return const AssetPage();
+            return const PropertyPage();
           case 2:
             return const SearchPage();
           case 3:
