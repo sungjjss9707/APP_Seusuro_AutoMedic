@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
+import 'package:seusuro/src/controller/ui/asset_page_controllet.dart';
 
 class AssetPage extends StatelessWidget {
   const AssetPage({super.key});
 
-  final _valueList = const ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
+  final _orderList = const ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+      Get.put(AssetPageController());
+
+      return Column(
       children: <Widget>[
         Container(
           padding: const EdgeInsets.all(16.0),
@@ -35,15 +39,13 @@ class AssetPage extends StatelessWidget {
                 )
               ),
               TextButton(
-                onPressed: () {
-
-                },
+                onPressed: openBottomSheet,
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.black
                 ),
                 child: Row(
                   children: [
-                    Text(_valueList[0]),
+                    Text(_orderList[AssetPageController.to.orderIndex.value]),
                     const Icon(
                       Icons.keyboard_arrow_down,
                       size: 24
@@ -115,6 +117,39 @@ class AssetPage extends StatelessWidget {
           )
         )
       ],
+    );
+  }
+
+  void openBottomSheet() {
+    Get.bottomSheet(
+      Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+
+            },
+            child: const Text('가나다 순'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+
+            },
+            child: const Text('최신 등록 순'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+
+            },
+            child: const Text('유효기간 순'),
+          ),
+        ]
+      ),
+      backgroundColor: Colors.white,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
     );
   }
 }
