@@ -11,8 +11,9 @@ class AssetPage extends StatelessWidget {
     return Column(
       children: <Widget>[
         Container(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RichText(
                 text: TextSpan(
@@ -21,7 +22,7 @@ class AssetPage extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
-                  children: [
+                  children: const [
                     TextSpan(text: '총 '),
                     TextSpan(
                       text: '164',
@@ -33,7 +34,24 @@ class AssetPage extends StatelessWidget {
                   ]
                 )
               ),
-            ]
+              TextButton(
+                onPressed: () {
+
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.black
+                ),
+                child: Row(
+                  children: [
+                    Text(_valueList[0]),
+                    const Icon(
+                      Icons.keyboard_arrow_down,
+                      size: 24
+                    )
+                  ]
+                ),
+              )
+            ],
           ),
         ),
       ],
