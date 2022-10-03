@@ -54,6 +54,66 @@ class AssetPage extends StatelessWidget {
             ],
           ),
         ),
+
+        Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              SizedBox(
+                width: 88,
+                height: 36,
+                child: OutlinedButton(
+                  onPressed: () {
+
+                  },
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
+                    foregroundColor: MaterialStateProperty.all(Colors.black),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
+                    ),
+                  ),
+                  child: const Text('분류'),
+                ),
+              ),
+              SizedBox(
+                width: 88,
+                height: 36,
+                child: OutlinedButton(
+                  onPressed: () {
+
+                  },
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
+                    foregroundColor: MaterialStateProperty.all(Colors.black),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
+                    ),
+                  ),
+                  child: const Text('유효기간'),
+                ),
+              ),
+              SizedBox(
+                width: 88,
+                height: 36,
+                child: OutlinedButton(
+                  onPressed: () {
+
+                  },
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
+                    foregroundColor: MaterialStateProperty.all(Colors.black),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
+                    ),
+                  ),
+                  child: const Text('보관장소'),
+                ),
+              )
+            ],
+          )
+        )
       ],
     );
   }
