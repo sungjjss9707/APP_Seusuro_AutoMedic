@@ -7,6 +7,7 @@ class AppColors {
 
   // Background
   Color bgWhite = const Color(0xFFFFFFFF);
+  Color bgGrey = const Color(0xD9D9D9D9);
 
   // Text
   Color textBlack = const Color(0xFF000000);
