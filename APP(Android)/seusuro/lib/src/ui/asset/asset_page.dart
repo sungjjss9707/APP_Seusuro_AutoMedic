@@ -125,23 +125,59 @@ class AssetPage extends StatelessWidget {
       Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          ElevatedButton(
-            onPressed: () {
-
-            },
-            child: const Text('가나다 순'),
+          Container(
+            width: 328,
+            height: 48,
+            alignment: Alignment.center,
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: AssetPageController.to.orderIndex.value == 0 ? MaterialStateProperty.all(AppColors().bgGrey) : MaterialStateProperty.all(Colors.transparent),
+                foregroundColor: MaterialStateProperty.all(Colors.black),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0))
+                ),
+              ),
+              onPressed: () {
+                
+              },
+              child: const Text('가나다 순'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-
-            },
-            child: const Text('최신 등록 순'),
+          Container(
+            width: 328,
+            height: 48,
+            alignment: Alignment.center,
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: AssetPageController.to.orderIndex.value == 1 ? MaterialStateProperty.all(AppColors().bgGrey) : MaterialStateProperty.all(Colors.transparent),
+                foregroundColor: MaterialStateProperty.all(Colors.black),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0))
+                ),
+              ),
+              onPressed: () {
+                
+              },
+              child: const Text('최신 등록 순'),
+            ),
           ),
-          ElevatedButton(
-            onPressed: () {
-
-            },
-            child: const Text('유효기간 순'),
+          Container(
+            width: 328,
+            height: 48,
+            alignment: Alignment.center,
+            child: TextButton(
+              style: ButtonStyle(
+                backgroundColor: AssetPageController.to.orderIndex.value == 2 ? MaterialStateProperty.all(AppColors().bgGrey) : MaterialStateProperty.all(Colors.transparent),
+                foregroundColor: MaterialStateProperty.all(Colors.black),
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0))
+                ),
+              ),
+              onPressed: () {
+                
+              },
+              child: const Text('유효기간 순'),
+            ),
           ),
         ]
       ),
