@@ -13,6 +13,7 @@ var make_table_Router = require('./routes/make_table');
 var drop_table_Router = require('./routes/drop_table');
 var drop_make_Router = require('./routes/drop_make');
 var testRouter = require('./routes/test');
+var boardRouter = require('./routes/board');
 //var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
 //var verifyRouter = require('./routes/verify');
@@ -43,6 +44,7 @@ app.use('/maketable', make_table_Router);
 app.use('/droptable', drop_table_Router);
 app.use('/dropmake', drop_make_Router);
 app.use('/test', testRouter);
+app.use('/board', boardRouter);
 //app.use('/verify', verifyRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
