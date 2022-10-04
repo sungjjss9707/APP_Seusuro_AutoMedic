@@ -26,29 +26,30 @@ async function myQuery(sql, param){
 }
 
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, 'public/');
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.originalname);
-    }
-  }),
+  	storage: multer.diskStorage({
+    	destination: function (req, file, cb) {
+      		cb(null, 'public/');
+    	},
+    	filename: function (req, file, cb) {
+      		cb(null, Date.now()+"-"+file.originalname);
+    	}
+  	}),
 });
 
 
 //const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.post('/', upload.single('img'), (req, res) => {
-  console.log(req.file); 
-	res.send(req.file);
+  	console.log(req.file); 
+	res.send(req.file.filename);
 });
-
+/*
 router.get('/:filename', (req, res) => {
 	var name = req.param.filename;
   //console.log(req.file);
-    res.sendFile("/public/"+filename);
+    //res.sendFile("/public/"+filename);
+	res.send("hi");
 });
-
+*/
 
 module.exports = router;
