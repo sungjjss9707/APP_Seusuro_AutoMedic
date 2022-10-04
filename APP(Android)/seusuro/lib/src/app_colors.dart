@@ -16,4 +16,9 @@ class AppColors {
 
   // Line
   Color lineGrey = const Color(0xFFD9D9D9);
+
+  //Status
+  Color statusGreen = const Color(0xFF04B900);
+  Color statusYellow = const Color(0xFFE8D000);
+  Color statusRed = const Color(0xFFFF0000);
 }
