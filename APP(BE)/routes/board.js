@@ -6,6 +6,7 @@ var db = require('mysql2/promise');
 var mysql = require('../config');
 var crypto = require('crypto');
 var table = require('../routes/table');
+var path = require('path');
 var inform = mysql.inform;
 const bodyParser = require('body-parser');
 const multer = require('multer');
@@ -43,13 +44,17 @@ router.post('/', upload.single('img'), (req, res) => {
   	console.log(req.file); 
 	res.send(req.file.filename);
 });
-/*
+
 router.get('/:filename', (req, res) => {
-	var name = req.param.filename;
+	var name = req.params.filename;
   //console.log(req.file);
-    //res.sendFile("/public/"+filename);
-	res.send("hi");
+	console.log(name);
+	var path = path.join(__dirname, '/../public/', name);
+	//var path = __dirname+"/../public/"+name;
+	console.log(path);
+    res.sendFile(path);
+//	res.send("hi");
 });
-*/
+
 
 module.exports = router;
