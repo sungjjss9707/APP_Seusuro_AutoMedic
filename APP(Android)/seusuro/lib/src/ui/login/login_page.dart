@@ -3,7 +3,10 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/login_page_controller.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
-import 'package:seusuro/src/ui/login/custom_text_form_field.dart';
+import 'package:seusuro/src/responsive_transition.dart';
+import 'package:seusuro/src/component/custom_text_form_field.dart';
+import 'package:seusuro/src/ui/main_page.dart';
+import 'package:seusuro/src/ui/register/register_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -28,24 +31,29 @@ class LoginPage extends StatelessWidget {
             ],
           ),
         ),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 16),
-          decoration: BoxDecoration(
-            color: AppColors().bgWhite,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _appLogo(),
-              const SizedBox(height: 60),
-              _userInputs(formKey),
-              const SizedBox(height: 48),
-              _loginButton(formKey),
-              const SizedBox(height: 16),
-              _registerButton(),
-            ],
-          ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 16),
+              decoration: BoxDecoration(
+                color: AppColors().bgWhite,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _appLogo(),
+                  const SizedBox(height: 60),
+                  _userInputs(formKey),
+                  const SizedBox(height: 48),
+                  _loginButton(formKey),
+                  const SizedBox(height: 16),
+                  _registerButton(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -115,9 +123,12 @@ class LoginPage extends StatelessWidget {
 
   Widget _loginButton(GlobalKey<FormState> formKey) {
     return InkWell(
-      onTap: () {
-        // 로그인 버튼
-        formKey.currentState?.validate();
+      onTap: () async {
+        if (formKey.currentState!.validate()) {
+          if (await LoginPageController.to.login()) {
+            Get.off(() => const MainPage(), transition: rTransition());
+          }
+        }
       },
       child: Container(
         width: 150,
@@ -143,6 +154,7 @@ class LoginPage extends StatelessWidget {
     return InkWell(
       onTap: () {
         // 회원가입 버튼
+        Get.to(() => const RegisterPage(), transition: rTransition());
       },
       child: Text(
         '회원가입',
