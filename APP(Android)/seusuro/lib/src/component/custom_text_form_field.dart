@@ -11,7 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   }) : super(key: key);
 
   final String content;
-  final String? Function(String?)? validator;
+  final String? Function(String?) validator;
   final TextEditingController controller;
   final bool? obscureText;
 
@@ -38,7 +38,7 @@ class CustomTextFormField extends StatelessWidget {
           obscureText: obscureText ?? false,
           style: TextStyle(
             color: AppColors().textBlack,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w400,
           ),
           cursorColor: AppColors().bgBlack,
