@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
 import 'package:seusuro/src/responsive_transition.dart';
-import 'package:seusuro/src/ui/login/login_page.dart';
+import 'package:seusuro/src/ui/login_page.dart';
 
 class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
@@ -11,7 +11,7 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future.delayed(const Duration(milliseconds: 1500), () {
-      Get.off(const LoginPage(), transition: rTransition());
+      Get.off(() => const LoginPage(), transition: rTransition());
     });
 
     return rScaffold(
