@@ -73,8 +73,9 @@ router.post('/', async function(req, res, next) {
 				console.log(access_token);
 				console.log(refresh_token);
 				var data = {id :id, name : name, email : email, password : password, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit, createdAt:createdAt, updatedAt : updatedAt};
-				res.setHeader("Authorization", access_token);
-				res.send({status:200, message:"Ok", data:data});
+				//res.setHeader("Authorization", access_token);
+				res.header({"accessToken":access_token, "refreshToken":refresh_token}).send({status:200, message:"Ok", data:data});
+				//res.send({status:200, message:"Ok", data:data});
 			}
     		else res.send({status:400, message:"Bad Request"});    	
 		}

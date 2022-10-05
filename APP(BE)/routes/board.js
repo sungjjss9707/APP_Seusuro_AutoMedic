@@ -16,16 +16,6 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(form_data.array());
 
-async function myQuery(sql, param){
-    try{
-        const [row, field] = await con.query(sql,param);
-        return {success:true, error:null};
-    }catch(error){
-        console.log(error);
-        return {success:false, error:error};
-    }
-}
-
 const upload = multer({
   	storage: multer.diskStorage({
     	destination: function (req, file, cb) {

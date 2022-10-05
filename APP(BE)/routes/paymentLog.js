@@ -23,6 +23,20 @@ router.put('/', async function(req, res, next) {
     con = await db.createConnection(inform);
 	await con.beginTransaction();
     var confirmor_id = req.body.confirmor;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,confirmor_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -143,7 +157,7 @@ router.put('/', async function(req, res, next) {
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
                     await con.rollback();
-					res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -157,7 +171,7 @@ router.put('/', async function(req, res, next) {
                     insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                     if(!insert_storagePlace_result){
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                     }
                 }
@@ -169,7 +183,7 @@ router.put('/', async function(req, res, next) {
                         delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
                         if(!delete_storagePlace_result){
 							await con.rollback();
-                    		res.send({success:false, message:"Bad Request", data:null});
+							res.send({status:400, message:"Bad Request", data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -182,7 +196,7 @@ router.put('/', async function(req, res, next) {
                         update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                         if(!update_storagePlace_result){
 							await con.rollback();
-                    		res.send({success:false, message:"Bad Request", data:null});
+							res.send({status:400, message:"Bad Request", data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -206,7 +220,7 @@ router.put('/', async function(req, res, next) {
                         console.log("열로옴");
                     //  await con.rollback();
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});	
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -222,7 +236,7 @@ router.put('/', async function(req, res, next) {
                     //  await con.rollback();
                         //return false;
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -238,7 +252,7 @@ router.put('/', async function(req, res, next) {
                     if(!insert_storagePlace_result){
                     //  await con.rollback();
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -255,7 +269,7 @@ router.put('/', async function(req, res, next) {
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-                    		res.send({success:false, message:"Bad Request", data:null});
+							res.send({status:400, message:"Bad Request", data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -268,7 +282,7 @@ router.put('/', async function(req, res, next) {
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-                    		res.send({success:false, message:"Bad Request", data:null});
+							res.send({status:400, message:"Bad Request", data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -295,7 +309,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -312,7 +326,7 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -325,7 +339,7 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -343,7 +357,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -359,7 +373,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -388,7 +402,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                 }
             //약장함에도 약 없음
@@ -402,7 +416,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -419,7 +433,7 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-                    res.send({success:false, message:"Bad Request", data:null});
+					res.send({status:400, message:"Bad Request", data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -435,7 +449,7 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -450,7 +464,7 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-                    	res.send({success:false, message:"Bad Request", data:null});
+						res.send({status:400, message:"Bad Request", data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -921,12 +935,12 @@ router.put('/', async function(req, res, next) {
     var created_time = time_result[0].createdAt;
     var updated_time = time_result[0].updatedAt;
     var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
-    res.send({status:200, message:"Ok", data:data});
+    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	await con.commit()
 });
 
 
-router.get('/show', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
     con = await db.createConnection(inform);
     const my_id = req.body.id;
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
@@ -937,6 +951,20 @@ router.get('/show', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,my_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
     /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1020,15 +1048,16 @@ router.get('/show', async function(req, res, next) {
             //res.send({status:200, message:"Ok", data:data});
 			data.push(individual_data);
 		}
-		res.send({status:200, message:"Ok", data:data});
+		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	}
 });
 
 
 
-router.get('/show/:id', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
     con = await db.createConnection(inform);
     const my_id = req.body.id;
+	
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
@@ -1037,6 +1066,20 @@ router.get('/show/:id', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,my_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 	/*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1118,7 +1161,7 @@ router.get('/show/:id', async function(req, res, next) {
             var user_updatedAt = select_user_result[0].updatedAt;
             var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit, createdAt:user_createdAt, updatedAt:user_updatedAt };
             var data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
-            res.send({status:200, message:"Ok", data:data});
+            res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).end({status:200, message:"Ok", data:data});
         }
     }
 });
@@ -1140,6 +1183,20 @@ router.post('/', async function(req, res, next) {
         return;
     }
 */
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,confirmor_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 	const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
@@ -1565,7 +1622,7 @@ router.post('/', async function(req, res, next) {
 	var created_time = time_result[0].createdAt;
 	var updated_time = time_result[0].updatedAt;
 	var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
-	res.send({status:200, message:"Ok", data:data});
+	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	await con.commit();
 
 	//오늘날짜로 yearmonthdate 조회해서 없으면 1번부터, 있으면 마지막+1 로 아이디 만들고 나머지거 insert하기

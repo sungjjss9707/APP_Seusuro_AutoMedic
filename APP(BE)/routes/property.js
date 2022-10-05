@@ -20,10 +20,24 @@ async function myQuery(sql, param){
 }
 
 
-router.get('/show', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
     console.log("show-PAGE");
 
 	const user_id = req.body.id;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 /*   
 	 const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -86,16 +100,32 @@ router.get('/show', async function(req, res, next) {
 			individual_data = {id :id, name : name, unit:unit, totalAmount:totalAmount, amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
 			data.push(individual_data);
 		}
-		res.send({status:200, message:"Ok", data:data});
+		//res.setHeader({"accessToken":new_access_token, "refreshToken":new_refresh_token});
+		//res.send({status:200, message:"Ok", data:data});
+		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
     }
 });
 
 
-router.get('/show/:id', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
     console.log("show-PAGE");
     const id = req.params.id;
 
     const user_id = req.body.id;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 /*    
 	const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -157,7 +187,7 @@ router.get('/show/:id', async function(req, res, next) {
 				log_arr.push(select_log_result[i].id);
 			}			
 			var data = {id :id, name : name, unit:unit, totalAmount:totalAmount,amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
-        	res.send({status:200, message:"Ok", data:data});	
+        	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});	
 		}
     }
 });
