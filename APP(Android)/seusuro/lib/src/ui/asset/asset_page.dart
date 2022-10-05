@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/asset_page_controllet.dart';
-
+import 'package:seusuro/src/ui/asset/asset_list_page.dart';
 class AssetPage extends StatelessWidget {
   const AssetPage({super.key});
 
@@ -115,7 +115,9 @@ class AssetPage extends StatelessWidget {
               )
             ],
           )
-        )
+        ),
+
+        const AssetList(),
       ],
     );
   }

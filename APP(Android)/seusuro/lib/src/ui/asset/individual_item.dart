@@ -44,7 +44,7 @@ Widget individualItem(String category, String productName, int ea) {
               style: TextStyle(fontWeight: FontWeight.w700),
             ),
             Text(
-              '$ea EA',
+              '{$ea}EA',
               style: const TextStyle(fontWeight: FontWeight.w700),
             )
           ],
