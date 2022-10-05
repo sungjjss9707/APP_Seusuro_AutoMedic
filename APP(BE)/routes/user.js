@@ -7,6 +7,7 @@ var mysql = require('../config');
 var crypto = require('crypto');
 var table = require('../routes/table');
 var inform = mysql.inform;
+var verify = require('../routes/verify');
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const form_data = multer();
@@ -40,7 +41,6 @@ const upload = multer({
 //const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.post('/picture', upload.single('img'), (req, res) => {
-    //console.log(req.file);
     res.send({status:200, message:"Ok", data:req.file.filename});
 });
 
@@ -97,6 +97,23 @@ router.post('/', async function(req, res, next) {
 	} 
 });
 
+router.post('/reduplication', async function(req, res, next) {
+    con = await db.createConnection(inform);
+    //con.connect(err => {
+     // if (err) throw new Error(err);
+    //});
+    const email = req.body.email;
+    var select_sql = "select email from user where email = ?;";
+    var select_param = email;
+    const [select_result, select_field] = await con.query(select_sql,select_param);
+	if(select_result.length==0){
+		res.send({status:200, message:"Ok", data:true});
+	}
+	else{
+		res.send({status:200, message:"이미 있는 이메일입니다.", data:false});
+	}
+});
+
 router.post('/belong', async function(req, res, next) {
     console.log("check_belong page");
 
@@ -118,6 +135,78 @@ router.post('/belong', async function(req, res, next) {
         else{
             res.send({status:400, message:"Bad Request", data:false});
         }
+    }
+});
+
+router.get('/', async function(req, res, next) {
+    const id = req.body.id;
+	const userId = req.body.userId;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+
+    con = await db.createConnection(inform);
+    var select_user_inform_sql = "select * from user where id = ?;";
+    var select_user_inform_param = userId;
+    const [result] = await con.query(select_user_inform_sql ,select_user_inform_param);
+    if(result.length==0){
+		res.send({status:400, message:"Bad Request", data:null});
+    }
+    else{
+
+		var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+	} 
+});
+
+router.put('/', async function(req, res, next) {
+    const id = req.body.id;
+    const name = req.body.name;
+	const email = req.body.email;
+	const phoneNumber = req.body.phoneNumber;
+	const rank = req.body.rank;
+	const enlistmentDate = req.body.enlistmentDate;
+	const pictureName = req.body.pictureName;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+
+    con = await db.createConnection(inform);
+
+    var update_user_inform_sql = "update user set name = ?, email = ?, phoneNumber = ?, mil_rank = ?, enlistmentDate = ?, pictureName = ?, updatedAt = now() where id = ?;";
+    var update_user_inform_param = [name, email, phoneNumber, rank, enlistmentDate, pictureName, id];
+    const update_success = await myQuery(update_user_inform_sql ,update_user_inform_param);
+    if(!update_success){
+        res.send({status:400, message:"Bad Request", data:null});
+    }
+    else{
+		var select_user_sql = "select * from user where id = ?;";
+		var select_user_param = id;
+		const [result] = await con.query(select_user_sql, select_user_param);
+        var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+        res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
     }
 });
 

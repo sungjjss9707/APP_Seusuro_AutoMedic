@@ -46,7 +46,7 @@ app.use('/paymentLog', paymentLogRouter);
 //app.use('/droptable', drop_table_Router);
 app.use('/dropmake', drop_make_Router);
 //app.use('/test', testRouter);
-//app.use('/board', boardRouter);
+app.use('/board', boardRouter);
 app.use('/', indexRouter);
 //app.use('/verify', verifyRouter);
 app.use('/tokencheck', tokencheckRouter);
