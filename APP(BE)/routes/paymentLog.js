@@ -20,6 +20,10 @@ async function myQuery(sql, param){
 }
 
 router.put('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     con = await db.createConnection(inform);
 	await con.beginTransaction();
     var confirmor_id = req.body.confirmor;
@@ -941,7 +945,11 @@ router.put('/', async function(req, res, next) {
 
 
 router.get('/', async function(req, res, next) {
-    con = await db.createConnection(inform);
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    con = await db.createConnection(inform); 
     const my_id = req.body.id;
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
@@ -1056,6 +1064,10 @@ router.get('/', async function(req, res, next) {
 
 
 router.get('/:id', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     con = await db.createConnection(inform);
     const my_id = req.body.id;
 	
@@ -1170,6 +1182,10 @@ router.get('/:id', async function(req, res, next) {
 
 
 router.post('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	con = await db.createConnection(inform);
 	await con.beginTransaction();
 	const confirmor_id = req.body.confirmor;

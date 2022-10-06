@@ -41,11 +41,19 @@ const upload = multer({
 //const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
 
 router.post('/picture', upload.single('img'), (req, res) => {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     res.send({status:200, message:"Ok", data:req.file.filename});
 });
 
 
 router.post('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     console.log("REISTER-PAGE");
 	con = await db.createConnection(inform);
 	//con.connect(err => {
@@ -98,6 +106,10 @@ router.post('/', async function(req, res, next) {
 });
 
 router.post('/reduplication', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     con = await db.createConnection(inform);
     //con.connect(err => {
      // if (err) throw new Error(err);
@@ -115,6 +127,10 @@ router.post('/reduplication', async function(req, res, next) {
 });
 
 router.post('/belong', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     console.log("check_belong page");
 
     const militaryUnit = req.body.militaryUnit;
@@ -139,6 +155,10 @@ router.post('/belong', async function(req, res, next) {
 });
 
 router.get('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     const id = req.body.id;
 	const userId = req.body.userId;
     const accessToken = req.header('accessToken');
@@ -171,6 +191,10 @@ router.get('/', async function(req, res, next) {
 });
 
 router.put('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     const id = req.body.id;
     const name = req.body.name;
 	const email = req.body.email;
@@ -211,6 +235,10 @@ router.put('/', async function(req, res, next) {
 });
 
 router.delete('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	const id = req.body.id;
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
