@@ -1252,6 +1252,10 @@ router.post('/', async function(req, res, next) {
 	var storagePlace_arr = [];
 	var amount_arr = [];
 	var unit_arr = [];
+	var category;
+	var niin;
+	var category_arr = [];
+	var niin_arr = [];
 	//const day = today.getDay();
 	//console.log(year+"-"+month+"-"+date+"-"+hours+"-"+minutes);
 	if(receiptPayment=="수입"){
@@ -1262,6 +1266,8 @@ router.post('/', async function(req, res, next) {
 			unit = items[i].unit;
 			storagePlace = items[i].storagePlace;
 			expirationDate = items[i].expirationDate;
+			category = items[i].category;
+			category_arr.push(category);
 			property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
 			unit_arr.push(unit);
@@ -1354,6 +1360,30 @@ router.post('/', async function(req, res, next) {
                     }
 				}
 			}
+		}
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_param; 
+		var select_medicInform_result;
+		for(let i=0; i<items.length; ++i){
+			select_medicInform_param = items[i].name;
+			select_medicInform_result = [];
+			select_medicInform_result = await con.query(select_medicInform_sql, select_medicInform_param);
+			if(select_medicInform_result.length==0){
+				var new_niin = Math.random().toString(36).substring(2, 12); 
+				niin = new_niin;
+				var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+        		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
+				var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
+				if(!insert_medicInform_success){
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
+				}
+			}
+			else{
+				niin = select_medicInform_result[0].niin;
+			}
+			niin_arr.push(niin);
 		}			
 	}
 	else if(receiptPayment=="이동"){
@@ -1466,6 +1496,23 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        var select_medicInform_result;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+            select_medicInform_result = [];
+            select_medicInform_result = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
 		
 	}
 	else{
@@ -1576,6 +1623,23 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        var select_medicInform_result;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+            select_medicInform_result = [];
+            select_medicInform_result = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
 	}
 	////////
 	var str_property_id_arr = "";
@@ -1639,6 +1703,10 @@ router.post('/', async function(req, res, next) {
     }
 	var created_time = time_result[0].createdAt;
 	var updated_time = time_result[0].updatedAt;
+	for(let i=0; i<items.length; ++i){
+		items[i].niin = niin_arr[i];
+		console.log(items[i].niin);
+	}
 	var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
 	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	await con.commit();

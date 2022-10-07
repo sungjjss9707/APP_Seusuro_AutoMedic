@@ -542,7 +542,8 @@ router.put('/', async function(req, res, next) {
 	var name_arr = [];
 	var expirationDate_arr = [];
     len = items.length;
-	var property_id;
+	var property_id,niin;
+	var niin_arr = [];
     if(receiptPayment=="수입"){
         for(let i=0; i<items.length; ++i){
             console.log("--------------------------");
@@ -643,6 +644,28 @@ router.put('/', async function(req, res, next) {
                     }
                 }
             }
+        }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                var new_niin = Math.random().toString(36).substring(2, 12);
+                niin = new_niin;
+                var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+                var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
+                var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
+                if(!insert_medicInform_success){
+                    res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
+                }
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
         }
     }
     else if(receiptPayment=="이동"){
@@ -761,6 +784,21 @@ router.put('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
 
     }
     else{
@@ -876,6 +914,21 @@ router.put('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
     }
 /*
 	for(let i=0; i<len; ++i){
@@ -938,6 +991,11 @@ router.put('/', async function(req, res, next) {
     }
     var created_time = time_result[0].createdAt;
     var updated_time = time_result[0].updatedAt;
+	for(let i=0; i<items.length; ++i){
+        items[i].niin = niin_arr[i];
+        console.log(niin_arr[i]);
+        console.log(items[i].niin);
+    }
     var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
     res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	await con.commit()
@@ -1028,10 +1086,32 @@ router.get('/', async function(req, res, next) {
             	var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
             	arr_expirationDate.push(myexpirationDate);
         	}
+
+			var niin_arr = [];
+        	var niin, category;
+        	var category_arr = [];
+        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_param;
+        	for(let k=0; k<arr_property_id.length; ++k){
+            	select_medicInform_param = arr_name[k];
+            	var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            	if(select_medicInform_result.length==0){
+                	res.send({status:400, message:"Bad Request", data:null});
+                	return;
+            	}
+            	else{
+                	niin = select_medicInform_result[0].niin;
+                	category = select_medicInform_result[0].category;
+            	}
+				console.log(niin);
+				console.log(category);
+            	niin_arr.push(niin);
+            	category_arr.push(category);
+        	}
         	var items = [];
         	var individual_item;
         	for(let k=0; k<len; ++k){
-            	individual_item = {name:arr_name[k], amount:arr_amount[k], unit:arr_unit[k], storagePlace:arr_storagePlace[k], expirationDate:arr_expirationDate[k]};
+            	individual_item = {name:arr_name[k], amount:arr_amount[k], unit:arr_unit[k],category:category_arr[k],niin:niin_arr[k], storagePlace:arr_storagePlace[k], expirationDate:arr_expirationDate[k]};
             	items.push(individual_item);
         	}
 			var select_user_sql = "select * from user where id = ?;";
@@ -1149,10 +1229,32 @@ router.get('/:id', async function(req, res, next) {
 			var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
 			arr_expirationDate.push(myexpirationDate);
         }
+///////////////////////////////////////////////////////
+		var niin_arr = [];
+		var niin, category;
+		var category_arr = [];
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<len; ++i){
+            select_medicInform_param = arr_name[i];
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+				category = select_medicInform_result[0].category;
+            }
+            niin_arr.push(niin);
+			category_arr.push(category);
+        }
+///////////////////////////////////////////////////////
 		var items = [];
 		var individual_item;
 		for(let i=0; i<len; ++i){
-			individual_item = {name:arr_name[i], amount:arr_amount[i], unit:arr_unit[i], storagePlace:arr_storagePlace[i], expirationDate:arr_expirationDate[i]};
+			///////////////////////////////////////////////////////////////////////////////
+			individual_item = {name:arr_name[i], amount:arr_amount[i], unit:arr_unit[i],category:category_arr[i], niin:niin_arr[i] , storagePlace:arr_storagePlace[i], expirationDate:arr_expirationDate[i]};
 			items.push(individual_item);
 		}	
         var select_user_sql = "select * from user where id = ?;";
@@ -1252,6 +1354,10 @@ router.post('/', async function(req, res, next) {
 	var storagePlace_arr = [];
 	var amount_arr = [];
 	var unit_arr = [];
+	var category;
+	var niin;
+	var category_arr = [];
+	var niin_arr = [];
 	//const day = today.getDay();
 	//console.log(year+"-"+month+"-"+date+"-"+hours+"-"+minutes);
 	if(receiptPayment=="수입"){
@@ -1262,6 +1368,8 @@ router.post('/', async function(req, res, next) {
 			unit = items[i].unit;
 			storagePlace = items[i].storagePlace;
 			expirationDate = items[i].expirationDate;
+			category = items[i].category;
+			category_arr.push(category);
 			property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
 			unit_arr.push(unit);
@@ -1354,6 +1462,29 @@ router.post('/', async function(req, res, next) {
                     }
 				}
 			}
+		}
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_param; 
+		for(let i=0; i<items.length; ++i){
+			select_medicInform_param = items[i].name;
+			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+			if(select_medicInform_result.length==0){
+				var new_niin = Math.random().toString(36).substring(2, 12); 
+				niin = new_niin;
+				var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+        		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
+				var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
+				if(!insert_medicInform_success){
+					res.send({status:400, message:"Bad Request", data:null});
+                    await con.rollback();
+                    return;
+				}
+			}
+			else{
+				niin = select_medicInform_result[0].niin;
+			}
+			console.log("씨발"+niin);
+			niin_arr.push(niin);
 		}			
 	}
 	else if(receiptPayment=="이동"){
@@ -1466,6 +1597,21 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
 		
 	}
 	else{
@@ -1576,6 +1722,21 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
+		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param;
+        for(let i=0; i<items.length; ++i){
+            select_medicInform_param = items[i].name;
+			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                await con.rollback();
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+            }
+            niin_arr.push(niin);
+        }
 	}
 	////////
 	var str_property_id_arr = "";
@@ -1639,6 +1800,11 @@ router.post('/', async function(req, res, next) {
     }
 	var created_time = time_result[0].createdAt;
 	var updated_time = time_result[0].updatedAt;
+	for(let i=0; i<items.length; ++i){
+		items[i].niin = niin_arr[i];
+		console.log(niin_arr[i]);
+		console.log(items[i].niin);
+	}
 	var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
 	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	await con.commit();

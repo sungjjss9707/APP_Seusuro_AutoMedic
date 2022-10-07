@@ -41,6 +41,18 @@ var storagePlaceMake = async function(militaryUnit){
     }
 }
 
+var medicInformMake = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+		var sql = "create table medicInform_"+militaryUnit+" ( name varchar(100), category varchar(100), niin varchar(100), primary key (name) );"
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
+
 var propertyDrop = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
@@ -77,13 +89,25 @@ var storagePlaceDrop = async function(militaryUnit){
     }
 }
 
+var medicInformDrop = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+        var sql = "drop table medicinform_"+militaryUnit+";";
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
 
 exports.propertyMake = propertyMake;
 exports.paymentLogMake = paymentLogMake;
 exports.storagePlaceMake = storagePlaceMake;
+exports.medicInformMake = medicInformMake;
 exports.propertyDrop = propertyDrop;
 exports.paymentLogDrop = paymentLogDrop;
 exports.storagePlaceDrop = storagePlaceDrop;
-
+exports.medicInformDrop = medicInformDrop;
 
 

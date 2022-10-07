@@ -101,7 +101,19 @@ router.get('/', async function(req, res, next) {
 			for(let k=0; k<select_log_result.length; ++k){
                 log_arr.push(select_log_result[k].id);
             }
-			individual_data = {id :id, name : name, unit:unit, totalAmount:totalAmount, amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
+			var niin, category;
+            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_param = name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+                category = select_medicInform_result[0].category;
+            }
+			individual_data = {id :id, name : name, unit:unit, totalAmount:totalAmount, amountByPlace:amountByPlace,category:category, niin:niin,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
 			data.push(individual_data);
 		}
 		//res.setHeader({"accessToken":new_access_token, "refreshToken":new_refresh_token});
@@ -193,8 +205,20 @@ router.get('/:id', async function(req, res, next) {
 			//console.log(select_log_result);
 			for(let i=0; i<select_log_result.length; ++i){
 				log_arr.push(select_log_result[i].id);
-			}			
-			var data = {id :id, name : name, unit:unit, totalAmount:totalAmount,amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
+			}
+        	var niin, category;
+        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_param = name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+               	res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+                category = select_medicInform_result[0].category;
+            }
+			var data = {id :id, name : name, unit:unit, totalAmount:totalAmount,amountByPlace:amountByPlace,category:category, niin:niin,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
         	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});	
 		}
     }
