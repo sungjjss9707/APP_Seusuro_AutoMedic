@@ -36,6 +36,8 @@ dependencies:
 
   firebase_core: ^1.23.0
 
+  syncfusion_flutter_charts: ^20.3.48
+
   get: ^4.6.5
 
 
