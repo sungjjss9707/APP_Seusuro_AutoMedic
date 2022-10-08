@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/controller/ui/log_page_controller.dart';
+import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/log/log_bubble.dart';
+import 'package:seusuro/src/ui/log/write_log_page.dart';
 
 class LogPage extends StatelessWidget {
   const LogPage({super.key});
@@ -114,7 +116,14 @@ class LogPage extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       child: FloatingActionButton.extended(
         onPressed: () {
-          // 로그 작성하기
+          Get.back();
+          Get.to(
+            () => WriteLogPage(
+              receiptPayment: receiptPayment,
+              keyColor: keyColor,
+            ),
+            transition: rTransition(),
+          );
         },
         backgroundColor: keyColor,
         icon: Icon(icon),
