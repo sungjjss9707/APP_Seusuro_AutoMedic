@@ -190,9 +190,9 @@ class LogBubble extends StatelessWidget {
                 child: Image.asset(imagePath),
               ),
               Positioned(
-                left: leftSide ? null : 70,
+                left: leftSide ? null : 54,
                 top: 15,
-                right: leftSide ? 70 : null,
+                right: leftSide ? 54 : null,
                 child: Container(
                   color: AppColors().bgWhite,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
