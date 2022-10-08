@@ -246,92 +246,97 @@ class LogBubble extends StatelessWidget {
           left: screenWidth > mobileWidth + 480 ? 480 : 0,
         ),
         padding: const EdgeInsets.all(32),
-        child: Container(
-          height: 420,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: AppColors().bgWhite,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            children: [
-              Text(
-                '$receiptPayment 내역',
-                style: TextStyle(
-                  color: AppColors().textBlack,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                ),
+        child: Wrap(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors().bgWhite,
+                borderRadius: BorderRadius.circular(20),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 32),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '10보급대대',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                      ),
+              child: Column(
+                children: [
+                  Text(
+                    '$receiptPayment 내역',
+                    style: TextStyle(
+                      color: AppColors().textBlack,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Icon(
-                        Icons.arrow_forward_rounded,
-                        size: 36,
-                        color: keyColor,
-                      ),
-                    ),
-                    Column(
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 32),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _confirmorImage(),
-                        const SizedBox(height: 4),
                         Text(
-                          '일병 유병재',
+                          '10보급대대',
                           style: TextStyle(
                             color: AppColors().textBlack,
-                            fontSize: 12,
+                            fontSize: 14,
                             fontWeight: FontWeight.w400,
                           ),
                         ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
+                          child: Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 36,
+                            color: keyColor,
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            _confirmorImage(),
+                            const SizedBox(height: 4),
+                            Text(
+                              '일병 유병재',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              ListView.separated(
-                shrinkWrap: true,
-                itemCount: LogPageController.to.detailTitleList.length,
-                itemBuilder: (context, index) {
-                  var detailTitleList = LogPageController.to.detailTitleList;
-                  var detailContentList =
-                      LogPageController.to.detailContentList;
-
-                  return _propertyDetail(
-                    title: detailTitleList[index],
-                    content: detailContentList[index],
-                  );
-                },
-                separatorBuilder: (context, index) => const SizedBox(height: 8),
-              ),
-              const Spacer(),
-              InkWell(
-                onTap: () {
-                  Get.back();
-                },
-                child: Text(
-                  '확인',
-                  style: TextStyle(
-                    color: keyColor,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
                   ),
-                ),
+                  ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: LogPageController.to.detailTitleList.length,
+                    itemBuilder: (context, index) {
+                      var detailTitleList =
+                          LogPageController.to.detailTitleList;
+                      var detailContentList =
+                          LogPageController.to.detailContentList;
+
+                      return _propertyDetail(
+                        title: detailTitleList[index],
+                        content: detailContentList[index],
+                      );
+                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
+                  ),
+                  const SizedBox(height: 32),
+                  InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      '확인',
+                      style: TextStyle(
+                        color: keyColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
