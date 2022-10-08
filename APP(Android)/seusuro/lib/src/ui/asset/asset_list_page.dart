@@ -2,68 +2,80 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
-import 'package:seusuro/src/ui/asset/individual_item.dart';
+import 'package:seusuro/src/ui/asset/item.dart';
 import 'package:seusuro/src/ui/asset/asset.dart';
 
-class AssetList extends StatefulWidget {
-  const AssetList({super.key});
+// ignore: must_be_immutable
+class AssetListPage extends StatefulWidget {
+  AssetListPage({super.key});
+
+  late int totalNum = 0;
 
   @override
-  State<StatefulWidget> createState() => _AssetListState();
+  State<StatefulWidget> createState() => _AssetListPageState();
   
 }
 
-class _AssetListState extends State<AssetList> {
+class _AssetListPageState extends State<AssetListPage> {
   List<dynamic> assets = [];
   
   static DateFormat dateFormat = DateFormat("yyyy년 MM월 dd일");
 
-  List<dynamic> testAssets = [
-    Asset(
-      id: '1234567890',
-      name: '아세트아미노펜',
-      unit: 'EA',
-      totalAmount: 2500,
-      amountByPlace: [
-
+  List<Map<String, dynamic>> testAssets = [
+    {
+      'id': '1234567890',
+      'name': '아세트아미노펜',
+      'unit': 'EA',
+      'totalAmount': 2500,
+      'category': '경구약',
+      'niin': '1234567890',
+      'amountByPlace': [
+        {
+          'storagePlace': '약장함 1',
+          'amount': 1900
+        },
+        {
+          'storagePlace': '약장함 2',
+          'amount': 600
+        },
       ],
-      expirationDate: dateFormat.parse("2022년 10월 27일"),
-      logRecord: [
-
+    },
+    {
+      'id': '1234567890',
+      'name': '벤토린에보할러',
+      'unit': 'EA',
+      'totalAmount': 12,
+      'category': '분무약',
+      'niin': '1234567890',
+      'amountByPlace': [
+        {
+          'storagePlace': '약장함 1',
+          'amount': 1900
+        },
+        {
+          'storagePlace': '약장함 2',
+          'amount': 600
+        },
       ],
-      createdAt: dateFormat.parse('2022년 09월 12일'),
-      updatedAt: dateFormat.parse('2022년 10월 06일')
-    ),
-    Asset(
-      id: '1234567890',
-      name: '아세트아미노펜',
-      unit: 'EA',
-      totalAmount: 2500,
-      amountByPlace: [
-
+    },
+    {
+      'id': '1234567890',
+      'name': '하브릭스주',
+      'unit': 'EA',
+      'totalAmount': 20,
+      'category': '백신류',
+      'niin': '1234567890',
+      'amountByPlace': [
+        {
+          'storagePlace': '약장함 1',
+          'amount': 1900
+        },
+        {
+          'storagePlace': '약장함 2',
+          'amount': 600
+        },
       ],
-      expirationDate: dateFormat.parse("2022년 10월 27일"),
-      logRecord: [
-
-      ],
-      createdAt: dateFormat.parse('2022년 09월 12일'),
-      updatedAt: dateFormat.parse('2022년 10월 06일')
-    ),
-    Asset(
-      id: '1234567890',
-      name: '아세트아미노펜',
-      unit: 'EA',
-      totalAmount: 2500,
-      amountByPlace: [
-
-      ],
-      expirationDate: dateFormat.parse("2022년 10월 27일"),
-      logRecord: [
-
-      ],
-      createdAt: dateFormat.parse('2022년 09월 12일'),
-      updatedAt: dateFormat.parse('2022년 10월 06일')
-    ),
+    },
   ];
 
   @override
@@ -73,7 +85,7 @@ class _AssetListState extends State<AssetList> {
   }
 
   _requestAssets() async {
-    var response = await http.get(Uri.parse('https://seusuro.com/property/show'));
+    var response = await http.get(Uri.parse('https://seusuro.com/property'));
     var statusCode = response.statusCode;
 
     List<dynamic> list = [];
@@ -86,19 +98,20 @@ class _AssetListState extends State<AssetList> {
 
     setState(() {
       assets = list;
+      widget.totalNum = testAssets.length;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     if (testAssets.isNotEmpty) {
-      return Container(
+      return SizedBox(
         width: 360,
-        height: 579,
+        height: MediaQuery.of(context).size.height - 235,
         child: ListView.separated(
           itemCount: testAssets.length,
           itemBuilder: (context, index) {
-            return individualItem('경구약', testAssets[index].name, testAssets[index].totalAmount);
+            return item(testAssets[index]['category'], testAssets[index]['name'], testAssets[index]['unit'], testAssets[index]['totalAmount']);
           },
           separatorBuilder: (BuildContext context, int index) {
             return const Divider();
@@ -106,7 +119,7 @@ class _AssetListState extends State<AssetList> {
         ),
       );
     } else {
-      return Container(
+      return SizedBox(
         width: 360,
         height: 579,
         child: Column(
