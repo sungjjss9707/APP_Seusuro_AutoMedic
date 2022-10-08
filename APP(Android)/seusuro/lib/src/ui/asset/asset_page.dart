@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
-import 'package:seusuro/src/controller/ui/asset_page_controllet.dart';
+import 'package:seusuro/src/controller/ui/asset_page_controller.dart';
 import 'package:seusuro/src/ui/asset/asset_list_page.dart';
-class AssetPage extends StatelessWidget {
+
+class AssetPage extends StatefulWidget {
   const AssetPage({super.key});
 
   final _orderList = const ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
+
+  static final _assetListPage = AssetListPage();
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +18,7 @@ class AssetPage extends StatelessWidget {
       return Column(
       children: <Widget>[
         Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -26,15 +29,15 @@ class AssetPage extends StatelessWidget {
                     fontSize: 14,
                     fontWeight: FontWeight.w400,
                   ),
-                  children: const [
-                    TextSpan(text: '총 '),
+                  children: [
+                    const TextSpan(text: '총 '),
                     TextSpan(
-                      text: '164',
-                      style: TextStyle(
+                      text: _assetListPage.totalNum.toString(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.w700,
                       )
                     ),
-                    TextSpan(text: '개'),
+                    const TextSpan(text: '개'),
                   ]
                 )
               ),
@@ -116,8 +119,7 @@ class AssetPage extends StatelessWidget {
             ],
           )
         ),
-
-        const AssetList(),
+        _assetListPage,
       ],
     );
   }
@@ -140,7 +142,7 @@ class AssetPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                
+                AssetPageController.to.changeOrderIndex(0);
               },
               child: const Text('가나다 순'),
             ),
@@ -158,7 +160,7 @@ class AssetPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                
+                AssetPageController.to.changeOrderIndex(1);
               },
               child: const Text('최신 등록 순'),
             ),
@@ -176,7 +178,7 @@ class AssetPage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                
+                AssetPageController.to.changeOrderIndex(2);
               },
               child: const Text('유효기간 순'),
             ),
@@ -190,4 +192,16 @@ class AssetPage extends StatelessWidget {
       ),
     );
   }
+  
+  @override
+  State<AssetPage> createState() => AssetPageState();
+}
+
+class AssetPageState extends State<AssetPage> {
+  
+  @override
+  Widget build(BuildContext context) {
+    
+  }
+
 }
