@@ -13,11 +13,11 @@ class AppColors {
   Color textBlack = const Color(0xFF000000);
   Color textGrey = const Color(0xFFD9D9D9);
   Color textWhite = const Color(0xFFFFFFFF);
-  Color textBlue = const Color(0x000000FF);
-  Color textPurple = const Color(0x00AD00FF);
+  Color textBlue = const Color.fromRGBO(0, 0, 255, 1.0);
+  Color textPurple = const Color.fromRGBO(173, 0, 255, 1.0);
   Color textOrange = const Color(0xFFFF7A00);
-  Color textGreen = const Color(0x0004B900);
-  Color textBrown = const Color(0x00CD6B10);
+  Color textGreen = const Color.fromRGBO(4, 185, 0, 1.0);
+  Color textBrown = const Color.fromRGBO(205, 107, 16, 1.0);
 
   // Line
   Color lineGrey = const Color(0xFFD9D9D9);
