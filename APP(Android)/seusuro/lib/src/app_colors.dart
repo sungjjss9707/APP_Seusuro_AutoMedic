@@ -20,6 +20,7 @@ class AppColors {
   Color textWhite = const Color(0xFFFFFFFF);
   Color textRed = const Color(0xFFFF0000);
   Color textGrey = const Color(0xFF808080);
+  Color textLightGrey = const Color(0xFFABABAB);
   Color textBlue = const Color(0xFF808080);
   Color textGreen = const Color(0xFF04B900);
   Color textPurple = const Color(0xFFAD00FF);
