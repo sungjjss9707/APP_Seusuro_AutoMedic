@@ -133,6 +133,7 @@ router.put('/', async function(req, res, next) {
         arr_amount.push(getsu);
     }
     var p_id;
+	//var category_arr = [];
     for(let i=0; i<arr_property_id.length; ++i){
         p_id = arr_property_id[i];
         var id_split = p_id.split('-');
@@ -140,6 +141,17 @@ router.put('/', async function(req, res, next) {
         var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
         arr_expirationDate.push(myexpirationDate);
     }
+	var category_arr = [];
+	for(let i=0; i<arr_name.length; ++i){
+		var select_category_sql = "select category from medicInform_"+militaryUnit+" where name = ?;";
+		var select_category_param = arr_name[i];
+		var [select_category_result] = await con.query(select_category_sql, select_category_param);
+		if(select_category_result.length==0){
+			res.send({status:400, message:"Bad Request", data:null});
+            return;
+		}
+		category_arr.push(select_category_result[i].category);
+	}
     var select_property_sql, select_property_param, select_property_result;
     var modify_amount;
     var update_property_sql, update_property_param, update_property_result;
@@ -156,8 +168,8 @@ router.put('/', async function(req, res, next) {
             select_property_param = arr_property_id[i];
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result==0){  //없으면
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-                insert_property_param = [arr_property_id[i], arr_name[i], (-1)*arr_amount[i], arr_unit[i], arr_expirationDate[i]];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+                insert_property_param = [arr_property_id[i], arr_name[i], (-1)*arr_amount[i], arr_unit[i],category_arr[i] ,arr_expirationDate[i]];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
                     await con.rollback();
@@ -399,8 +411,8 @@ router.put('/', async function(req, res, next) {
             var property_updatedAt = select_property_result[0].updatedAt;
 */
             if(select_property_result==0){  //오류가 아니라 그 빼기함으로써 다 써서 없는거임
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?, now(), now());";
-                insert_property_param = [arr_property_id[i], arr_name[i], arr_amount[i], arr_unit[i], arr_expirationDate[i]];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?, now(), now());";
+                insert_property_param = [arr_property_id[i], arr_name[i], arr_amount[i], arr_unit[i],category_arr[i], arr_expirationDate[i]];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
         //          await con.rollback();
@@ -544,6 +556,7 @@ router.put('/', async function(req, res, next) {
     len = items.length;
 	var property_id,niin;
 	var niin_arr = [];
+	var category;
     if(receiptPayment=="수입"){
         for(let i=0; i<items.length; ++i){
             console.log("--------------------------");
@@ -552,6 +565,8 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
+			category = items[i].category;
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             unit_arr.push(unit);
@@ -562,8 +577,8 @@ router.put('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){   //새로 재산에 넣고 storagePlace에도 넣기
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-                insert_property_param = [property_id,name,amount,unit,expirationDate];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+                insert_property_param = [property_id,name,amount,unit,category,expirationDate];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(insert_property_result){
                     console.log(property_id+" property 테이블 insert 성공");
@@ -676,6 +691,7 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -809,6 +825,7 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -1368,6 +1385,7 @@ router.post('/', async function(req, res, next) {
 			unit = items[i].unit;
 			storagePlace = items[i].storagePlace;
 			expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
 			category = items[i].category;
 			category_arr.push(category);
 			property_id = name+"-"+expirationDate;
@@ -1380,8 +1398,8 @@ router.post('/', async function(req, res, next) {
 			select_property_param = property_id;
 			[select_property_result] = await con.query(select_property_sql, select_property_param);
 			if(select_property_result.length==0){	//새로 재산에 넣고 storagePlace에도 넣기 
-				insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-				insert_property_param = [property_id,name,amount,unit,expirationDate];
+				insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+				insert_property_param = [property_id,name,amount,unit,category,expirationDate];
 				insert_property_result = await myQuery(insert_property_sql, insert_property_param);
 				if(insert_property_result){
 					console.log(property_id+" property 테이블 insert 성공");
@@ -1495,6 +1513,7 @@ router.post('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -1622,6 +1641,7 @@ router.post('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -1761,7 +1781,7 @@ router.post('/', async function(req, res, next) {
 	console.log(str_amount_arr);
 	var now = year+"-"+month+"-"+date;
 	console.log(now);
-	var select_now_sql = "select * from paymentLog_"+militaryUnit+" where YearMonthDate = ?;";
+	var select_now_sql = "select * from paymentLog_"+militaryUnit+" where YearMonthDate = ? order by log_num asc;";
 	var select_now_param = now;
 	var[select_now_result, select_now_param] = await con.query(select_now_sql, select_now_param);
 	var log_id, nextnum;

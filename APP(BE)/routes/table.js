@@ -8,7 +8,7 @@ var inform = mysql.inform;
 var propertyMake = async function(militaryUnit){
     try{
 		var con = await db.createConnection(inform);
-		var sql = "create table property_"+militaryUnit+" ( id varchar(100) not null, name varchar(100) not null, totalAmount int not null, unit varchar(20) not null, expirationDate datetime not null, createdAt datetime, updatedAt datetime, primary key(id) );";
+		var sql = "create table property_"+militaryUnit+" ( id varchar(100) not null, name varchar(100) not null, totalAmount int not null, unit varchar(20) not null,category varchar(100) not null, expirationDate datetime not null, createdAt datetime, updatedAt datetime, primary key(id) );";
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){

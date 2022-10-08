@@ -65,8 +65,8 @@ router.post('/', async function(req, res, next) {
 	const phoneNumber = req.body.phoneNumber;
 	const serviceNumber = req.body.serviceNumber;
 	const mil_rank = req.body.rank;
-	const enlistmentDate = req.body.enlistmentDate;
-	const dischargeDate = req.body.dischargeDate;
+	var enlistmentDate = req.body.enlistmentDate;
+	var dischargeDate = req.body.dischargeDate;
 	const militaryUnit = req.body.militaryUnit;
 	const pictureName = req.body.pictureName;
 	const encoded_pw = bcrypt.hashSync(password, 10);
@@ -154,7 +154,7 @@ router.post('/belong', async function(req, res, next) {
     }
 });
 
-router.get('/', async function(req, res, next) {
+router.post('/userInformation', async function(req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
@@ -200,7 +200,8 @@ router.put('/', async function(req, res, next) {
 	const email = req.body.email;
 	const phoneNumber = req.body.phoneNumber;
 	const rank = req.body.rank;
-	const enlistmentDate = req.body.enlistmentDate;
+	var enlistmentDate = req.body.enlistmentDate;
+	var dischargeDate = req.body.dischargeDate;
 	const pictureName = req.body.pictureName;
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -219,8 +220,8 @@ router.put('/', async function(req, res, next) {
 
     con = await db.createConnection(inform);
 
-    var update_user_inform_sql = "update user set name = ?, email = ?, phoneNumber = ?, mil_rank = ?, enlistmentDate = ?, pictureName = ?, updatedAt = now() where id = ?;";
-    var update_user_inform_param = [name, email, phoneNumber, rank, enlistmentDate, pictureName, id];
+    var update_user_inform_sql = "update user set name = ?, email = ?, phoneNumber = ?, mil_rank = ?, enlistmentDate = ?,dischargeDate = ?, pictureName = ?, updatedAt = now() where id = ?;";
+    var update_user_inform_param = [name, email, phoneNumber, rank, enlistmentDate, dischargeDate,pictureName, id];
     const update_success = await myQuery(update_user_inform_sql ,update_user_inform_param);
     if(!update_success){
         res.send({status:400, message:"Bad Request", data:null});
