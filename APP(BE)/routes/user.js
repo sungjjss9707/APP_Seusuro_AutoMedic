@@ -3,11 +3,16 @@ var bcrypt = require('bcrypt');
 var router = express.Router(); 
 var con;
 var db = require('mysql2/promise');
+var config = require('../config');
 var mysql = require('../config');
 var crypto = require('crypto');
 var table = require('../routes/table');
 var inform = mysql.inform;
 var verify = require('../routes/verify');
+const jwt = require('jsonwebtoken');
+var new_issue = require('../routes/issue');
+var refresh_time = config.refresh_time;
+var access_time = config.access_time;
 const bodyParser = require('body-parser');
 const multer = require('multer');
 const form_data = multer();
@@ -39,7 +44,7 @@ const upload = multer({
 
 
 //const upload = multer({ dest: 'uploads/', limits: { fileSize: 5 * 1024 * 1024 } });
-
+/*
 router.post('/picture', upload.single('img'), (req, res) => {
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -48,7 +53,7 @@ router.post('/picture', upload.single('img'), (req, res) => {
 	res.setHeader("Access-Control-Expose-Headers","*");
     res.send({status:200, message:"Ok", data:req.file.filename});
 });
-
+*/
 
 router.post('/', async function(req, res, next) {
 	res.setHeader("Access-Control-Allow-Origin", "*");
@@ -58,6 +63,7 @@ router.post('/', async function(req, res, next) {
 	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("REISTER-PAGE");
 	con = await db.createConnection(inform);
+	await con.beginTransaction();
 	//con.connect(err => {
 	 // if (err) throw new Error(err);
 	//});
@@ -91,11 +97,25 @@ router.post('/', async function(req, res, next) {
 		if(select_result.length!=0){
 			var created_time = select_result[0].createdAt;
 			var updated_time = select_result[0].updatedAt;
+			var access_token_obj = await new_issue.issue_new_token(encoded_id, name, access_time);
+            var refresh_token_obj = await new_issue.issue_new_token(encoded_id, name, refresh_time);
+            var access_token = access_token_obj.Token;
+            var refresh_token = refresh_token_obj.Token;			
+			var insert_token_sql = "insert into refresh_token values (?, ?);";
+            var insert_token_param = [encoded_id, refresh_token];
+			var insert_token_success = await myQuery(insert_token_sql, insert_token_param);
+			if(!insert_token_success){
+				res.send({status:400, message:"Bad Request"});
+				await con.rollback();
+				return;
+			}
 			var data = {id : encoded_id, name : name, email : email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit,pictureName:pictureName, createdAt:created_time, updatedAt : updated_time};
-			res.send({status:200, message:"Ok", data:data});
+			res.header({"accessToken":access_token, "refreshToken":refresh_token}).send({status:200, message:"Ok", data:data});
+			await con.commit();
 		}
 		else{
 			res.send({status:400, message:"Bad Request"});
+			await con.rollback();
 		}
 	}
 	 //res.send("가입 완료");
@@ -103,6 +123,7 @@ router.post('/', async function(req, res, next) {
 		//console.log(insert_success.error);
 		if(insert_success.error.code=="ER_DUP_ENTRY"){
 			res.send({status:400, message:"이미 있는 id 입니다", data:null});
+			await con.rollback();
 		}
 	} 
 });

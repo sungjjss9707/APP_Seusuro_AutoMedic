@@ -92,7 +92,7 @@ var storagePlaceDrop = async function(militaryUnit){
 var medicInformDrop = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
-        var sql = "drop table medicinform_"+militaryUnit+";";
+        var sql = "drop table medicInform_"+militaryUnit+";";
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){

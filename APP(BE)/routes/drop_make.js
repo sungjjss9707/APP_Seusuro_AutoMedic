@@ -26,7 +26,6 @@ router.post('/', async function(req, res, next) {
 	var delete_mil_and_code = myQuery("delete from mil_and_code where militaryUnit = ?;", militaryUnit);
     if(!delete_mil_and_code){
         res.send("Fail");
-        return;
     }
 	var insert_mil_and_code = myQuery("insert into mil_and_code values (?,?);", [militaryUnit, code]);
 	if(!insert_mil_and_code){
@@ -37,17 +36,17 @@ router.post('/', async function(req, res, next) {
     var log_drop_success = await table.paymentLogDrop(militaryUnit);
     var storagePlace_drop_success = await table.storagePlaceDrop(militaryUnit);
 	var medicInform_drop_success = await table.medicInformDrop(militaryUnit);
-    if(property_drop_success.success&&log_drop_success.success&&storagePlace_drop_success&&medicInform_drop_success){
+    //if(property_drop_success.success&&log_drop_success.success&&storagePlace_drop_success&&medicInform_drop_success){
 		var property_make_success = await table.propertyMake(militaryUnit);
     	var log_make_success = await table.paymentLogMake(militaryUnit);
     	var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
 		var medicInform_make_success = await table.medicInformMake(militaryUnit);
-    	if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success){
+    	//if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success){
 			res.send("success");
-    	}
-    	else res.send({status:400, message:"Bad Request"});
-    }
-    else res.send({status:400, message:"Bad Request"});
+    	//}
+    	//else res.send({status:400, message:"Bad Request"});
+    //}
+   // else res.send({status:400, message:"Bad Request"});
 
 });
 
