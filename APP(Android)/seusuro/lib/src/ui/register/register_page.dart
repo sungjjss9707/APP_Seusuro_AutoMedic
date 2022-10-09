@@ -55,7 +55,7 @@ class RegisterPage extends StatelessWidget {
                   content: RegisterPageController.to.registerStep.value < 3
                       ? '다음'
                       : '시작하기',
-                  onTap: () {
+                  onTap: () async {
                     var formKey = GlobalKey<FormState>();
 
                     switch (RegisterPageController.to.registerStep.value) {
@@ -71,11 +71,26 @@ class RegisterPage extends StatelessWidget {
                     }
 
                     if (formKey.currentState!.validate()) {
-                      if (RegisterPageController.to.registerStep.value < 3) {
-                        RegisterPageController.to.registerStep.value += 1;
+                      if (RegisterPageController.to.registerStep.value == 1) {
+                        // 1단계
+                        if (await RegisterPageController.to.checkEmail()) {
+                          RegisterPageController.to.registerStep.value += 1;
+                        }
+                      } else if (RegisterPageController.to.registerStep.value ==
+                          2) {
+                        // 2단계
+                        if (await RegisterPageController.to.uploadImage()) {
+                          RegisterPageController.to.registerStep.value += 1;
+                        }
                       } else {
-                        Get.offAll(() => const MainPage(),
-                            transition: rTransition());
+                        // 3단계
+                        if (await RegisterPageController.to
+                            .checkMilitaryUnit()) {
+                          if (await RegisterPageController.to.register()) {
+                            Get.offAll(() => const MainPage(),
+                                transition: rTransition());
+                          }
+                        }
                       }
                     }
                   },
