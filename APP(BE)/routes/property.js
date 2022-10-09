@@ -25,7 +25,25 @@ router.get('/expirationDate', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+	res.setHeader("Access-Control-Expose-Headers","*");
+	
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -39,6 +57,7 @@ router.get('/expirationDate', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -127,7 +146,24 @@ router.get('/expirationDate/:expirationDate', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -141,6 +177,7 @@ router.get('/expirationDate/:expirationDate', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -219,7 +256,24 @@ router.get('/category', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -233,6 +287,7 @@ router.get('/category', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -321,7 +376,24 @@ router.get('/category/:category', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -335,6 +407,7 @@ router.get('/category/:category', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -413,6 +486,24 @@ router.get('/storagePlace', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
     const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -427,6 +518,7 @@ router.get('/storagePlace', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -535,7 +627,24 @@ router.get('/storagePlace/:storagePlace', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -549,6 +658,7 @@ router.get('/storagePlace/:storagePlace', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     con = await db.createConnection(inform);
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;
@@ -664,8 +774,25 @@ router.get('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("show-PAGE");
-
+	
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
 	const user_id = req.body.id;
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -681,6 +808,7 @@ router.get('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 /*   
 	 const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -767,9 +895,27 @@ router.get('/:id', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("show-PAGE");
-    const id = req.params.id;
 
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+
+    const id = req.params.id;
+/*
     const user_id = req.body.id;
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -785,6 +931,7 @@ router.get('/:id', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 /*    
 	const accessToken = req.header('Authorization');
     if (accessToken == null) {

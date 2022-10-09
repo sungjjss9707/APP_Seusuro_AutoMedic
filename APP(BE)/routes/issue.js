@@ -1,10 +1,10 @@
 const jwt = require('jsonwebtoken');
 const config = require('../config');
-var issue_new_token = async function(my_email, my_name, expired_time){
+var issue_new_token = async function(my_id, my_name, expired_time){
 	try {
     	const accessToken = await new Promise((resolve, reject) => {
         	jwt.sign({
-        			email : my_email,
+        			id : my_id,
             		name : my_name
         		},
             	config.secret,

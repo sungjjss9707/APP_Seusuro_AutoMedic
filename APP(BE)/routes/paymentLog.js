@@ -24,9 +24,28 @@ router.put('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     con = await db.createConnection(inform);
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    //var confirmor_id = verify_success.id;
+	var confirmor_id = req.body.confirmor;
+
 	await con.beginTransaction();
-    var confirmor_id = req.body.confirmor;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -41,6 +60,7 @@ router.put('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1024,8 +1044,25 @@ router.get('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     con = await db.createConnection(inform); 
-    const my_id = req.body.id;
+    //const my_id = req.body.id;
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+	var my_id = verify_success.id;
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
@@ -1034,6 +1071,7 @@ router.get('/', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1048,6 +1086,7 @@ router.get('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1120,8 +1159,8 @@ router.get('/', async function(req, res, next) {
                 	niin = select_medicInform_result[0].niin;
                 	category = select_medicInform_result[0].category;
             	}
-				console.log(niin);
-				console.log(category);
+				//console.log(niin);
+				//console.log(category);
             	niin_arr.push(niin);
             	category_arr.push(category);
         	}
@@ -1165,8 +1204,24 @@ router.get('/:id', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     con = await db.createConnection(inform);
-    const my_id = req.body.id;
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var my_id = verify_success.id;
 	
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
@@ -1176,6 +1231,7 @@ router.get('/:id', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1190,6 +1246,7 @@ router.get('/:id', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 	/*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1221,10 +1278,10 @@ router.get('/:id', async function(req, res, next) {
 		var unit_arr = select_log_result[0].unit_arr;
 		var createdAt = select_log_result[0].createdAt;
 		var updatedAt = select_log_result[0].updatedAt;
-		console.log(property_id_arr);
-		console.log(storagePlace_arr);
-		console.log(amount_arr);
-		console.log(unit_arr);
+		//console.log(property_id_arr);
+		//console.log(storagePlace_arr);
+		//console.log(amount_arr);
+		//console.log(unit_arr);
 		var arr_property_id = property_id_arr.split('/');	////////////////
 		var arr_storagePlace = storagePlace_arr.split('/'); ////////////////
 		var str_arr_amount = amount_arr.split('/');
@@ -1305,9 +1362,27 @@ router.post('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
 	con = await db.createConnection(inform);
 	await con.beginTransaction();
-	const confirmor_id = req.body.confirmor;
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    //var confirmor_id = verify_success.id;
+	var confirmor_id = req.body.confirmor;
+
 /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1320,6 +1395,7 @@ router.post('/', async function(req, res, next) {
         return;
     }
 */
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1334,6 +1410,7 @@ router.post('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 	const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);

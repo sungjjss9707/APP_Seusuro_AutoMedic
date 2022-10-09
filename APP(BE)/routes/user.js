@@ -45,6 +45,7 @@ router.post('/picture', upload.single('img'), (req, res) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     res.send({status:200, message:"Ok", data:req.file.filename});
 });
 
@@ -54,6 +55,7 @@ router.post('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("REISTER-PAGE");
 	con = await db.createConnection(inform);
 	//con.connect(err => {
@@ -110,6 +112,7 @@ router.post('/reduplication', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     con = await db.createConnection(inform);
     //con.connect(err => {
      // if (err) throw new Error(err);
@@ -131,6 +134,7 @@ router.post('/belong', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("check_belong page");
 
     const militaryUnit = req.body.militaryUnit;
@@ -159,8 +163,26 @@ router.post('/userInformation', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    const id = req.body.id;
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var id = verify_success.id;
+
 	const userId = req.body.userId;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -175,7 +197,7 @@ router.post('/userInformation', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
-
+*/
     con = await db.createConnection(inform);
     var select_user_inform_sql = "select * from user where id = ?;";
     var select_user_inform_param = userId;
@@ -195,6 +217,24 @@ router.put('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    //var my_id = verify_success.id;
+
     const id = req.body.id;
     const name = req.body.name;
 	const email = req.body.email;
@@ -203,7 +243,7 @@ router.put('/', async function(req, res, next) {
 	var enlistmentDate = req.body.enlistmentDate;
 	var dischargeDate = req.body.dischargeDate;
 	const pictureName = req.body.pictureName;
-    const accessToken = req.header('accessToken');
+/*    const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
         res.send({status:400, message:"토큰없음", data:null});
@@ -217,7 +257,7 @@ router.put('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
-
+*/
     con = await db.createConnection(inform);
 
     var update_user_inform_sql = "update user set name = ?, email = ?, phoneNumber = ?, mil_rank = ?, enlistmentDate = ?,dischargeDate = ?, pictureName = ?, updatedAt = now() where id = ?;";
@@ -240,7 +280,24 @@ router.delete('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	const id = req.body.id;
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var id = verify_success.id;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -255,7 +312,7 @@ router.delete('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
-
+*/
     con = await db.createConnection(inform);
     var select_user_inform_sql = "select email, name from user where id = ?;";
     var select_user_inform_param = id;

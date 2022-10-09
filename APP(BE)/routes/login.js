@@ -25,6 +25,7 @@ router.post('/', async function(req, res, next) {
 	res.setHeader("Access-Control-Allow-Credentials", "true");
 	res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
 	res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("login page");
 	const email = req.body.email;
     const password = req.body.password;
@@ -64,8 +65,8 @@ router.post('/', async function(req, res, next) {
 
 			}
 			//console.log("내이름 : "+my_name);
-			var access_token_obj = await new_issue.issue_new_token(email, name, access_time);
-			var refresh_token_obj = await new_issue.issue_new_token(email, name, refresh_time);
+			var access_token_obj = await new_issue.issue_new_token(id, name, access_time);
+			var refresh_token_obj = await new_issue.issue_new_token(id, name, refresh_time);
 			var access_token = access_token_obj.Token;
 			var refresh_token = refresh_token_obj.Token;
 			//console.log("액세스토큰 : "+access_token);
