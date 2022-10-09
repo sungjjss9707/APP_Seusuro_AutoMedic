@@ -8,4 +8,8 @@ class DataController extends GetxService {
   RxDouble screenWidth = 0.0.obs;
 
   bool isDesktop() => GetPlatform.isDesktop && screenWidth.value > mobileWidth;
+
+  RxString userId = ''.obs;
+  RxString accessToken = ''.obs;
+  RxString refreshToken = ''.obs;
 }

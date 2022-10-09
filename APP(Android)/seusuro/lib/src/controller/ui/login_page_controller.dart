@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
 import 'package:seusuro/src/repository/login_repository.dart';
 import 'package:seusuro/src/responsive_snackbar.dart';
@@ -16,10 +19,16 @@ class LoginPageController extends GetxController {
     String email = emailEditingController.text;
     String password = passwordEditingController.text;
 
-    ResponseDto responseDto = await _loginRepository.login(email, password);
+    var response = await _loginRepository.login(email, password);
+
+    ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
 
     if (responseDto.status == 200) {
-      rSnackbar(title: '알림', message: '로그인에 성공하였습니다!');
+      DataController.to.userId.value = responseDto.data['id'];
+      DataController.to.accessToken.value = response.headers['accesstoken']!;
+      DataController.to.refreshToken.value = response.headers['refreshtoken']!;
+
+      rSnackbar(title: '알림', message: '${responseDto.data['name']}님 환영합니다!');
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);

@@ -1,6 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/component/custom_input_button.dart';
@@ -33,6 +36,63 @@ class RegisterStep2 extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 64),
+        Stack(
+          alignment: AlignmentDirectional.center,
+          children: [
+            InkWell(
+              onTap: () async {
+                final ImagePicker picker = ImagePicker();
+
+                final XFile? image =
+                    await picker.pickImage(source: ImageSource.gallery);
+
+                if (image != null) {
+                  Uint8List imageAsBytes = await image.readAsBytes();
+                  RegisterPageController.to.imageAsBytes.value = imageAsBytes;
+                }
+              },
+              child: Obx(() => Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: AppColors().keyGrey,
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: RegisterPageController.to.imageAsBytes.value.isEmpty
+                        ? Icon(
+                            Icons.person_rounded,
+                            size: 80,
+                            color: AppColors().keyGrey,
+                          )
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(50),
+                            child: Image.memory(
+                              RegisterPageController.to.imageAsBytes.value,
+                            ),
+                          ),
+                  )),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 64, top: 64),
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: AppColors().lineGrey,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Icon(
+                  Icons.photo_camera_rounded,
+                  color: AppColors().bgBlack,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 32),
         Form(
           key: formkey,
           child: Column(
