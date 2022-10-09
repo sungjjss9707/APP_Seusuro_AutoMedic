@@ -1,27 +1,24 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:seusuro/src/ui/asset/item.dart';
-import 'package:seusuro/src/ui/asset/asset.dart';
 
 // ignore: must_be_immutable
-class AssetListPage extends StatefulWidget {
-  AssetListPage({super.key});
+class AssetList extends StatefulWidget {
+  AssetList({super.key});
 
-  late int totalNum = 0;
+  int? totalNum;
 
   @override
-  State<StatefulWidget> createState() => _AssetListPageState();
+  State<StatefulWidget> createState() => AssetListState();
   
 }
 
-class _AssetListPageState extends State<AssetListPage> {
+class AssetListState extends State<AssetList> {
   List<dynamic> assets = [];
   
-  static DateFormat dateFormat = DateFormat("yyyy년 MM월 dd일");
 
-  List<Map<String, dynamic>> testAssets = [
+  List<dynamic> testAssets = [
     {
       'id': '1234567890',
       'name': '아세트아미노펜',
@@ -39,6 +36,12 @@ class _AssetListPageState extends State<AssetListPage> {
           'amount': 600
         },
       ],
+      'expirationDate': DateTime(2022, 10, 27),
+      'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+      ]
     },
     {
       'id': '1234567890',
@@ -57,6 +60,12 @@ class _AssetListPageState extends State<AssetListPage> {
           'amount': 600
         },
       ],
+      'expirationDate': DateTime(2022, 10, 11),
+      'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+      ]
     },
     {
       'id': '1234567890',
@@ -75,6 +84,12 @@ class _AssetListPageState extends State<AssetListPage> {
           'amount': 600
         },
       ],
+      'expirationDate': DateTime(2022, 10, 15),
+      'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+      ]
     },
   ];
 
@@ -111,10 +126,10 @@ class _AssetListPageState extends State<AssetListPage> {
         child: ListView.separated(
           itemCount: testAssets.length,
           itemBuilder: (context, index) {
-            return item(testAssets[index]['category'], testAssets[index]['name'], testAssets[index]['unit'], testAssets[index]['totalAmount']);
+            return item(testAssets[index]);
           },
           separatorBuilder: (BuildContext context, int index) {
-            return const Divider();
+            return const Divider(height: 1.0);
           },
         ),
       );
