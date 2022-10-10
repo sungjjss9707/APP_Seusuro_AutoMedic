@@ -36,11 +36,11 @@ class AssetListState extends State<AssetList> {
           'amount': 600
         },
       ],
-      'expirationDate': DateTime(2022, 10, 27),
+      'expirationDate': DateTime(2023, 10, 27),
       'logRecord': [
         '2022년 08월 25일 수입 3500EA',
-        '2022년 09월 13일 수입 400EA',
-        '2022년 09월 30일 수입 600EA',
+        '2022년 09월 13일 불출 400EA',
+        '2022년 09월 30일 불출 600EA',
       ]
     },
     {
@@ -60,11 +60,11 @@ class AssetListState extends State<AssetList> {
           'amount': 600
         },
       ],
-      'expirationDate': DateTime(2022, 10, 11),
+      'expirationDate': DateTime(2023, 5, 11),
       'logRecord': [
         '2022년 08월 25일 수입 3500EA',
         '2022년 09월 13일 수입 400EA',
-        '2022년 09월 30일 수입 600EA',
+        '2022년 09월 30일 불출 600EA',
       ]
     },
     {
@@ -84,10 +84,10 @@ class AssetListState extends State<AssetList> {
           'amount': 600
         },
       ],
-      'expirationDate': DateTime(2022, 10, 15),
+      'expirationDate': DateTime(2024, 10, 15),
       'logRecord': [
         '2022년 08월 25일 수입 3500EA',
-        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 13일 불출 400EA',
         '2022년 09월 30일 수입 600EA',
       ]
     },

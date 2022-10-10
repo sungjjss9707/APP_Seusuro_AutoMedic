@@ -23,6 +23,11 @@ List<dynamic> testAssets = [
       },
     ],
     'expirationDate': DateTime(2022, 10, 27),
+    'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+    ]
   },
   {
     'id': '1234567890',
@@ -42,6 +47,11 @@ List<dynamic> testAssets = [
       },
     ],
     'expirationDate': DateTime(2022, 10, 27),
+    'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+    ]
   },
   {
     'id': '1234567890',
@@ -61,10 +71,17 @@ List<dynamic> testAssets = [
       },
     ],
     'expirationDate': DateTime(2022, 10, 27),
+    'logRecord': [
+        '2022년 08월 25일 수입 3500EA',
+        '2022년 09월 13일 수입 400EA',
+        '2022년 09월 30일 수입 600EA',
+    ]
   },
 ];
 
 class BookMarkPage extends StatefulWidget {
+  const BookMarkPage({super.key});
+
   @override
   State<BookMarkPage> createState() => BookMarkPageState();
 
@@ -78,62 +95,64 @@ class BookMarkPageState extends State<BookMarkPage> {
       rBody: rBody(context, testAssets),
     );
   }
-}
 
-AppBar rAppBar(BuildContext context) {
+  AppBar rAppBar(BuildContext context) {
   return AppBar(
-    centerTitle: true,
-    elevation: 0,
-    backgroundColor: AppColors().bgWhite,
-    leading: IconButton(
-      onPressed: () {
-        Navigator.pop(context);
-      },
-      icon: Icon(
-        Icons.arrow_back,
-        size: 16,
-        color: AppColors().textBlack,
+      centerTitle: true,
+      elevation: 0,
+      backgroundColor: AppColors().bgWhite,
+      leading: IconButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        icon: Icon(
+          Icons.arrow_back,
+          size: 20,
+          color: AppColors().textBlack,
+        ),
       ),
-    ),
-    title: Text(
-      '즐겨찾기',
-      style: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        color: AppColors().textBlack,
+      title: Text(
+        '즐겨찾기',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: AppColors().textBlack,
+        )
       )
-    )
-  );
-}
+    );
+  }
 
-Widget rBody(BuildContext context, List<dynamic> bookmarkedAssets) {
-  return SizedBox(
-    height: MediaQuery.of(context).size.height - 56,
-    child: ListView.separated(
-      itemCount: bookmarkedAssets.length,
-      itemBuilder: (context, index) {
-        return Slidable(
-          startActionPane: ActionPane(
-            motion: const ScrollMotion(),
-            extentRatio: 0.20,
-            children: [
-              SlidableAction(
-                onPressed: (context) {
-
-                },
-                backgroundColor: AppColors().bgRed,
-                foregroundColor: AppColors().textWhite,
-                icon: Icons.delete,
-                label: '삭제',
-              )
-            ]
-          ),
-          child: item(bookmarkedAssets[index])
-        );
-      },
-      separatorBuilder: (context, index) {
-        return const Divider(height: 1.0);
-      },
-    )
-  );
+  Widget rBody(BuildContext context, List<dynamic> bookmarkedAssets) {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height - 56,
+      child: ListView.separated(
+        itemCount: bookmarkedAssets.length,
+        itemBuilder: (context, index) {
+          return Slidable(
+            startActionPane: ActionPane(
+              motion: const ScrollMotion(),
+              extentRatio: 0.20,
+              children: [
+                SlidableAction(
+                  onPressed: (context) {
+                    setState(() {
+                      bookmarkedAssets.remove(bookmarkedAssets[index]);
+                    });
+                  },
+                  backgroundColor: AppColors().bgRed,
+                  foregroundColor: AppColors().textWhite,
+                  icon: Icons.delete,
+                  label: '삭제',
+                )
+              ]
+            ),
+            child: item(bookmarkedAssets[index])
+          );
+        },
+        separatorBuilder: (context, index) {
+          return const Divider(height: 1.0);
+        },
+      )
+    );
+  }
 }
