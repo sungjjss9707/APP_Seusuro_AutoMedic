@@ -7,6 +7,7 @@ import 'package:seusuro/src/ui/asset/asset_page.dart';
 import 'package:seusuro/src/ui/log/log_page.dart';
 import 'package:seusuro/src/ui/mypage/mypage_page.dart';
 import 'package:seusuro/src/ui/search/search_page.dart';
+import 'package:seusuro/src/ui/asset/bookmark_page.dart';
 
 class MainPage extends StatelessWidget {
   const MainPage({super.key});
@@ -14,7 +15,7 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.put(MainPageController());
-
+    
     return rScaffold(
       rAppBar: _appBar(),
       rBody: Obx(() {
@@ -66,6 +67,59 @@ class MainPage extends StatelessWidget {
           ),
         );
       }),
+      actions: [
+        Obx(() {
+          switch(MainPageController.to.currentIndex.value) {
+            case 1:
+              return IconButton(
+                onPressed: () {
+
+                },
+                icon: Icon(
+                  Icons.picture_as_pdf,
+                  size: 20,
+                  color: AppColors().textBlack
+                ),
+              );
+            default:
+              return Container();
+          }
+        }),
+        Obx(() {
+          switch(MainPageController.to.currentIndex.value) {
+            case 1:
+              return IconButton(
+                onPressed: () {
+                  Get.to(() => BookMarkPage());
+                },
+                icon: Icon(
+                  Icons.star_outline_rounded,
+                  size: 20,
+                  color: AppColors().textBlack
+                ),
+              );
+            default:
+              return Container();
+          }
+        }),
+        Obx(() {
+          switch(MainPageController.to.currentIndex.value) {
+            case 1:
+              return IconButton(
+                onPressed: () {
+
+                },
+                icon: Icon(
+                  Icons.search_rounded,
+                  size: 20,
+                  color: AppColors().textBlack
+                ),
+              );
+            default:
+              return Container();
+          }
+        }),
+      ],
     );
   }
 
