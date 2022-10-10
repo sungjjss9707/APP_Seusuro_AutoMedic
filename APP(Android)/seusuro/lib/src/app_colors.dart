@@ -12,7 +12,7 @@ class AppColors {
 
   // Text
   Color textBlack = const Color(0xFF000000);
-  Color textGrey = const Color(0xFFD9D9D9);
+  Color textGrey = const Color(0xFFABABAB);
   Color textWhite = const Color(0xFFFFFFFF);
   Color textBlue = const Color.fromRGBO(0, 0, 255, 1.0);
   Color textPurple = const Color.fromRGBO(173, 0, 255, 1.0);
@@ -27,4 +27,7 @@ class AppColors {
   Color statusGreen = const Color(0xFF04B900);
   Color statusYellow = const Color(0xFFE8D000);
   Color statusRed = const Color(0xFFFF0000);
+
+  //Chart
+  Color chartGrey = const Color(0xFF808080);
 }
