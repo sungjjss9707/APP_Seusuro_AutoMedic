@@ -72,7 +72,7 @@ router.get('/expirationDate', async function(req, res, next) {
     ////////////////
 //////내용
     ///////////////
-    var select_distinct_expirationDate_sql = "select distinct(expirationDate) from property_"+militaryUnit+";";
+    var select_distinct_expirationDate_sql = "select distinct(expirationDate) from property_"+militaryUnit+" order by expirationDate;";
     var [select_distinct_expirationDate_result] = await con.query(select_distinct_expirationDate_sql);
     if(select_distinct_expirationDate_result.length==0){
         res.send({status:200, message:'검색결과가 없습니다', data:null});
@@ -108,7 +108,7 @@ router.get('/expirationDate', async function(req, res, next) {
             for(let j=0; j<select_amountByPlace_result.length; ++j){
                 amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
             }
-            var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+            var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
             var select_log_param = "%"+property_id+"%";
             const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
             if(select_log_result.length==0){
@@ -219,7 +219,7 @@ router.get('/expirationDate/:expirationDate', async function(req, res, next) {
         for(let j=0; j<select_amountByPlace_result.length; ++j){
             amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
         }
-        var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+        var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+property_id+"%";
         const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
         if(select_log_result.length==0){
@@ -338,7 +338,7 @@ router.get('/category', async function(req, res, next) {
         	for(let j=0; j<select_amountByPlace_result.length; ++j){
             	amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
         	}
-        	var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+        	var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         	var select_log_param = "%"+property_id+"%";
         	const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
         	if(select_log_result.length==0){
@@ -449,7 +449,7 @@ router.get('/category/:category', async function(req, res, next) {
 		for(let j=0; j<select_amountByPlace_result.length; ++j){
             amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
         }
-		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+property_id+"%";
         const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
 		if(select_log_result.length==0){
@@ -578,7 +578,7 @@ router.get('/storagePlace', async function(req, res, next) {
            	}
            	medicInform_category = select_medicInform_result[0].category;
            	medicInform_niin = select_medicInform_result[0].niin;
-           	var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by YearMonthDate, log_num;";
+           	var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by createdAt, log_num;";
            	var select_log_param =["%"+property_id+"%", "%"+storagePlace+"%"];
            	var select_log_by_target_sql = "select id, receiptPayment from paymentLog_"+militaryUnit+" where target = ? and property_id_arr like ?;";
            	var select_log_by_target_param = [storagePlace, "%"+property_id+"%"];
@@ -708,7 +708,7 @@ router.get('/storagePlace/:storagePlace', async function(req, res, next) {
             }
 			medicInform_category = select_medicInform_result[0].category;
 			medicInform_niin = select_medicInform_result[0].niin;
-			var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by YearMonthDate, log_num;";
+			var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by createdAt, log_num;";
 			var select_log_param =["%"+property_id+"%", "%"+storagePlace+"%"];
 			var select_log_by_target_sql = "select id, receiptPayment from paymentLog_"+militaryUnit+" where target = ? and property_id_arr like ?;";
 			var select_log_by_target_param = [storagePlace, "%"+property_id+"%"];
@@ -861,7 +861,7 @@ router.get('/', async function(req, res, next) {
          	   amountByPlace.push({storagePlace:select_amountByPlace_result[k].name, amount:select_amountByPlace_result[k].amount});
         	}
 
-        	select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+        	select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         	select_log_param = "%"+id+"%";
 			[select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
 			log_arr = [];
@@ -979,7 +979,7 @@ router.get('/:id', async function(req, res, next) {
 		for(let i=0; i<select_amountByPlace_result.length; ++i){
 			amountByPlace.push({storagePlace:select_amountByPlace_result[i].name, amount:select_amountByPlace_result[i].amount});
 		}
-		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
+		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+id+"%";
     	const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
         //console.log(created_time+" "+updated_time);
