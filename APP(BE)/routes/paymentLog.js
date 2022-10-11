@@ -53,23 +53,24 @@ router.post('/filter', async function(req, res, next) {
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
 	var type = req.body.type;
 	var date = req.body.date;
-	var select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in (?,?,?,?,?) and DATE(createdAt) between ? and ? order by createdAt, log_num;";
+	//var select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in (?,?,?,?,?) and DATE(createdAt) between ? and ? order by createdAt, log_num;";
+	var select_log_sql = "";
 	var select_log_param = [];
 	var str_type_arr;
 	if(type==null){
-		select_log_param.push('수입');
-		select_log_param.push('불출');
-		select_log_param.push('폐기');
-		select_log_param.push('반납');
-		select_log_param.push('이동');
+		select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in ('수입', '불출', '폐기', '반납', '이동') and DATE(createdAt) between ? and ? order by createdAt, log_num;";
 	}
 	else{
+		select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in ";
+		var param = "(";
 		for(let i=0; i<type.length; ++i){
-			select_log_param.push(type[i]);
+			param+="'";
+			param+=type[i];
+			param+="'";
+			if(i!=type.length-1) param+=",";
 		}
-		for(let i=0; i<5-type.length; ++i){
-			select_log_param.push(type[0]);
-		}
+		select_log_sql+=param;
+		select_log_sql+=") and DATE(createdAt) between ? and ? order by createdAt, log_num;";
 		//console.log(str_type_arr);
 	}
 	if(date==null){
@@ -80,7 +81,7 @@ router.post('/filter', async function(req, res, next) {
 		select_log_param.push(date);
         select_log_param.push(date);
 	}
-	console.log(select_log_param);
+	console.log(select_log_sql);
 	//var select_log_sql = "select * from paymentLog where receiptPayment in ? and DATE(createdAt) between ? and ? order by createdAt;";
 	var [select_log_result] = await con.query(select_log_sql, select_log_param);
 	if(select_log_result.length==0){
