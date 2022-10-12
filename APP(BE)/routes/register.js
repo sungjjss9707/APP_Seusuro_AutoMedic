@@ -12,10 +12,10 @@ var inform = mysql.inform;
 async function myQuery(sql, param){
     try{
         const [row, field] = await con.query(sql,param);
-        return true;
+        return {success:true, error:null};
     }catch(error){
         console.log(error);
-        return false;
+        return {success:false, error:error};
     }
 }
 
@@ -40,7 +40,7 @@ router.post('/', async function(req, res, next) {
 	var check_militaryUnit_param = militaryUnit;
 	const[check_militaryUnit_result] = await con.query(check_militaryUnit_sql, check_militaryUnit_param);
 	if(check_militaryUnit_result.length==0){
-		res.send({status:400, message:"Bad Request"});
+		res.send({status:400, message:"없는 부대입니다"});
 		return;
 	}
 //	var encoded_id = crypto.createHash('sha256').update(email).digest('base64');
@@ -48,7 +48,7 @@ router.post('/', async function(req, res, next) {
 	var insert_sql = "insert into user values (?,?,?,?,?,?,?,?,?,?,now(), now());";
 	var insert_param = [encoded_id, name, email, encoded_pw, phoneNumber, serviceNumber, mil_rank, enlistmentDate, dischargeDate, militaryUnit];
 	var insert_success = await myQuery(insert_sql, insert_param);
-	if(insert_success){
+	if(insert_success.success){
 		var select_sql = "select createdAt, updatedAt from user where id = ?;";
 		var select_param = encoded_id;
 		const [select_result, select_field] = await con.query(select_sql,select_param);
@@ -61,10 +61,16 @@ router.post('/', async function(req, res, next) {
 		else{
 			res.send({status:400, message:"Bad Request"});
 		}
-
 	}
 	 //res.send("가입 완료");
-	else res.send({status:400, message:"Bad Request"});
+	else{
+		//console.log(insert_success.error);
+		if(insert_success.error.code=="ER_DUP_ENTRY"){
+			res.send({status:400, message:"이미 있는 id 입니다", data:null});
+		}
+	} 
 });
+
+
 
 module.exports = router;

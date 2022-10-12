@@ -20,10 +20,28 @@ async function myQuery(sql, param){
 }
 
 
-router.get('/show', async function(req, res, next) {
+router.get('/', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     console.log("show-PAGE");
 
 	const user_id = req.body.id;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 /*   
 	 const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -76,26 +94,58 @@ router.get('/show', async function(req, res, next) {
          	   amountByPlace.push({storagePlace:select_amountByPlace_result[k].name, amount:select_amountByPlace_result[k].amount});
         	}
 
-        	select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ?;";
+        	select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
         	select_log_param = "%"+id+"%";
 			[select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
 			log_arr = [];
 			for(let k=0; k<select_log_result.length; ++k){
                 log_arr.push(select_log_result[k].id);
             }
-			individual_data = {id :id, name : name, unit:unit, totalAmount:totalAmount, amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
+			var niin, category;
+            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_param = name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+                category = select_medicInform_result[0].category;
+            }
+			individual_data = {id :id, name : name, unit:unit, totalAmount:totalAmount, amountByPlace:amountByPlace,category:category, niin:niin,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
 			data.push(individual_data);
 		}
-		res.send({status:200, message:"Ok", data:data});
+		//res.setHeader({"accessToken":new_access_token, "refreshToken":new_refresh_token});
+		//res.send({status:200, message:"Ok", data:data});
+		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
     }
 });
 
 
-router.get('/show/:id', async function(req, res, next) {
+router.get('/:id', async function(req, res, next) {
+	res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     console.log("show-PAGE");
     const id = req.params.id;
 
     const user_id = req.body.id;
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
 /*    
 	const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -143,7 +193,7 @@ router.get('/show/:id', async function(req, res, next) {
 		for(let i=0; i<select_amountByPlace_result.length; ++i){
 			amountByPlace.push({storagePlace:select_amountByPlace_result[i].name, amount:select_amountByPlace_result[i].amount});
 		}
-		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ?;";
+		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by YearMonthDate, log_num;";
         var select_log_param = "%"+id+"%";
     	const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
         //console.log(created_time+" "+updated_time);
@@ -155,9 +205,21 @@ router.get('/show/:id', async function(req, res, next) {
 			//console.log(select_log_result);
 			for(let i=0; i<select_log_result.length; ++i){
 				log_arr.push(select_log_result[i].id);
-			}			
-			var data = {id :id, name : name, unit:unit, totalAmount:totalAmount,amountByPlace:amountByPlace,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
-        	res.send({status:200, message:"Ok", data:data});	
+			}
+        	var niin, category;
+        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_param = name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+               	res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+                category = select_medicInform_result[0].category;
+            }
+			var data = {id :id, name : name, unit:unit, totalAmount:totalAmount,amountByPlace:amountByPlace,category:category, niin:niin,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
+        	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});	
 		}
     }
 });
