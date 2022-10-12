@@ -20,12 +20,13 @@ async function myQuery(sql, param){
 }
 
 router.post('/filter', async function(req, res, next) {
+/*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -236,12 +237,13 @@ router.post('/filter', async function(req, res, next) {
 
 
 router.get('/expirationDate', async function(req, res, next) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+/* 
+   res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-	
+*/	
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -357,12 +359,13 @@ router.get('/expirationDate', async function(req, res, next) {
 
 
 router.get('/expirationDate/:expirationDate', async function(req, res, next) {
+/*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -467,12 +470,13 @@ router.get('/expirationDate/:expirationDate', async function(req, res, next) {
 
 
 router.get('/category', async function(req, res, next) {
+/*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -587,12 +591,13 @@ router.get('/category', async function(req, res, next) {
 
 
 router.get('/category/:category', async function(req, res, next) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
+/* 
+   res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -697,12 +702,13 @@ router.get('/category/:category', async function(req, res, next) {
 
 
 router.get('/storagePlace', async function(req, res, next) {
+/*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -838,12 +844,13 @@ router.get('/storagePlace', async function(req, res, next) {
 
 
 router.get('/storagePlace/:storagePlace', async function(req, res, next) {
+/*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -985,12 +992,14 @@ router.get('/storagePlace/:storagePlace', async function(req, res, next) {
 
 
 router.get('/', async function(req, res, next) {
+/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-    console.log("show-PAGE");
+*/  
+  console.log("show-PAGE");
 	
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -1106,11 +1115,13 @@ router.get('/', async function(req, res, next) {
 
 
 router.get('/:id', async function(req, res, next) {
+	/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
+*/
     console.log("show-PAGE");
 
 	const accessToken = req.header('accessToken');

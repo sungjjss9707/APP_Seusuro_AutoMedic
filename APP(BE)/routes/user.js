@@ -10,6 +10,7 @@ var table = require('../routes/table');
 var inform = mysql.inform;
 var verify = require('../routes/verify');
 const jwt = require('jsonwebtoken');
+var cors = require("cors");
 var new_issue = require('../routes/issue');
 var refresh_time = config.refresh_time;
 var access_time = config.access_time;
@@ -20,6 +21,14 @@ var app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(form_data.array());
+//const cookieParser = require('cookie-parser');
+//var helmet = require('helmet');
+//app.use(helmet.referrerPolicy({ policy: 'strict-origin-when-cross-origin' }));
+//app.use(cors({
+//	origin:'*',
+//	credential : 'true'
+//}));
+
 
 async function myQuery(sql, param){
     try{
@@ -56,11 +65,13 @@ router.post('/picture', upload.single('img'), (req, res) => {
 */
 
 router.post('/', async function(req, res, next) {
+/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
+*/
     console.log("REISTER-PAGE");
 	con = await db.createConnection(inform);
 	await con.beginTransaction();
@@ -129,11 +140,13 @@ router.post('/', async function(req, res, next) {
 });
 
 router.post('/reduplication', async function(req, res, next) {
+/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
+*/
     con = await db.createConnection(inform);
     //con.connect(err => {
      // if (err) throw new Error(err);
@@ -151,11 +164,12 @@ router.post('/reduplication', async function(req, res, next) {
 });
 
 router.post('/belong', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+/*	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
+*/
     console.log("check_belong page");
 
     const militaryUnit = req.body.militaryUnit;
@@ -180,12 +194,13 @@ router.post('/belong', async function(req, res, next) {
 });
 
 router.post('/userInformation', async function(req, res, next) {
+/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -234,12 +249,13 @@ router.post('/userInformation', async function(req, res, next) {
 });
 
 router.put('/', async function(req, res, next) {
+/*
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 	res.setHeader("Access-Control-Expose-Headers","*");
-
+*/
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -297,14 +313,30 @@ router.put('/', async function(req, res, next) {
 });
 
 router.delete('/', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
-
+	//res.setHeader("Access-Control-Allow-Origin", "*");
+	//res.setHeader("Access-Control-Allow-Origin", "https://seusuro.com");
+    //res.setHeader("Access-Control-Allow-Credentials", "true");
+    //res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT,DELETE");
+	//res.setHeader("Access-Control-Allow-Headers",");
+//    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,Authorization");
+	//res.setHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin, Content-Type, Authorization, Accept, Downlink");
+	//res.setHeader("Access-Control-Expose-Headers","*");
+	//const Authorization = req.e.Authorization;
+	//const Authorization = req.header('Authorization');
+	//const accessToken = req.cookie.accessToken;
+	//const refreshToken = req.cookie.refreshToken;
 	const accessToken = req.header('accessToken');
-    const refreshToken = req.header('refreshToken');
+	const refreshToken = req.header('refreshToken');
+	console.log(accessToken);
+	console.log(refreshToken);
+	
+	//console.log(aut);
+	//console.log(Authorization);
+	//console.log(accesToken);
+	//console.log(refreshToken);
+	//res.send({status:200, message:accessToken+" "+refreshToken, data:null});
+	//const accessToken = req.header('accessToken');
+    //const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
         res.send({status:400, message:"토큰없음", data:null});
         return;
@@ -348,7 +380,7 @@ router.delete('/', async function(req, res, next) {
     const [check_token_result] = await con.query(select_token_sql, select_token_param);
     const [check_user_inform_result] = await con.query(select_user_inform_sql ,select_user_inform_param);
     if(check_token_result.length==0&&check_user_inform_result.length==0){
-        res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:null});
+        res.send({status:200, message:"삭제완료^^", data:null});
     }
     else res.send({status:400, message:"Bad Request", data:null});
 });
