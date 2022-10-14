@@ -12,7 +12,7 @@ class RegisterRepository {
     var url = Uri.parse('$baseUrl/user/reduplication');
 
     http.Response response = await http.post(url, body: {
-      "email": email,
+      'email': email,
     });
 
     return ResponseDto.fromJson(jsonDecode(response.body));
@@ -44,8 +44,8 @@ class RegisterRepository {
     var url = Uri.parse('$baseUrl/user/belong');
 
     http.Response response = await http.post(url, body: {
-      "militaryUnit": militaryUnit,
-      "accessCode": accessCode,
+      'militaryUnit': militaryUnit,
+      'accessCode': accessCode,
     });
 
     return ResponseDto.fromJson(jsonDecode(response.body));

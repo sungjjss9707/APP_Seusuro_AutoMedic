@@ -6,6 +6,8 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/model/dto/register_request_dto.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
+import 'package:seusuro/src/model/token_info.dart';
+import 'package:seusuro/src/model/user_info.dart';
 import 'package:seusuro/src/repository/base_url.dart';
 import 'package:seusuro/src/repository/register_repository.dart';
 import 'package:seusuro/src/responsive_snackbar.dart';
@@ -67,15 +69,19 @@ class RegisterPageController extends GetxController {
   }
 
   Future<bool> uploadImage() async {
-    ResponseDto responseDto =
-        await _registerRepository.uploadImage(imageAsBytes.value);
+    if (imageAsBytes.value.isNotEmpty) {
+      ResponseDto responseDto =
+          await _registerRepository.uploadImage(imageAsBytes.value);
 
-    if (responseDto.status == 200) {
-      imagePath.value = '$baseUrl/${responseDto.data}';
-      return true;
+      if (responseDto.status == 200) {
+        imagePath.value = '$baseUrl/${responseDto.data}';
+        return true;
+      } else {
+        rSnackbar(title: '알림', message: responseDto.message);
+        return false;
+      }
     } else {
-      rSnackbar(title: '알림', message: responseDto.message);
-      return false;
+      return true;
     }
   }
 
@@ -118,9 +124,8 @@ class RegisterPageController extends GetxController {
     ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
 
     if (responseDto.status == 200) {
-      DataController.to.userId.value = responseDto.data['id'];
-      DataController.to.accessToken.value = response.headers['accesstoken']!;
-      DataController.to.refreshToken.value = response.headers['refreshtoken']!;
+      DataController.to.userInfo.value = UserInfo.fromJson(responseDto.data);
+      DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
 
       rSnackbar(
         title: '알림',
