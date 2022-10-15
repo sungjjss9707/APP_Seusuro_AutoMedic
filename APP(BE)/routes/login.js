@@ -50,6 +50,7 @@ router.post('/', async function(req, res, next) {
 			const enlistmentDate = select_result1[0].enlistmentDate;
 			const dischargeDate = select_result1[0].dischargeDate;
 			const militaryUnit = select_result1[0].militaryUnit;
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
 			const pictureName = select_result1[0].pictureName;
 			const createdAt = select_result1[0].createdAt;
 			const updatedAt = select_result1[0].updatedAt;
@@ -78,7 +79,7 @@ router.post('/', async function(req, res, next) {
 			if(insert_success){
 				console.log(access_token);
 				console.log(refresh_token);
-				var data = {id :id, name : name, email : email, password : password, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit, pictureName:pictureName,createdAt:createdAt, updatedAt : updatedAt};
+				var data = {id :id, name : name, email : email, password : password, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit_blank, pictureName:pictureName,createdAt:createdAt, updatedAt : updatedAt};
 				//res.setHeader("Authorization", access_token);
 				res.header({"accessToken":access_token, "refreshToken":refresh_token}).send({status:200, message:"Ok", data:data});
 				//res.send({status:200, message:"Ok", data:data});
