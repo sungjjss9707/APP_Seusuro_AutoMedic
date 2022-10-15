@@ -168,7 +168,8 @@ router.post('/filter', async function(req, res, next) {
         var pictureName = select_user_result[0].pictureName;
         var user_createdAt = select_user_result[0].createdAt;
         var user_updatedAt = select_user_result[0].updatedAt;
-        var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+		var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
+        var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
         var individual_data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
             //res.send({status:200, message:"Ok", data:data});
         data.push(individual_data);
@@ -1178,7 +1179,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         await con.rollback();
         return;
     }
-    var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");
+    var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
     var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
@@ -1351,7 +1353,8 @@ router.get('/', async function(req, res, next) {
 			var pictureName = select_user_result[0].pictureName;
             var user_createdAt = select_user_result[0].createdAt;
             var user_updatedAt = select_user_result[0].updatedAt;
-            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");	
+            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
             var individual_data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
             //res.send({status:200, message:"Ok", data:data});
 			data.push(individual_data);
@@ -1514,7 +1517,8 @@ router.get('/:id', async function(req, res, next) {
 			var pictureName = select_user_result[0].pictureName;
             var user_createdAt = select_user_result[0].createdAt;
             var user_updatedAt = select_user_result[0].updatedAt;
-            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
+            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
             var data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
             res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
         }
@@ -2053,8 +2057,9 @@ router.post('/', async function(req, res, next) {
 		res.send({status:400, message:"Bad Request", data:null});
         await con.rollback();
 		return;
-	}	
-	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+	}
+	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");	
+	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
 	var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);

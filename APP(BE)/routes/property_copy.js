@@ -46,7 +46,6 @@ router.get('/storagePlace', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
-	var blank_militaryUnit = militaryUnit.replace(/_/g, " ");
 	var select_storagePlace_sql = "select distinct(name) from storagePlace_"+militaryUnit+";";
 	var [select_storagePlace_result] = await con.query(select_storagePlace_sql);
 	if(select_storagePlace_result.length==0){
@@ -176,7 +175,6 @@ router.delete('/favorite', async function(req, res, next) {
         }
         niin = select_medicInform_result[0].niin;
         category = select_medicInform_result[0].category;
-		
         var individual_data={id :id,name:name,unit:unit,totalAmount:totalAmount, amountByPlace:amountByPlace,category:category, niin:niin,expirationDate:expirationDate,logRecord:log_arr ,createdAt:created_time, updatedAt : updated_time};
         data.push(individual_data);
     }
@@ -606,6 +604,766 @@ router.post('/filter', async function(req, res, next) {
     //res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 });
 
+
+router.get('/expirationDate', async function(req, res, next) {
+/* 
+   res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+	
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+
+/*
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+    var category = req.params.category;
+
+    ////////////////
+//////내용
+    ///////////////
+    var select_distinct_expirationDate_sql = "select distinct(expirationDate) from property_"+militaryUnit+" order by expirationDate;";
+    var [select_distinct_expirationDate_result] = await con.query(select_distinct_expirationDate_sql);
+    if(select_distinct_expirationDate_result.length==0){
+        res.send({status:200, message:'검색결과가 없습니다', data:null});
+        return;
+    }
+    var data = [];
+    for(let index = 0; index<select_distinct_expirationDate_result.length; ++index){
+        var expirationDate = select_distinct_expirationDate_result[index].expirationDate;
+        var select_expirationDate_sql = "select * from property_"+militaryUnit+" where expirationDate = ?;";
+        var select_expirationDate_param = expirationDate;
+        var [select_expirationDate_result] = await con.query(select_expirationDate_sql, select_expirationDate_param);
+        if(select_expirationDate_result.length==0){
+            res.send({status:200, message:'검색결과가 없습니다', data:null});
+            return;
+        }
+        var individual_data_arr = [];
+        for(let i=0; i<select_expirationDate_result.length; ++i){
+            var property_id = select_expirationDate_result[i].id;
+            var property_name = select_expirationDate_result[i].name;
+            var property_totalAmount = select_expirationDate_result[i].totalAmount;
+            var property_unit = select_expirationDate_result[i].unit;
+            var property_category = select_expirationDate_result[i].category;
+            var property_createdAt = select_expirationDate_result[i].createdAt;
+            var property_updatedAt = select_expirationDate_result[i].updatedAt;
+            var amountByPlace = [];
+            var select_amountByPlace_sql = "select name, amount from storagePlace_"+militaryUnit+" where property_id = ?;";
+            var select_amountByPlace_param = property_id;
+            const[select_amountByPlace_result] = await con.query(select_amountByPlace_sql, select_amountByPlace_param);
+            if(select_amountByPlace_result.length==0){
+                res.send({status:400, message:"Bad Request"});
+                return;
+            }
+            for(let j=0; j<select_amountByPlace_result.length; ++j){
+                amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
+            }
+            var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
+            var select_log_param = "%"+property_id+"%";
+            const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
+            if(select_log_result.length==0){
+                console.log("위");
+                res.send({status:400, message:'Bad Request', data:null});
+                return;
+            }
+            var log_arr = [];
+            //console.log(select_log_result);
+            for(let j=0; j<select_log_result.length; ++j){
+                log_arr.push(select_log_result[j].id);
+            }
+            var niin;
+            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_param = property_name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                console.log("밑");
+                res.send({status:400, message:"Bad Request", data:null});
+                return;
+            }
+            niin = select_medicInform_result[0].niin;
+            var individual_individual_data = {id:property_id, name:property_name, unit:property_unit, totalAmount:property_totalAmount, category:property_category, niin:niin ,amountByPlace:amountByPlace, expirationDate:expirationDate, logRecord:log_arr, createdAt:property_createdAt, updatedAt:property_updatedAt};
+            individual_data_arr.push(individual_individual_data);
+        }
+        var individual_data = {expirationDate:expirationDate, individualData:individual_data_arr};
+        data.push(individual_data);
+    }
+    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+});
+
+
+router.get('/expirationDate/:expirationDate', async function(req, res, next) {
+/*
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+    var expirationDate = req.params.expirationDate;
+
+    ////////////////
+//////내용
+    ///////////////
+    var select_expirationDate_sql = "select * from property_"+militaryUnit+" where expirationDate = ?;";
+    var select_expirationDate_param = expirationDate;
+    var [select_expirationDate_result] = await con.query(select_expirationDate_sql, select_expirationDate_param);
+    if(select_expirationDate_result.length==0){
+        res.send({status:200, message:'검색결과가 없습니다', data:null});
+        return;
+    }
+    var data = [];
+    for(let i=0; i<select_expirationDate_result.length; ++i){
+        var property_id = select_expirationDate_result[i].id;
+        var property_name = select_expirationDate_result[i].name;
+        var property_totalAmount = select_expirationDate_result[i].totalAmount;
+        var property_unit = select_expirationDate_result[i].unit;
+        var property_category = select_expirationDate_result[i].category;
+        var property_createdAt = select_expirationDate_result[i].createdAt;
+        var property_updatedAt = select_expirationDate_result[i].updatedAt;
+        var amountByPlace = [];
+        var select_amountByPlace_sql = "select name, amount from storagePlace_"+militaryUnit+" where property_id = ?;";
+        var select_amountByPlace_param = property_id;
+        const[select_amountByPlace_result] = await con.query(select_amountByPlace_sql, select_amountByPlace_param);
+        if(select_amountByPlace_result.length==0){
+            res.send({status:400, message:"Bad Request"});
+            return;
+        }
+        for(let j=0; j<select_amountByPlace_result.length; ++j){
+            amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
+        }
+        var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
+        var select_log_param = "%"+property_id+"%";
+        const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
+        if(select_log_result.length==0){
+            console.log("위");
+            res.send({status:400, message:'Bad Request', data:null});
+            return;
+        }
+        var log_arr = [];
+            //console.log(select_log_result);
+        for(let j=0; j<select_log_result.length; ++j){
+            log_arr.push(select_log_result[j].id);
+        }
+        var niin;
+        var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param = property_name;
+        var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+        if(select_medicInform_result.length==0){
+            console.log("밑");
+            res.send({status:400, message:"Bad Request", data:null});
+            return;
+        }
+        niin = select_medicInform_result[0].niin;
+        var individual_data = {id:property_id, name:property_name, unit:property_unit, totalAmount:property_totalAmount, category:property_category, niin:niin ,amountByPlace:amountByPlace, expirationDate:expirationDate, logRecord:log_arr, createdAt:property_createdAt, updatedAt:property_updatedAt};
+
+        data.push(individual_data);
+
+    }
+    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+});
+
+
+router.get('/category', async function(req, res, next) {
+/*
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+    var category = req.params.category;
+
+    ////////////////
+//////내용
+    ///////////////
+	var select_distinct_category_sql = "select distinct(category) from property_"+militaryUnit+";";
+	var [select_distinct_category_result] = await con.query(select_distinct_category_sql);
+	if(select_distinct_category_result.length==0){
+		res.send({status:200, message:'검색결과가 없습니다', data:null});
+        return;
+	}
+	var data = [];
+	for(let index = 0; index<select_distinct_category_result.length; ++index){
+		var category = select_distinct_category_result[index].category;
+		var select_category_sql = "select * from property_"+militaryUnit+" where category = ?;";
+    	var select_category_param = category;
+    	var [select_category_result] = await con.query(select_category_sql, select_category_param);
+    	if(select_category_result.length==0){
+        	res.send({status:200, message:'검색결과가 없습니다', data:null});
+        	return;
+    	}
+		var individual_data_arr = [];
+    	for(let i=0; i<select_category_result.length; ++i){
+        	var property_id = select_category_result[i].id;
+        	var property_name = select_category_result[i].name;
+        	var property_totalAmount = select_category_result[i].totalAmount;
+        	var property_unit = select_category_result[i].unit;
+        	var property_expirationDate = select_category_result[i].expirationDate;
+        	var property_createdAt = select_category_result[i].createdAt;
+        	var property_updatedAt = select_category_result[i].updatedAt;
+        	var amountByPlace = [];
+        	var select_amountByPlace_sql = "select name, amount from storagePlace_"+militaryUnit+" where property_id = ?;";
+        	var select_amountByPlace_param = property_id;
+        	const[select_amountByPlace_result] = await con.query(select_amountByPlace_sql, select_amountByPlace_param);
+        	if(select_amountByPlace_result.length==0){
+            	res.send({status:400, message:"Bad Request"});
+            	return;
+        	}
+        	for(let j=0; j<select_amountByPlace_result.length; ++j){
+            	amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
+        	}
+        	var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
+        	var select_log_param = "%"+property_id+"%";
+        	const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
+        	if(select_log_result.length==0){
+            	console.log("위");
+            	res.send({status:400, message:'Bad Request', data:null});
+            	return;
+        	}
+        	var log_arr = [];
+            //console.log(select_log_result);
+        	for(let j=0; j<select_log_result.length; ++j){
+            	log_arr.push(select_log_result[j].id);
+        	}
+        	var niin;
+        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_param = property_name;
+        	var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+        	if(select_medicInform_result.length==0){
+            	console.log("밑");
+            	res.send({status:400, message:"Bad Request", data:null});
+            	return;
+        	}
+        	niin = select_medicInform_result[0].niin;
+        	var individual_individual_data = {id:property_id, name:property_name, unit:property_unit, totalAmount:property_totalAmount, category:category, niin:niin ,amountByPlace:amountByPlace, expirationDate:property_expirationDate, logRecord:log_arr, createdAt:property_createdAt, updatedAt:property_updatedAt};
+			individual_data_arr.push(individual_individual_data);
+    	}
+		var individual_data = {category:category, individualData:individual_data_arr};
+		data.push(individual_data);
+    }
+    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+});
+
+
+router.get('/category/:category', async function(req, res, next) {
+/* 
+   res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+	var category = req.params.category;
+	
+    ////////////////
+//////내용
+    ///////////////
+	var select_category_sql = "select * from property_"+militaryUnit+" where category = ?;";
+	var select_category_param = category;
+	var [select_category_result] = await con.query(select_category_sql, select_category_param);
+	if(select_category_result.length==0){
+		res.send({status:200, message:'검색결과가 없습니다', data:null});
+		return;
+	}
+	var data = [];
+	for(let i=0; i<select_category_result.length; ++i){
+		var property_id = select_category_result[i].id;
+		var property_name = select_category_result[i].name;
+		var property_totalAmount = select_category_result[i].totalAmount;
+		var property_unit = select_category_result[i].unit;
+		var property_expirationDate = select_category_result[i].expirationDate;
+		var property_createdAt = select_category_result[i].createdAt;
+		var property_updatedAt = select_category_result[i].updatedAt;
+		var amountByPlace = [];
+        var select_amountByPlace_sql = "select name, amount from storagePlace_"+militaryUnit+" where property_id = ?;";
+        var select_amountByPlace_param = property_id;
+        const[select_amountByPlace_result] = await con.query(select_amountByPlace_sql, select_amountByPlace_param);
+        if(select_amountByPlace_result.length==0){
+            res.send({status:400, message:"Bad Request"});
+            return;
+        }
+		for(let j=0; j<select_amountByPlace_result.length; ++j){
+            amountByPlace.push({storagePlace:select_amountByPlace_result[j].name, amount:select_amountByPlace_result[j].amount});
+        }
+		var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
+        var select_log_param = "%"+property_id+"%";
+        const [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
+		if(select_log_result.length==0){
+			console.log("위");
+			res.send({status:400, message:'Bad Request', data:null});
+        	return;
+		}
+		var log_arr = [];
+            //console.log(select_log_result);
+        for(let j=0; j<select_log_result.length; ++j){
+            log_arr.push(select_log_result[j].id);
+        }
+        var niin;
+        var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_param = property_name;
+        var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+        if(select_medicInform_result.length==0){
+			console.log("밑");
+            res.send({status:400, message:"Bad Request", data:null});
+            return;
+        }
+        niin = select_medicInform_result[0].niin;
+		var individual_data = {id:property_id, name:property_name, unit:property_unit, totalAmount:property_totalAmount, category:category, niin:niin ,amountByPlace:amountByPlace, expirationDate:property_expirationDate, logRecord:log_arr, createdAt:property_createdAt, updatedAt:property_updatedAt};
+
+		data.push(individual_data);
+
+	}
+    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+});
+
+
+router.get('/storagePlace', async function(req, res, next) {
+/*
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
+    const user_id = req.body.id;        /////////////////////////////////////////////////////// //무슨 id인지 고치기
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+	var select_distinct_storagePlace_sql = "select distinct(name) from storagePlace_"+militaryUnit+";";
+    var [select_distinct_storagePlace_result] = await con.query(select_distinct_storagePlace_sql);
+	if(select_distinct_storagePlace_result.length==0){
+		res.send({status:200, message:'검색결과가 없습니다', data:null});
+		return;
+	}
+	var storagePlace;
+	var data = [];
+	var individual_data;
+	for(let index=0; index<select_distinct_storagePlace_result.length; ++index){
+		storagePlace = select_distinct_storagePlace_result[index].name;
+		var select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where name = ?;";
+    	var select_storagePlace_param = storagePlace;
+    	var [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+    	if(select_storagePlace_result.length==0){
+        	res.send({status:200, message:'검색결과가 없습니다', data:null});
+			return;
+    	}
+        var property_id,storagePlace_id,storagePlace_name, amount, unit;
+        var property_name, property_expirationDate, proeprty_createdAt, proeprty_updatedAt;
+        var medicInform_category, medicInform_niin;
+        var	individual_data_arr = [];
+	    var individual_individual_data;
+       	for(let i=0; i<select_storagePlace_result.length; ++i){
+            property_id = select_storagePlace_result[i].property_id;
+           	storagePlace_id = select_storagePlace_result[i].id;
+           	storagePlace_name = storagePlace;
+           	amount = select_storagePlace_result[i].amount;
+           	unit = select_storagePlace_result[i].unit;
+
+           	var select_property_sql = "select * from property_"+militaryUnit+" where id = ?;";
+           	var select_property_param = property_id;
+           	var [select_property_result] = await con.query(select_property_sql, select_property_param);
+           	if(select_property_result.length==0){
+               	res.send({status:400, message:'Bad Request', data:null});
+               	return;
+           	}
+           	property_name = select_property_result[0].name;
+           	property_expirationDate = select_property_result[0].expirationDate;
+           	property_createdAt = select_property_result[0].createdAt;
+           	property_updatedAt = select_property_result[0].updatedAt;
+           	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+           	var select_medicInform_param = property_name;
+           	var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+           	if(select_medicInform_result.length==0){
+               	res.send({status:400, message:'Bad Request', data:null});
+               	return;
+           	}
+           	medicInform_category = select_medicInform_result[0].category;
+           	medicInform_niin = select_medicInform_result[0].niin;
+           	var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by createdAt, log_num;";
+           	var select_log_param =["%"+property_id+"%", "%"+storagePlace+"%"];
+           	var select_log_by_target_sql = "select id, receiptPayment from paymentLog_"+militaryUnit+" where target = ? and property_id_arr like ?;";
+           	var select_log_by_target_param = [storagePlace, "%"+property_id+"%"];
+           	const [select_log_result] = await con.query(select_log_sql,select_log_param);
+           	const [select_log_by_target_result] = await con.query(select_log_by_target_sql,select_log_by_target_param);
+           	if(select_log_result.length==0&&select_log_by_target_result.length==0){
+               	res.send({status:400, message:'Bad Request', data:null});
+               	return;
+           	}
+           	var log_arr = [];
+           	var string_property_id_arr, string_storagePlace_arr;
+           	for(let j=0; j<select_log_result.length; ++j){
+                //log_arr.push(select_log_result[j].id);
+                //console.log(string_property_id_arr+"   "+string_storagePlace_arr);
+               	string_property_id_arr = select_log_result[j].property_id_arr;
+               	string_storagePlace_arr = select_log_result[j].storagePlace_arr;
+                //console.log(select_log_result[k].id+"  "+string_property_id_arr+"   "+string_storagePlace_arr);
+               	var property_id_arr = string_property_id_arr.split('/');
+               	var storagePlace_arr = string_storagePlace_arr.split('/');
+               	for(let k=0; k<property_id_arr.length; ++k){
+                   	if(storagePlace_arr[k]==storagePlace&&property_id_arr[k]==property_id){
+                       	log_arr.push(select_log_result[j].id);
+                       	break;
+                   	}
+               	}
+           	}
+           	for(let j=0; j<select_log_by_target_result.length; ++j){
+               	if(select_log_by_target_result[j].receiptPayment=="이동"){
+                   	log_arr.push(select_log_by_target_result[j].id);
+               	}
+           	}
+
+           	individual_individual_data={propertyId :property_id,propertyName:property_name,unit:unit,amount:amount, category:medicInform_category, niin:medicInform_niin,expirationDate:property_expirationDate,logRecord:log_arr,createdAt:property_createdAt, updatedAt : property_updatedAt};
+            //individual_data={propertyId :property_id,propertyName:property_name,unit:unit,amount:amount, category:medicInform_category, niin:medicInform_niin,expirationDate:property_expirationDate,createdAt:property_createdAt, updatedAt : property_updatedAt};
+           	individual_data_arr.push(individual_individual_data);
+		}
+		individual_data = {name:storagePlace, individualData:individual_data_arr};
+		data.push(individual_data);
+	}
+	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:'Ok', data:data});
+});
+
+
+router.get('/storagePlace/:storagePlace', async function(req, res, next) {
+/*
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+/*
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰없음", data:null});
+        return;
+    }
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+*/
+    con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:400, message:'Bad Request', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+	var storagePlace = req.params.storagePlace;
+	var select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where name = ?;";
+	var select_storagePlace_param = storagePlace;
+	var [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+	if(select_storagePlace_result.length==0){
+		res.send({status:200, message:'검색결과가 없습니다', data:null});
+	}
+	else{
+		var property_id,storagePlace_id,storagePlace_name, amount, unit;
+		var property_name, property_expirationDate, proeprty_createdAt, proeprty_updatedAt;
+		var medicInform_category, medicInform_niin;
+		var data = [];
+		var individual_data;
+		for(let i=0; i<select_storagePlace_result.length; ++i){
+			property_id = select_storagePlace_result[i].property_id;
+			storagePlace_id = select_storagePlace_result[i].id;
+			storagePlace_name = storagePlace;
+			amount = select_storagePlace_result[i].amount;
+			unit = select_storagePlace_result[i].unit;
+			
+			var select_property_sql = "select * from property_"+militaryUnit+" where id = ?;";
+			var select_property_param = property_id;
+			var [select_property_result] = await con.query(select_property_sql, select_property_param);
+			if(select_property_result.length==0){
+				res.send({status:400, message:'Bad Request', data:null});
+        		return;
+			}
+			property_name = select_property_result[0].name;
+			property_expirationDate = select_property_result[0].expirationDate;
+			property_createdAt = select_property_result[0].createdAt;
+			property_updatedAt = select_property_result[0].updatedAt;
+			var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_param = property_name;
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+			if(select_medicInform_result.length==0){
+                res.send({status:400, message:'Bad Request', data:null});
+                return;
+            }
+			medicInform_category = select_medicInform_result[0].category;
+			medicInform_niin = select_medicInform_result[0].niin;
+			var select_log_sql = "select id, property_id_arr, storagePlace_arr from paymentLog_"+militaryUnit+" where property_id_arr like ? and storagePlace_arr like ?  order by createdAt, log_num;";
+			var select_log_param =["%"+property_id+"%", "%"+storagePlace+"%"];
+			var select_log_by_target_sql = "select id, receiptPayment from paymentLog_"+militaryUnit+" where target = ? and property_id_arr like ?;";
+			var select_log_by_target_param = [storagePlace, "%"+property_id+"%"];
+        	const [select_log_result] = await con.query(select_log_sql,select_log_param);
+			const [select_log_by_target_result] = await con.query(select_log_by_target_sql,select_log_by_target_param);
+			if(select_log_result.length==0&&select_log_by_target_result.length==0){
+				res.send({status:400, message:'Bad Request', data:null});
+                return;
+			}
+			var log_arr = [];
+			var string_property_id_arr, string_storagePlace_arr;
+			for(let j=0; j<select_log_result.length; ++j){
+				//log_arr.push(select_log_result[j].id);
+				//console.log(string_property_id_arr+"   "+string_storagePlace_arr);
+					string_property_id_arr = select_log_result[j].property_id_arr;
+                	string_storagePlace_arr = select_log_result[j].storagePlace_arr;
+                //console.log(select_log_result[k].id+"  "+string_property_id_arr+"   "+string_storagePlace_arr);
+                	var property_id_arr = string_property_id_arr.split('/');
+                	var storagePlace_arr = string_storagePlace_arr.split('/');
+                	for(let k=0; k<property_id_arr.length; ++k){
+                    	if(storagePlace_arr[k]==storagePlace&&property_id_arr[k]==property_id){
+                        	log_arr.push(select_log_result[j].id);
+                        	break;
+                    	}
+                	}
+/*
+				string_property_id_arr = select_log_result[j].property_id_arr;
+				string_storagePlace_arr = select_log_result[j].storagePlace_arr;
+				//console.log(select_log_result[k].id+"  "+string_property_id_arr+"   "+string_storagePlace_arr);
+				var property_id_arr = string_property_id_arr.split('/');
+				var storagePlace_arr = string_storagePlace_arr.split('/');
+				for(let k=0; k<property_id_arr.length; ++k){
+					if(storagePlace_arr[k]==storagePlace&&property_id_arr[k]==property_id){
+						log_arr.push(select_log_result[j].id);
+						break;
+					}
+				}
+*/
+			}
+			for(let j=0; j<select_log_by_target_result.length; ++j){
+				if(select_log_by_target_result[j].receiptPayment=="이동"){
+					log_arr.push(select_log_by_target_result[j].id);
+				}			
+			}
+
+			individual_data={propertyId :property_id,propertyName:property_name,unit:unit,amount:amount, category:medicInform_category, niin:medicInform_niin,expirationDate:property_expirationDate,logRecord:log_arr,createdAt:property_createdAt, updatedAt : property_updatedAt};
+			//individual_data={propertyId :property_id,propertyName:property_name,unit:unit,amount:amount, category:medicInform_category, niin:medicInform_niin,expirationDate:property_expirationDate,createdAt:property_createdAt, updatedAt : property_updatedAt};
+			data.push(individual_data);
+		}
+		
+        res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:'Ok', data:data});
+    	
+	}
+    ////////////////
+//////내용
+    ///////////////
+    //res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+});
 
 
 router.get('/', async function(req, res, next) {

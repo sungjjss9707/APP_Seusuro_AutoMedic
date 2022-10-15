@@ -69,7 +69,7 @@ var bookmarkMake = async function(militaryUnit){
 var favoriteMake = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
-        var sql = "create table favorite_"+militaryUnit+" ( user_id varchar(100), property_id varchar(100), primary key (user_id, name) );"
+        var sql = "create table favorite_"+militaryUnit+" ( user_id varchar(100), property_id varchar(100), primary key (user_id, property_id) );"
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){

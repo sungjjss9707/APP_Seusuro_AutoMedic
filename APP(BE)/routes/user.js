@@ -90,8 +90,9 @@ router.post('/', async function(req, res, next) {
 	const militaryUnit = req.body.militaryUnit;
 	const pictureName = req.body.pictureName;
 	const encoded_pw = bcrypt.hashSync(password, 10);
+	const new_militaryUnit = militaryUnit.replace(/ /g, "_");
 	var check_militaryUnit_sql = "select * from mil_and_code where militaryUnit = ?;";
-	var check_militaryUnit_param = militaryUnit;
+	var check_militaryUnit_param = new_militaryUnit;
 	const[check_militaryUnit_result] = await con.query(check_militaryUnit_sql, check_militaryUnit_param);
 	if(check_militaryUnit_result.length==0){
 		res.send({status:400, message:"없는 부대입니다"});
@@ -100,7 +101,7 @@ router.post('/', async function(req, res, next) {
 //	var encoded_id = crypto.createHash('sha256').update(email).digest('base64');
 	var encoded_id = email;	
 	var insert_sql = "insert into user values (?,?,?,?,?,?,?,?,?,?,?,now(), now());";
-	var insert_param = [encoded_id, name, email, encoded_pw, phoneNumber, serviceNumber, mil_rank, enlistmentDate, dischargeDate, militaryUnit, pictureName];
+	var insert_param = [encoded_id, name, email, encoded_pw, phoneNumber, serviceNumber, mil_rank, enlistmentDate, dischargeDate, new_militaryUnit, pictureName];
 	var insert_success = await myQuery(insert_sql, insert_param);
 	if(insert_success.success){
 		var select_sql = "select createdAt, updatedAt from user where id = ?;";
@@ -175,7 +176,8 @@ router.post('/belong', async function(req, res, next) {
 
     console.log("check_belong page");
 
-    const militaryUnit = req.body.militaryUnit;
+    var militaryUnit = req.body.militaryUnit;
+	militaryUnit = militaryUnit.replace(/ /g, "_");
     const accessCode = req.body.accessCode;
     con = await db.createConnection(inform);
     var select_sql = "select * from mil_and_code where militaryUnit = ?;";
@@ -246,8 +248,8 @@ router.post('/userInformation', async function(req, res, next) {
 		res.send({status:400, message:"Bad Request", data:null});
     }
     else{
-
-		var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+		var militaryUnit = result[0].militaryUnit.replace(/_/g, " ");
+		var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
 		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
 	} 
 });
@@ -275,7 +277,7 @@ router.put('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
-    //var my_id = verify_success.id;
+    var user_id = verify_success.id;
 
     const id = req.body.id;
     const name = req.body.name;
@@ -285,6 +287,9 @@ router.put('/', async function(req, res, next) {
 	var enlistmentDate = req.body.enlistmentDate;
 	var dischargeDate = req.body.dischargeDate;
 	const pictureName = req.body.pictureName;
+	//if(id!=user_id){
+	//	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"", data:data});
+	//}
 /*    const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -312,7 +317,8 @@ router.put('/', async function(req, res, next) {
 		var select_user_sql = "select * from user where id = ?;";
 		var select_user_param = id;
 		const [result] = await con.query(select_user_sql, select_user_param);
-        var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+		var militaryUnit = result[0].militaryUnit.replace(/_/g, " ");
+        var data = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit, pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
         res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
     }
 });

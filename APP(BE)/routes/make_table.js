@@ -21,20 +21,23 @@ async function myQuery(sql, param){
 
 router.post('/', async function(req, res, next) {
 	con = await db.createConnection(inform);
-	const militaryUnit = req.body.militaryUnit;
-	const code = req.body.code;
-	var insert_mil_and_code = myQuery("insert into mil_and_code values (?,?);", [militaryUnit, code]);
-	if(!insert_mil_and_code){
-		res.send("Fail");
-		return;
-	}
-	var property_make_success = await table.propertyMake(militaryUnit);
-	var log_make_success = await table.paymentLogMake(militaryUnit);
-	var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
-	if(property_make_success.success&&log_make_success.success&&storagePlace_make_success){
+    var militaryUnit = req.body.militaryUnit;
+    const code = req.body.code;
+	militaryUnit = militaryUnit.replace(/ /g, "_");
+    var insert_mil_and_code = myQuery("insert into mil_and_code values (?,?);", [militaryUnit, code]);
+    if(!insert_mil_and_code){
+        res.send("Fail");
+        return;
+    }
+    var property_make_success = await table.propertyMake(militaryUnit);
+    var log_make_success = await table.paymentLogMake(militaryUnit);
+    var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
+    var medicInform_make_success = await table.medicInformMake(militaryUnit);
+    var favorite_make_success = await table.favoriteMake(militaryUnit);
+    var bookmark_make_success = await table.bookmarkMake(militaryUnit);
+    if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success&&favorite_make_success&&bookmark_make_success){
 		res.send("success");
-	} 
-	else res.send({status:400, message:"Bad Request"});
+	}
 });
 
 module.exports = router;
