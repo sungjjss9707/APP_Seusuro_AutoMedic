@@ -16,6 +16,8 @@ var testRouter = require('./routes/test');
 var pictureRouter = require('./routes/picture');
 var indexRouter = require('./routes/index');
 var tokencheckRouter = require('./routes/tokencheck');
+var bookmarkRouter = require('./routes/bookmark');
+var favoriteRouter = require('./routes/favorite');
 //var indexRouter = require('./routes/index');
 //var usersRouter = require('./routes/users');
 //var verifyRouter = require('./routes/verify');
@@ -54,6 +56,8 @@ app.use('/picture', pictureRouter);
 app.use('/', indexRouter);
 //app.use('/verify', verifyRouter);
 app.use('/tokencheck', tokencheckRouter);
+app.use('/bookmark', bookmarkRouter);
+app.use('/favorite', favoriteRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));

@@ -70,8 +70,9 @@ router.post('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
 */
+	res.setHeader("Access-Control-Expose-Headers","*");
+
     console.log("REISTER-PAGE");
 	con = await db.createConnection(inform);
 	await con.beginTransaction();
@@ -145,8 +146,9 @@ router.post('/reduplication', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
 */
+	res.setHeader("Access-Control-Expose-Headers","*");
+
     con = await db.createConnection(inform);
     //con.connect(err => {
      // if (err) throw new Error(err);
@@ -168,8 +170,9 @@ router.post('/belong', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
 */
+	res.setHeader("Access-Control-Expose-Headers","*");
+
     console.log("check_belong page");
 
     const militaryUnit = req.body.militaryUnit;
@@ -199,8 +202,9 @@ router.post('/userInformation', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
 */
+	res.setHeader("Access-Control-Expose-Headers","*");
+
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -254,8 +258,9 @@ router.put('/', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	res.setHeader("Access-Control-Expose-Headers","*");
 */
+	res.setHeader("Access-Control-Expose-Headers","*");
+
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -320,7 +325,7 @@ router.delete('/', async function(req, res, next) {
 	//res.setHeader("Access-Control-Allow-Headers",");
 //    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,Authorization");
 	//res.setHeader("Access-Control-Allow-Headers","Access-Control-Allow-Origin, Content-Type, Authorization, Accept, Downlink");
-	//res.setHeader("Access-Control-Expose-Headers","*");
+	res.setHeader("Access-Control-Expose-Headers","*");
 	//const Authorization = req.e.Authorization;
 	//const Authorization = req.header('Authorization');
 	//const accessToken = req.cookie.accessToken;
