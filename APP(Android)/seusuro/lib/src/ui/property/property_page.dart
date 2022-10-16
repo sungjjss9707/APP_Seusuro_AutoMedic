@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
-import 'package:seusuro/src/controller/ui/asset_page_controller.dart';
+import 'package:seusuro/src/controller/ui/property_page_controller.dart';
 import 'package:seusuro/src/ui/property/property_list.dart';
+import 'package:seusuro/src/repository/property_repository.dart';
 
 class PropertyPage extends StatefulWidget {
   const PropertyPage({super.key});
@@ -15,10 +16,10 @@ class PropertyPageState extends State<PropertyPage> {
   
   final _orderList = const ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
 
-  static final _assetListPage = PropertyList();
+  static final _propertyList = PropertyList();
 
   int index = 0;
-  int? totalNum = _assetListPage.totalNum;
+  late int? totalNum = _propertyList.totalNum;
 
   valueChanged(int i) {
     setState(() {
@@ -28,7 +29,7 @@ class PropertyPageState extends State<PropertyPage> {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(AssetPageController());
+    Get.put(PropertyPageController());
 
     return Column(
       children: <Widget>[
@@ -63,7 +64,7 @@ class PropertyPageState extends State<PropertyPage> {
                 ),
                 child: Row(
                   children: [
-                    Text(_orderList[AssetPageController.to.orderIndex.value]),
+                    Text(_orderList[PropertyPageController.to.orderIndex.value]),
                     const Icon(
                       Icons.keyboard_arrow_down,
                       size: 24
@@ -84,7 +85,7 @@ class PropertyPageState extends State<PropertyPage> {
                 height: 36,
                 child: OutlinedButton(
                   onPressed: () {
-  
+                    openSortDialog(context);
                   },
                   style: ButtonStyle(
                     side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
@@ -133,7 +134,7 @@ class PropertyPageState extends State<PropertyPage> {
             ],
           )
         ),
-        _assetListPage,
+        _propertyList,
       ],
     );
   }
@@ -152,13 +153,13 @@ class PropertyPageState extends State<PropertyPage> {
               child: TextButton(
                 style: TextButton.styleFrom(
                   minimumSize: const Size(328, 48),
-                  backgroundColor: AssetPageController.to.orderIndex.value == 0 ? AppColors().bgGrey : Colors.transparent,
+                  backgroundColor: PropertyPageController.to.orderIndex.value == 0 ? AppColors().bgGrey : Colors.transparent,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
                 ),
                 onPressed: () {
                   setState(() {
-                    AssetPageController.to.changeOrderIndex(0);
+                    PropertyPageController.to.changeOrderIndex(0);
                   });
                   Navigator.pop(context);
                 },
@@ -172,13 +173,13 @@ class PropertyPageState extends State<PropertyPage> {
               child: TextButton(
                 style: TextButton.styleFrom(
                   minimumSize: const Size(328, 48),
-                  backgroundColor: AssetPageController.to.orderIndex.value == 1 ? AppColors().bgGrey : Colors.transparent,
+                  backgroundColor: PropertyPageController.to.orderIndex.value == 1 ? AppColors().bgGrey : Colors.transparent,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
                 ),
                 onPressed: () {
                   setState(() {
-                    AssetPageController.to.changeOrderIndex(1);
+                    PropertyPageController.to.changeOrderIndex(1);
                   });
                   Navigator.pop(context);
                 },
@@ -192,13 +193,13 @@ class PropertyPageState extends State<PropertyPage> {
               child: TextButton(
                 style: TextButton.styleFrom(
                   minimumSize: const Size(328, 48),
-                  backgroundColor: AssetPageController.to.orderIndex.value == 2 ? AppColors().bgGrey : Colors.transparent,
+                  backgroundColor: PropertyPageController.to.orderIndex.value == 2 ? AppColors().bgGrey : Colors.transparent,
                   foregroundColor: Colors.black,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
                 ),
                 onPressed: () {
                   setState(() {
-                    AssetPageController.to.changeOrderIndex(2);
+                    PropertyPageController.to.changeOrderIndex(2);
                   });
                   Navigator.pop(context);
                 },
@@ -215,4 +216,200 @@ class PropertyPageState extends State<PropertyPage> {
       ),
     );
   }
+}
+
+void openSortDialog(BuildContext context) {
+  Get.dialog(
+    SimpleDialog(
+      title: Text(
+        '분류',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 20,
+          color: AppColors().textBlack,
+        )
+      ),
+      children: [
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '경구약',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textBlue,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeOrally.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeOrally.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '백신류',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textPurple,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeVaccine.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeVaccine.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '분무약',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textOrange,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeAerosol.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeAerosol.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '보호대',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textGreen,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeGuard.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeGuard.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '마스크',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textGrey,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeMask.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeMask.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '소모품',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  color: AppColors().textBrown,
+                ),
+              ),
+              Checkbox(
+                checkColor: AppColors().bgWhite,
+                fillColor: MaterialStateProperty.resolveWith(getColor),
+                value: PropertyPageController.to.includeConsumable.value,
+                onChanged: (bool? value) {
+                  () {
+                    PropertyPageController.to.includeConsumable.value = value!;
+                  };
+                }
+              )
+            ],
+          ),
+        ),
+        TextButton(
+          child: Text(
+            '확인',
+            style: TextStyle(
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              color: AppColors().textBlack,
+            ),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        )
+      ],
+    )
+  );
+}
+
+Color getColor(Set<MaterialState> states) {
+  const Set<MaterialState> interacitveStates = <MaterialState> {
+    MaterialState.pressed,
+  };
+  if (states.any(interacitveStates.contains)) {
+    return AppColors().bgBlack;
+  }
+  return AppColors().bgBlack;
 }
