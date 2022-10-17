@@ -170,7 +170,7 @@ router.delete('/favorite', async function(req, res, next) {
             log_arr.push(select_log_result[k].id);
         }
         var niin, category;
-        var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
         var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
         if(select_medicInform_result.length==0){
@@ -262,7 +262,7 @@ router.get('/favorite', async function(req, res, next) {
             log_arr.push(select_log_result[k].id);
         }
         var niin, category;
-        var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
         var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
         if(select_medicInform_result.length==0){
@@ -372,7 +372,7 @@ router.post('/favorite', async function(req, res, next) {
             log_arr.push(select_log_result[k].id);
         }
         var niin, category;
-        var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
         var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
         if(select_medicInform_result.length==0){
@@ -509,7 +509,7 @@ router.post('/filter', async function(req, res, next) {
                 log_arr.push(select_log_result[k].id);
             }
             var niin, category;
-            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_sql = "select * from medicInform where name = ?;";
             var select_medicInform_param = name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
@@ -528,6 +528,13 @@ router.post('/filter', async function(req, res, next) {
         res.send({status:200, message:"Ok", data:data});
 	}
 	else{
+		var select_storagePlace_sql = "select * from storagePlace_"+militaryUnit+" where name = ?;";
+		var select_storagePlace_param = storagePlace;
+		var [select_storagePlace_result] = await con.query(select_storagePlace_sql, select_storagePlace_param);
+		if(select_storagePlace_result.length==0){
+			res.send({status:200, message:"검색결과가 없습니다.", data:null});
+			return;
+		}
 		var data = [];
         var log_arr = [];
         var Individual_data;
@@ -594,7 +601,7 @@ router.post('/filter', async function(req, res, next) {
             }
 */
             var niin, category;
-            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_sql = "select * from medicInform where name = ?;";
             var select_medicInform_param = name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
@@ -723,7 +730,7 @@ router.get('/', async function(req, res, next) {
                 log_arr.push(select_log_result[k].id);
             }
 			var niin, category;
-            var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+            var select_medicInform_sql = "select * from medicInform where name = ?;";
             var select_medicInform_param = name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
@@ -852,7 +859,7 @@ router.get('/:id', async function(req, res, next) {
 				log_arr.push(select_log_result[i].id);
 			}
         	var niin, category;
-        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_sql = "select * from medicInform where name = ?;";
         	var select_medicInform_param = name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){

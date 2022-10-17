@@ -32,10 +32,10 @@ router.post('/', async function(req, res, next) {
     var property_make_success = await table.propertyMake(militaryUnit);
     var log_make_success = await table.paymentLogMake(militaryUnit);
     var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
-    var medicInform_make_success = await table.medicInformMake(militaryUnit);
+    //var medicInform_make_success = await table.medicInformMake(militaryUnit);
     var favorite_make_success = await table.favoriteMake(militaryUnit);
     var bookmark_make_success = await table.bookmarkMake(militaryUnit);
-    if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success&&favorite_make_success&&bookmark_make_success){
+    if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&favorite_make_success&&bookmark_make_success){
 		res.send("success");
 	}
 });

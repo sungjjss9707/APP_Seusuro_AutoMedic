@@ -129,7 +129,7 @@ router.post('/filter', async function(req, res, next) {
     	var niin_arr = [];
     	var niin, category;
     	var category_arr = [];
-    	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+    	var select_medicInform_sql = "select * from medicInform where name = ?;";
     	var select_medicInform_param;
         for(let k=0; k<arr_property_id.length; ++k){
             select_medicInform_param = arr_name[k];
@@ -332,7 +332,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
     }
 	var category_arr = [];
 	for(let i=0; i<arr_name.length; ++i){
-		var select_category_sql = "select category from medicInform_"+militaryUnit+" where name = ?;";
+		var select_category_sql = "select category from medicInform where name = ?;";
 		var select_category_param = arr_name[i];
 		var [select_category_result] = await con.query(select_category_sql, select_category_param);
 		if(select_category_result.length==0){
@@ -849,7 +849,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
@@ -857,7 +857,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
             if(select_medicInform_result.length==0){
                 var new_niin = Math.random().toString(36).substring(2, 12);
                 niin = new_niin;
-                var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+                var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
                 var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
                 var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
                 if(!insert_medicInform_success){
@@ -989,7 +989,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
@@ -1120,7 +1120,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
@@ -1320,7 +1320,7 @@ router.get('/', async function(req, res, next) {
 			var niin_arr = [];
         	var niin, category;
         	var category_arr = [];
-        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_sql = "select * from medicInform where name = ?;";
         	var select_medicInform_param;
         	for(let k=0; k<arr_property_id.length; ++k){
             	select_medicInform_param = arr_name[k];
@@ -1486,7 +1486,7 @@ router.get('/:id', async function(req, res, next) {
 		var niin_arr = [];
 		var niin, category;
 		var category_arr = [];
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<len; ++i){
             select_medicInform_param = arr_name[i];
@@ -1747,7 +1747,7 @@ router.post('/', async function(req, res, next) {
 				}
 			}
 		}
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
 		var select_medicInform_param; 
 		for(let i=0; i<items.length; ++i){
 			select_medicInform_param = items[i].name;
@@ -1755,7 +1755,7 @@ router.post('/', async function(req, res, next) {
 			if(select_medicInform_result.length==0){
 				var new_niin = Math.random().toString(36).substring(2, 12); 
 				niin = new_niin;
-				var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+				var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
         		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
 				var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
 				if(!insert_medicInform_success){
@@ -1882,7 +1882,7 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
@@ -2008,7 +2008,7 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;

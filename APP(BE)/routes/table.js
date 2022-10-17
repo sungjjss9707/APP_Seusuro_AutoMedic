@@ -153,13 +153,13 @@ var favoriteDrop = async function(militaryUnit){
 exports.propertyMake = propertyMake;
 exports.paymentLogMake = paymentLogMake;
 exports.storagePlaceMake = storagePlaceMake;
-exports.medicInformMake = medicInformMake;
+//exports.medicInformMake = medicInformMake;
 exports.bookmarkMake = bookmarkMake;
 exports.favoriteMake = favoriteMake;
 exports.propertyDrop = propertyDrop;
 exports.paymentLogDrop = paymentLogDrop;
 exports.storagePlaceDrop = storagePlaceDrop;
-exports.medicInformDrop = medicInformDrop;
+//exports.medicInformDrop = medicInformDrop;
 exports.bookmarkDrop = bookmarkDrop;
 exports.favoriteDrop = favoriteDrop;
 

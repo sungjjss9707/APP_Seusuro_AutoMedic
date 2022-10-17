@@ -46,12 +46,12 @@ const upload = multer({
 
 
 router.post('/', upload.single('img'), (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    //res.setHeader("Access-Control-Allow-Origin", "*");
+    //res.setHeader("Access-Control-Allow-Credentials", "true");
+    //res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    //res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
     res.setHeader("Access-Control-Expose-Headers","*");
-	console.log("준거 : "+req.file.filename);
+	//console.log("준거 : "+req.file.filename);
     res.send({status:200, message:"Ok", data:req.file.filename});
 });
 

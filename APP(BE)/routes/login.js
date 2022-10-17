@@ -36,7 +36,7 @@ router.post('/', async function(req, res, next) {
 	const [select_result1, select_field1] = await con.query(select_sql, select_param);
 	if(select_result1.length==0){
         //console.log("없는 계정입니다.");
-        res.send({status:400, message:"존재하지 않는 계정입니다"});
+        res.send({status:200, message:"존재하지 않는 email 입니다.", data:null});
     }
     else{
 		const real_my_encoded_pw = select_result1[0].password;
@@ -84,11 +84,11 @@ router.post('/', async function(req, res, next) {
 				res.header({"accessToken":access_token, "refreshToken":refresh_token}).send({status:200, message:"Ok", data:data});
 				//res.send({status:200, message:"Ok", data:data});
 			}
-    		else res.send({status:400, message:"Bad Request"});    	
+    		else res.send({status:500, message:"Internal Server Error", data:null});    	
 		}
 		else{
 			console.log("로그인 실패");
-			res.send({status:400, message:"비밀번호가 틀립니다", data:null});
+			res.send({status:200, message:"잘못된 비밀번호 입니다.", data:null});
 		}
     }
 });
