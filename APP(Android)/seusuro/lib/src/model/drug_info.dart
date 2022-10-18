@@ -3,7 +3,7 @@ class DrugInfo {
   final String? itemName; // 제품명
   final String? efcyQesitm; // 1. 효능
   final String? useMethodQesitm; // 2. 사용법
-  final String? atpnWarnQesitm; // 3. 주의사항 경고
+  final String? atpnWarnQesitm; // 3. 경고사항
   final String? atpnQesitm; // 4. 주의사항
   final String? intrcQesitm; // 5. 상호작용
   final String? seQesitm; // 6. 부작용
