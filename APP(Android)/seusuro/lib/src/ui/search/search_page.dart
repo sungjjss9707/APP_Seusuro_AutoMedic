@@ -5,6 +5,7 @@ import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/search_page_controller.dart';
 import 'package:seusuro/src/model/drug_info.dart';
 import 'package:seusuro/src/responsive_transition.dart';
+import 'package:seusuro/src/ui/search/bookmark_page.dart';
 import 'package:seusuro/src/ui/search/drug_info_page.dart';
 
 class SearchPage extends StatelessWidget {
@@ -14,16 +15,50 @@ class SearchPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(SearchPageController());
 
-    return Container(
-      color: AppColors().bgWhite,
-      child: Column(
-        children: [
-          _searchBox(),
-          Obx(() => !SearchPageController.to.isSearching.value
-              ? _recentSearch()
-              : _searchResult()),
-        ],
+    return Column(
+      children: [
+        _appBar(),
+        Expanded(
+          child: Container(
+            color: AppColors().bgWhite,
+            child: Column(
+              children: [
+                _searchBox(),
+                Obx(() => !SearchPageController.to.isSearching.value
+                    ? _recentSearch()
+                    : _searchResult()),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppColors().bgWhite,
+      title: Text(
+        '약품 검색',
+        style: TextStyle(
+          color: AppColors().textBlack,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Get.to(() => const BookmarkPage(), transition: rTransition());
+          },
+          icon: Icon(
+            Icons.bookmark_outline_rounded,
+            color: AppColors().bgBlack,
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 
