@@ -211,7 +211,7 @@ router.post('/userInformation', async function(req, res, next) {
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -267,7 +267,7 @@ router.put('/', async function(req, res, next) {
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -350,7 +350,7 @@ router.delete('/', async function(req, res, next) {
 	//const accessToken = req.header('accessToken');
     //const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -394,7 +394,7 @@ router.delete('/', async function(req, res, next) {
     if(check_token_result.length==0&&check_user_inform_result.length==0){
         res.send({status:200, message:"Ok", data:true});
     }
-    else res.send({status:500, message:"Internal Server Error", data:false});
+    else res.send({status:500, message:"Internal Server Error", data:null});
 });
 
 

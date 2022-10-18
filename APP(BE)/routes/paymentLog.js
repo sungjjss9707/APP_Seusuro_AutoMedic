@@ -31,7 +31,7 @@ router.post('/filter', async function(req, res, next) {
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -50,7 +50,7 @@ router.post('/filter', async function(req, res, next) {
     const check_militaryUnit_param = user_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        res.send({status:500, message:'Internal Sever Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
@@ -88,7 +88,7 @@ router.post('/filter', async function(req, res, next) {
 	//var select_log_sql = "select * from paymentLog where receiptPayment in ? and DATE(createdAt) between ? and ? order by createdAt;";
 	var [select_log_result] = await con.query(select_log_sql, select_log_param);
 	if(select_log_result.length==0){
-		res.send({status:200, message:"검색결과가 없습니다.", data:null});
+		res.send({status:200, message:"검색결과가 없습니다", data:null});
 		return;
 	}
 	var data = [];
@@ -135,7 +135,7 @@ router.post('/filter', async function(req, res, next) {
             select_medicInform_param = arr_name[k];
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                res.send({status:500, message:"Internal Server Error", data:null});
                 return;
             }
             else{
@@ -155,7 +155,7 @@ router.post('/filter', async function(req, res, next) {
         var select_user_param = confirmor_id;
         const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
         if(select_user_result.length==0){
-           res.send({status:400, message:"Bad Request"});
+			res.send({status:500, message:"Internal Server Error", data:null});
             return;
         }
         var user_name = select_user_result[0].name;
@@ -194,7 +194,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -210,7 +210,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 	res.setHeader("accessToken", new_access_token);
     res.setHeader("refreshToken", new_refresh_token);
 	if(user_id!=confirmor_id){
-        res.send({status:200, message:'본인 계정의 로그만 변경 가능합니다.', data:null});
+        res.send({status:400, message:'본인 계정의 로그만 변경 가능합니다', data:null});
         return;
     }
 	await con.beginTransaction();
@@ -246,7 +246,7 @@ res.setHeader("Access-Control-Allow-Origin", "*");
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
 
@@ -336,7 +336,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 		var select_category_param = arr_name[i];
 		var [select_category_result] = await con.query(select_category_sql, select_category_param);
 		if(select_category_result.length==0){
-			res.send({status:400, message:"Bad Request", data:null});
+//			res.send({status:400, message:"Bad Request", data:null});
+			res.send({status:500, message:'Internal Server Error', data:null});
             return;
 		}
 		category_arr.push(select_category_result[i].category);
@@ -362,7 +363,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
                     await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});	
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -376,7 +378,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                     if(!insert_storagePlace_result){
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                     }
                 }
@@ -388,7 +391,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
                         if(!delete_storagePlace_result){
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -401,7 +405,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                         if(!update_storagePlace_result){
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -425,7 +430,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         console.log("열로옴");
                     //  await con.rollback();
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});	
+						//res.send({status:400, message:"Bad Request", data:null});		
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -441,7 +447,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     //  await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -457,7 +464,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     if(!insert_storagePlace_result){
                     //  await con.rollback();
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -474,7 +482,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -487,7 +496,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -514,7 +524,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});	
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -531,7 +542,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -544,7 +556,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});	
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -562,7 +575,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -578,7 +592,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -607,7 +622,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                 }
             //약장함에도 약 없음
@@ -621,7 +637,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -638,7 +655,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -654,7 +672,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -669,7 +688,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -774,7 +794,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
                 else{
 					console.log(property_id+" property 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
 					await con.rollback();
 					return;
                 }
@@ -787,7 +808,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -804,7 +826,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -824,7 +847,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -842,7 +866,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -861,7 +886,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                 var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
                 var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
                 if(!insert_medicInform_success){
-                    res.send({status:400, message:"Bad Request", data:null});
+                    //res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -928,7 +954,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});	
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -943,7 +970,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -964,7 +992,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -982,7 +1011,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -995,7 +1025,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
                 await con.rollback();
                 return;
             }
@@ -1048,7 +1079,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(property_id+" property 테이블 삭제 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -1063,7 +1095,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                     }
                     else{
                         console.log(property_id+" property 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -1097,7 +1130,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -1112,7 +1146,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -1126,7 +1161,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
                 await con.rollback();
                 return;
             }
@@ -1166,7 +1202,8 @@ res.setHeader("Access-Control-Allow-Origin", "*");
 	var delete_paymentLog_param = log_id;
 	var delete_success = await myQuery(delete_paymentLog_sql, delete_paymentLog_param);
 	if(!delete_success){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
 	}
@@ -1174,10 +1211,12 @@ res.setHeader("Access-Control-Allow-Origin", "*");
     var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,YearMonthDate, log_num, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr, createdAt];
     var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
     if(!insert_log_result){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
     }
+/*
     var select_user_sql = "select * from user where id = ?;";
     var select_user_param = confirmor_id;
     var [result] = await con.query(select_user_sql, select_user_param);
@@ -1186,13 +1225,15 @@ res.setHeader("Access-Control-Allow-Origin", "*");
         await con.rollback();
         return;
     }
+*/
 	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");
     var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
     var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
     if(time_result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+//		res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
     }
@@ -1223,7 +1264,7 @@ router.get('/', async function(req, res, next) {
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -1241,7 +1282,8 @@ router.get('/', async function(req, res, next) {
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        //res.send({status:400, message:'Bad Request', data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
@@ -1276,7 +1318,7 @@ router.get('/', async function(req, res, next) {
     var select_log_sql = "select * from paymentLog_"+militaryUnit+" order by createdAt, log_num;";
     const [select_log_result, select_log_field] = await con.query(select_log_sql);
     if(select_log_result.length==0){
-        res.send({status:400, message:"Bad Request"});
+        res.send({status:200, message:"로그가 없습니다.", data:null});
     }
     else{
 		//var receiptPayment, confirmor_id, target, YearMonthDate, log_num, property_id_arr, storagePlace_arr, amount_arr, unit_arr, createdAt, updatedAt;
@@ -1326,7 +1368,7 @@ router.get('/', async function(req, res, next) {
             	select_medicInform_param = arr_name[k];
             	var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             	if(select_medicInform_result.length==0){
-                	res.send({status:400, message:"Bad Request", data:null});
+                	res.send({status:500, message:"Internal Server Error", data:null});
                 	return;
             	}
             	else{
@@ -1348,7 +1390,8 @@ router.get('/', async function(req, res, next) {
         	var select_user_param = confirmor_id;
         	const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
 			if(select_user_result.length==0){
-         	   res.send({status:400, message:"Bad Request"});
+				res.send({status:500, message:'Internal Server Error', data:null});
+//         	   res.send({status:400, message:"Bad Request"});
 				return;
         	}
 			var user_name = select_user_result[0].name;
@@ -1387,7 +1430,7 @@ router.get('/:id', async function(req, res, next) {
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -1406,7 +1449,8 @@ router.get('/:id', async function(req, res, next) {
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        //res.send({status:400, message:'Bad Request', data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
@@ -1443,7 +1487,7 @@ router.get('/:id', async function(req, res, next) {
     var select_log_param = id;
     const [select_log_result, select_log_field] = await con.query(select_log_sql, select_log_param);
     if(select_log_result.length==0){
-        res.send({status:400, message:"Bad Request"});
+        res.send({status:400, message:"해당 로그가 없습니다", data:null});
     }
     else{
         var receiptPayment = select_log_result[0].receiptPayment;
@@ -1492,7 +1536,8 @@ router.get('/:id', async function(req, res, next) {
             select_medicInform_param = arr_name[i];
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
+//                res.send({status:400, message:"Bad Request", data:null});
                 return;
             }
             else{
@@ -1514,7 +1559,8 @@ router.get('/:id', async function(req, res, next) {
         var select_user_param = confirmor_id;
         const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
         if(select_user_result.length==0){
-            res.send({status:400, message:"Bad Request"});
+			res.send({status:500, message:'Internal Server Error', data:null});
+//            res.send({status:400, message:"Bad Request"});
         }
         else{
             var user_name = select_user_result[0].name;
@@ -1552,7 +1598,7 @@ router.post('/', async function(req, res, next) {
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
-        res.send({status:400, message:"토큰없음", data:null});
+        res.send({status:400, message:"토큰 없음", data:null});
         return;
     }
     //console.log(accessToken+"  "+id);
@@ -1568,7 +1614,7 @@ router.post('/', async function(req, res, next) {
 	var user_id = verify_success.id;
 	var confirmor_id = req.body.confirmor;
 	if(user_id!=confirmor_id){
-		res.send({status:200, message:'본인 계정의 로그만 입력 가능합니다.', data:null});
+		res.send({status:200, message:'본인 계정의 로그만 입력 가능합니다', data:null});
         return;
 	}
 
@@ -1604,7 +1650,7 @@ router.post('/', async function(req, res, next) {
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        res.send({status:500, message:'Internal Server Error', data:null});
 		//await con.rollback();
         return;
     }
@@ -1672,7 +1718,7 @@ router.post('/', async function(req, res, next) {
 				}
 				else{
 					console.log(property_id+" property 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
 					await con.rollback();
 					return;
 				}
@@ -1685,7 +1731,8 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
                 }
@@ -1702,7 +1749,8 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
                 }
@@ -1722,7 +1770,8 @@ router.post('/', async function(req, res, next) {
                 	}
                 	else{
                     	console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                     	await con.rollback();
                     	return;
                 	}
@@ -1740,7 +1789,8 @@ router.post('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+//						res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -1759,7 +1809,8 @@ router.post('/', async function(req, res, next) {
         		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
 				var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
 				if(!insert_medicInform_success){
-					res.send({status:400, message:"Bad Request", data:null});
+//					res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
 				}
@@ -1790,7 +1841,8 @@ router.post('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){
-				res.send({status:400, message:"Bad Request", data:null});
+//				res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:400, message:property_id+" 가 없습니다", data:null});
                 await con.rollback();
                 return;
             }
@@ -1824,7 +1876,7 @@ router.post('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -1838,7 +1890,8 @@ router.post('/', async function(req, res, next) {
                             console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                         }
                         else{
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
 							await con.rollback();
 							return;
                         }
@@ -1858,7 +1911,8 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+//							res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                         await con.rollback();
                         return;
                     }
@@ -1875,7 +1929,8 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                         await con.rollback();
                         return;
                     }
@@ -1888,7 +1943,8 @@ router.post('/', async function(req, res, next) {
             select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:"Internal Server Error", data:null});
                 await con.rollback();
                 return;
             }
@@ -1938,7 +1994,7 @@ router.post('/', async function(req, res, next) {
                         console.log(property_id+" property 테이블 삭제  성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                 		await con.rollback();
                 		return;
                     }	
@@ -1952,7 +2008,8 @@ router.post('/', async function(req, res, next) {
                     	console.log(property_id+" property 테이블 update 성공");
                 	}
                 	else{
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                 		await con.rollback();
                 		return;
                 	}
@@ -1986,7 +2043,7 @@ router.post('/', async function(req, res, next) {
                         	console.log(property_id+" storagePlace 테이블 삭제  성공");
                     	}
                     	else{
-							res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                     		await con.rollback();
                     		return;
                     	}
@@ -2000,7 +2057,8 @@ router.post('/', async function(req, res, next) {
                         	console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     	}
                     	else{
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                             await con.rollback();
                             return;
                     	}
@@ -2014,7 +2072,8 @@ router.post('/', async function(req, res, next) {
             select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:"Internal Server Error", data:null});
+//                res.send({status:400, message:"Bad Request", data:null});
                 await con.rollback();
                 return;
             }
@@ -2063,7 +2122,8 @@ router.post('/', async function(req, res, next) {
 	var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,now, nextnum, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr];
 	var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
 	if(!insert_log_result){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
         return;
 	}
@@ -2071,7 +2131,8 @@ router.post('/', async function(req, res, next) {
 	var select_user_param = confirmor_id;
 	var [result] = await con.query(select_user_sql, select_user_param);
 	if(result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
 		return;
 	}
@@ -2081,7 +2142,8 @@ router.post('/', async function(req, res, next) {
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
 	if(time_result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
         return;
     }
