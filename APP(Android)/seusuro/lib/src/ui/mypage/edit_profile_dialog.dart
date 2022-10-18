@@ -8,7 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
-import 'package:seusuro/src/controller/ui/main_page_controller.dart';
 import 'package:seusuro/src/controller/ui/mypage_page_controller.dart';
 import 'package:seusuro/src/model/user_info.dart';
 import 'package:seusuro/src/responsive_bottom_sheet.dart';
