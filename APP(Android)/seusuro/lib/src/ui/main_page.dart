@@ -3,9 +3,11 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/main_page_controller.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
+import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/log/log_page.dart';
 import 'package:seusuro/src/ui/mypage/mypage_page.dart';
 import 'package:seusuro/src/ui/property/property_page.dart';
+import 'package:seusuro/src/ui/search/bookmark_page.dart';
 import 'package:seusuro/src/ui/search/search_page.dart';
 
 class MainPage extends StatelessWidget {
@@ -66,6 +68,42 @@ class MainPage extends StatelessWidget {
           ),
         );
       }),
+      actions: [
+        Obx(() {
+          var actionList = <Widget>[];
+
+          switch (MainPageController.to.currentIndex.value) {
+            case 0:
+              // 수불 로그
+              break;
+            case 1:
+              // 재산 현황
+              break;
+            case 2:
+              // 약품 검색
+              actionList.add(
+                IconButton(
+                  onPressed: () {
+                    Get.to(() => const BookmarkPage(),
+                        transition: rTransition());
+                  },
+                  icon: Icon(
+                    Icons.bookmark_outline_rounded,
+                    color: AppColors().bgBlack,
+                  ),
+                ),
+              );
+              break;
+            case 3:
+              // 마이페이지
+              break;
+          }
+
+          actionList.add(const SizedBox(width: 8));
+
+          return Row(children: actionList);
+        }),
+      ],
     );
   }
 
