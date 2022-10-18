@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 class LogPageController extends GetxController {
   static LogPageController get to => Get.find();
 
+  RxList logTypeList = [].obs;
+  Rx<DateTime> filterDate = DateTime(2000, 1, 1).obs;
+
   var detailTitleList = [
     '품명',
     '분류',

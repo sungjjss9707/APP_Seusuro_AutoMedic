@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/controller/ui/log_page_controller.dart';
@@ -76,6 +77,13 @@ class LogPage extends StatelessWidget {
     var mobileWidth = DataController.to.mobileWidth;
     var screenWidth = DataController.to.screenWidth.value;
 
+    var colorMap = {
+      '수입': AppColors().keyBlue,
+      '불출': AppColors().keyRed,
+      '반납': AppColors().keyGreen,
+      '폐기': AppColors().keyGrey,
+    };
+
     return Dialog(
       elevation: 0,
       insetPadding: EdgeInsets.zero,
@@ -127,23 +135,44 @@ class LogPage extends StatelessWidget {
                       crossAxisSpacing: 16,
                     ),
                     itemBuilder: (context, index) {
-                      return Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: AppColors().lineBlack,
-                          ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '수입',
-                          style: TextStyle(
-                            color: AppColors().textBlack,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
+                      String receiptPayment = colorMap.keys.toList()[index];
+
+                      return InkWell(
+                        onTap: () {
+                          if (!LogPageController.to.logTypeList
+                              .contains(receiptPayment)) {
+                            LogPageController.to.logTypeList
+                                .add(receiptPayment);
+                          } else {
+                            LogPageController.to.logTypeList
+                                .remove(receiptPayment);
+                          }
+                        },
+                        child: Obx(() => Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: LogPageController.to.logTypeList
+                                        .contains(receiptPayment)
+                                    ? colorMap[receiptPayment]
+                                    : AppColors().bgWhite,
+                                border: Border.all(
+                                  width: 1,
+                                  color: colorMap[receiptPayment]!,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                receiptPayment,
+                                style: TextStyle(
+                                  color: LogPageController.to.logTypeList
+                                          .contains(receiptPayment)
+                                      ? AppColors().textWhite
+                                      : colorMap[receiptPayment],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            )),
                       );
                     },
                   ),
@@ -159,12 +188,16 @@ class LogPage extends StatelessWidget {
                   const SizedBox(height: 8),
                   InkWell(
                     onTap: () async {
-                      await showDatePicker(
+                      var filterDate = await showDatePicker(
                         context: Get.overlayContext!,
                         initialDate: DateTime.now(),
                         firstDate: DateTime(2022, 3, 21),
                         lastDate: DateTime(2030, 12, 31),
                       );
+
+                      if (filterDate != null) {
+                        LogPageController.to.filterDate.value = filterDate;
+                      }
                     },
                     child: Container(
                       height: 48,
@@ -176,14 +209,18 @@ class LogPage extends StatelessWidget {
                         ),
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      child: Text(
-                        '2022년 10월 29일',
-                        style: TextStyle(
-                          color: AppColors().textBlack,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      child: Obx(() => Text(
+                            LogPageController.to.filterDate.value ==
+                                    DateTime(2000, 1, 1)
+                                ? '날짜를 선택해주세요'
+                                : DateFormat('yyyy년 MM월 dd일').format(
+                                    LogPageController.to.filterDate.value),
+                            style: TextStyle(
+                              color: AppColors().textBlack,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          )),
                     ),
                   ),
                   const SizedBox(height: 32),
