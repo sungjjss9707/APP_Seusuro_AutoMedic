@@ -4,7 +4,8 @@ class ItemInfo {
   final String unit;
   final String category;
   final String storagePlace;
-  final DateTime expirationDate;
+  final String expirationDate;
+  final String niin;
 
   ItemInfo(
     this.name,
@@ -13,6 +14,7 @@ class ItemInfo {
     this.category,
     this.storagePlace,
     this.expirationDate,
+    this.niin,
   );
 
   ItemInfo.fromJson(Map<String, dynamic> json)
@@ -21,7 +23,8 @@ class ItemInfo {
         unit = json['unit'],
         category = json['category'],
         storagePlace = json['storagePlace'],
-        expirationDate = json['expirationDate'];
+        expirationDate = json['expirationDate'],
+        niin = json['niin'];
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -30,5 +33,6 @@ class ItemInfo {
         'category': category,
         'storagePlace': storagePlace,
         'expirationDate': expirationDate,
+        'niin': niin,
       };
 }

@@ -201,7 +201,7 @@ class WriteLogPage extends StatelessWidget {
           detailContentList
               .add('${itemInfo.amount.toString()} ${itemInfo.unit}');
           detailContentList
-              .add(DateFormat('yyyy년 MM월 dd일').format(itemInfo.expirationDate));
+              .add(itemInfo.expirationDate);
           detailContentList.add(itemInfo.storagePlace);
 
           return _propertyDetail(
