@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/controller/ui/log_page_controller.dart';
+import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/log/log_bubble.dart';
 import 'package:seusuro/src/ui/log/write_log_page.dart';
@@ -23,14 +24,28 @@ class LogPage extends StatelessWidget {
             color: AppColors().bgWhite,
             child: Stack(
               children: [
-                ListView.separated(
-                  shrinkWrap: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 10,
-                  itemBuilder: (context, index) => const LogBubble(),
-                  separatorBuilder: (context, index) =>
-                      const SizedBox(height: 32),
-                ),
+                Obx(() => ListView.separated(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: LogPageController.to.logList.length,
+                      itemBuilder: (context, index) {
+                        LogInfo logInfo = LogPageController.to.logList[index];
+                        String createdDate = logInfo.createdAt.substring(0, 10);
+
+                        if (!LogPageController.to.dateList
+                            .contains(createdDate)) {
+                          LogPageController.to.dateList.add(createdDate);
+                          LogPageController.to.showDateList.add(logInfo.id);
+                        }
+
+                        bool showDate = LogPageController.to.showDateList
+                            .contains(logInfo.id);
+
+                        return LogBubble(showDate: showDate, logInfo: logInfo);
+                      },
+                      separatorBuilder: (context, index) =>
+                          const SizedBox(height: 32),
+                    )),
                 Positioned(
                   right: 16,
                   bottom: 16,

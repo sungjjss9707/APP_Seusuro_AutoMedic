@@ -1,33 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_network/image_network.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/controller/ui/log_page_controller.dart';
+import 'package:seusuro/src/model/item_info.dart';
+import 'package:seusuro/src/model/log_info.dart';
+import 'package:seusuro/src/model/user_info.dart';
 
 class LogBubble extends StatelessWidget {
-  const LogBubble({super.key});
+  const LogBubble({
+    Key? key,
+    required this.showDate,
+    required this.logInfo,
+  }) : super(key: key);
+
+  final bool showDate;
+  final LogInfo logInfo;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        _logDate(),
-        const SizedBox(height: 16),
-        ListView.separated(
-          shrinkWrap: true,
-          itemCount: 4,
-          itemBuilder: (context, index) {
-            var typeList = ['수입', '불출', '반납', '폐기'];
-
-            return _bubble(receiptPayment: typeList[index]);
-          },
-          separatorBuilder: (context, index) => const SizedBox(height: 32),
-        ),
+        showDate
+            ? Column(
+                children: [
+                  _logDate(logInfo: logInfo),
+                  const SizedBox(height: 16),
+                ],
+              )
+            : Container(),
+        _bubble(logInfo: logInfo),
       ],
     );
   }
 
-  Widget _logDate() {
+  Widget _logDate({required LogInfo logInfo}) {
+    String createdAt = logInfo.createdAt;
+
+    var month = createdAt.substring(5, 7);
+    var day = createdAt.substring(8, 10);
+
     return SizedBox(
       height: 16,
       child: Stack(
@@ -35,16 +48,16 @@ class LogBubble extends StatelessWidget {
         children: [
           Container(
             height: 1,
-            color: AppColors().textGrey,
+            color: AppColors().textLightGrey,
           ),
           Container(
             width: 64,
             color: AppColors().bgWhite,
             alignment: Alignment.center,
             child: Text(
-              '9월 28일',
+              '$month월 $day일',
               style: TextStyle(
-                color: AppColors().textGrey,
+                color: AppColors().textLightGrey,
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
@@ -55,13 +68,13 @@ class LogBubble extends StatelessWidget {
     );
   }
 
-  Widget _bubble({required String receiptPayment}) {
-    bool leftSide = receiptPayment == '수입';
+  Widget _bubble({required LogInfo logInfo}) {
+    bool leftSide = logInfo.receiptPayment == '수입';
 
     Color keyColor;
     String imagePath;
 
-    switch (receiptPayment) {
+    switch (logInfo.receiptPayment) {
       case '수입':
         keyColor = AppColors().keyBlue;
         imagePath = 'assets/triangle_left.png';
@@ -89,7 +102,7 @@ class LogBubble extends StatelessWidget {
           leftSide ? MainAxisAlignment.start : MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        leftSide ? _confirmorImage() : Container(),
+        leftSide ? _confirmorImage(confirmor: logInfo.confirmor) : Container(),
         SizedBox(
           width: 262,
           child: Stack(
@@ -101,7 +114,7 @@ class LogBubble extends StatelessWidget {
                 left: leftSide ? 16 : null,
                 right: leftSide ? null : 16,
                 child: Text(
-                  '일병 유병재',
+                  '${logInfo.confirmor.rank} ${logInfo.confirmor.name}',
                   style: TextStyle(
                     color: AppColors().textBlack,
                     fontSize: 12,
@@ -113,7 +126,7 @@ class LogBubble extends StatelessWidget {
                 onTap: () {
                   Get.dialog(
                     _logDetailDialog(
-                      receiptPayment: receiptPayment,
+                      logInfo: logInfo,
                       keyColor: keyColor,
                     ),
                   );
@@ -136,22 +149,16 @@ class LogBubble extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        '미세먼지 마스크 KF-94 (흰색)',
-                        style: TextStyle(
-                          color: AppColors().textBlack,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '1500EA',
-                        style: TextStyle(
-                          color: AppColors().textBlack,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                        ),
+                      ListView.separated(
+                        shrinkWrap: true,
+                        itemCount: logInfo.items.length,
+                        itemBuilder: (context, index) {
+                          var itemInfo = logInfo.items[index];
+
+                          return _itemTile(itemInfo);
+                        },
+                        separatorBuilder: (context, index) =>
+                            const SizedBox(height: 8),
                       ),
                       Container(
                         height: 1,
@@ -170,7 +177,7 @@ class LogBubble extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '중위 성준혁',
+                            logInfo.target,
                             style: TextStyle(
                               color: AppColors().textBlack,
                               fontSize: 14,
@@ -197,7 +204,7 @@ class LogBubble extends StatelessWidget {
                   color: AppColors().bgWhite,
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Text(
-                    receiptPayment,
+                    logInfo.receiptPayment,
                     style: TextStyle(
                       color: keyColor,
                       fontSize: 12,
@@ -211,7 +218,7 @@ class LogBubble extends StatelessWidget {
                 right: leftSide ? 0 : null,
                 bottom: 4,
                 child: Text(
-                  '11:25',
+                  logInfo.createdAt.substring(11, 16),
                   style: TextStyle(
                     color: AppColors().textBlack,
                     fontSize: 10,
@@ -222,13 +229,38 @@ class LogBubble extends StatelessWidget {
             ],
           ),
         ),
-        leftSide ? Container() : _confirmorImage(),
+        leftSide ? Container() : _confirmorImage(confirmor: logInfo.confirmor),
+      ],
+    );
+  }
+
+  Widget _itemTile(ItemInfo itemInfo) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          itemInfo.name,
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          '${itemInfo.amount.toString()}${itemInfo.unit}',
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ],
     );
   }
 
   Widget _logDetailDialog({
-    required String receiptPayment,
+    required LogInfo logInfo,
     required Color keyColor,
   }) {
     var isDesktop = DataController.to.isDesktop();
@@ -257,7 +289,7 @@ class LogBubble extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '$receiptPayment 내역',
+                    '${logInfo.receiptPayment} 내역',
                     style: TextStyle(
                       color: AppColors().textBlack,
                       fontSize: 24,
@@ -269,14 +301,29 @@ class LogBubble extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          '10보급대대',
-                          style: TextStyle(
-                            color: AppColors().textBlack,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        logInfo.receiptPayment == '수입'
+                            ? Text(
+                                logInfo.target,
+                                style: TextStyle(
+                                  color: AppColors().textBlack,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              )
+                            : Column(
+                                children: [
+                                  _confirmorImage(confirmor: logInfo.confirmor),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${logInfo.confirmor.rank} ${logInfo.confirmor.name}',
+                                    style: TextStyle(
+                                      color: AppColors().textBlack,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           child: Icon(
@@ -285,20 +332,29 @@ class LogBubble extends StatelessWidget {
                             color: keyColor,
                           ),
                         ),
-                        Column(
-                          children: [
-                            _confirmorImage(),
-                            const SizedBox(height: 4),
-                            Text(
-                              '일병 유병재',
-                              style: TextStyle(
-                                color: AppColors().textBlack,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w400,
+                        logInfo.receiptPayment == '수입'
+                            ? Column(
+                                children: [
+                                  _confirmorImage(confirmor: logInfo.confirmor),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    '${logInfo.confirmor.rank} ${logInfo.confirmor.name}',
+                                    style: TextStyle(
+                                      color: AppColors().textBlack,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                logInfo.target,
+                                style: TextStyle(
+                                  color: AppColors().textBlack,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
                       ],
                     ),
                   ),
@@ -311,7 +367,7 @@ class LogBubble extends StatelessWidget {
                       var detailContentList =
                           LogPageController.to.detailContentList;
 
-                      return _propertyDetail(
+                      return _detailTile(
                         title: detailTitleList[index],
                         content: detailContentList[index],
                       );
@@ -342,41 +398,10 @@ class LogBubble extends StatelessWidget {
     );
   }
 
-  Widget _propertyDetail({
-    required String title,
-    required String content,
-  }) {
-    return Row(
-      children: [
-        SizedBox(
-          width: 76,
-          child: Text(
-            title,
-            style: TextStyle(
-              color: AppColors().textLightGrey,
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-        Expanded(
-          child: Text(
-            content,
-            style: TextStyle(
-              color: AppColors().textBlack,
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _confirmorImage() {
+  Widget _confirmorImage({required UserInfo confirmor}) {
     return InkWell(
       onTap: () {
-        // 프로필 보기
+        Get.dialog(_confirmorDialog(confirmor: confirmor));
       },
       child: Container(
         width: 32,
@@ -388,11 +413,151 @@ class LogBubble extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(
-          Icons.person_rounded,
-          color: AppColors().lineGrey,
+        child: confirmor.pictureName.isEmpty
+            ? Icon(
+                Icons.person_rounded,
+                color: AppColors().keyGrey,
+              )
+            : ImageNetwork(
+                width: 32,
+                height: 32,
+                image: confirmor.pictureName,
+                onTap: () {
+                  Get.dialog(_confirmorDialog(confirmor: confirmor));
+                },
+                onLoading: SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 1,
+                    color: AppColors().keyGrey,
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+      ),
+    );
+  }
+
+  Widget _confirmorDialog({required UserInfo confirmor}) {
+    var isDesktop = DataController.to.isDesktop();
+
+    var mobileWidth = DataController.to.mobileWidth;
+    var screenWidth = DataController.to.screenWidth.value;
+
+    return Dialog(
+      elevation: 0,
+      insetPadding: EdgeInsets.zero,
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: isDesktop ? mobileWidth : screenWidth,
+        margin: EdgeInsets.only(
+          left: screenWidth > mobileWidth + 480 ? 480 : 0,
+        ),
+        padding: const EdgeInsets.all(32),
+        child: Wrap(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppColors().bgWhite,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    '확인자 정보',
+                    style: TextStyle(
+                      color: AppColors().textBlack,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 1,
+                        color: AppColors().lineGrey,
+                      ),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: confirmor.pictureName.isEmpty
+                        ? Icon(
+                            Icons.person_rounded,
+                            color: AppColors().keyGrey,
+                          )
+                        : ImageNetwork(
+                            width: 100,
+                            height: 100,
+                            image: confirmor.pictureName,
+                            onLoading: CircularProgressIndicator(
+                              color: AppColors().keyGrey,
+                            ),
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                  ),
+                  const SizedBox(height: 32),
+                  _detailTile(title: '이름', content: confirmor.name),
+                  const SizedBox(height: 8),
+                  _detailTile(title: '계급', content: confirmor.rank),
+                  const SizedBox(height: 8),
+                  _detailTile(title: '군번', content: confirmor.serviceNumber),
+                  const SizedBox(height: 8),
+                  _detailTile(title: '소속부대', content: confirmor.militaryUnit),
+                  const SizedBox(height: 32),
+                  InkWell(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      '확인',
+                      style: TextStyle(
+                        color: AppColors().textBlack,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+Widget _detailTile({
+  required String title,
+  required String content,
+}) {
+  return Row(
+    children: [
+      SizedBox(
+        width: 76,
+        child: Text(
+          title,
+          style: TextStyle(
+            color: AppColors().textLightGrey,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+      Expanded(
+        child: Text(
+          content,
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    ],
+  );
 }
