@@ -24,28 +24,42 @@ class LogPage extends StatelessWidget {
             color: AppColors().bgWhite,
             child: Stack(
               children: [
-                Obx(() => ListView.separated(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.all(16),
-                      itemCount: LogPageController.to.logList.length,
-                      itemBuilder: (context, index) {
-                        LogInfo logInfo = LogPageController.to.logList[index];
-                        String createdDate = logInfo.createdAt.substring(0, 10);
+                Obx(() {
+                  var logList = LogPageController.to.logList;
 
-                        if (!LogPageController.to.dateList
-                            .contains(createdDate)) {
+                  return ListView.separated(
+                    reverse: true,
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.all(16),
+                    itemCount: logList.length,
+                    itemBuilder: (context, index) {
+                      LogInfo logInfo = logList[logList.length - 1 - index];
+                      String createdDate = logInfo.createdAt.substring(0, 10);
+
+                      if (logList.length - 1 > index) {
+                        LogInfo prevLogInfo =
+                            logList[logList.length - 2 - index];
+                        String prevCreatedDate =
+                            prevLogInfo.createdAt.substring(0, 10);
+
+                        if (createdDate != prevCreatedDate) {
                           LogPageController.to.dateList.add(createdDate);
                           LogPageController.to.showDateList.add(logInfo.id);
                         }
+                      } else {
+                        LogPageController.to.dateList.add(createdDate);
+                        LogPageController.to.showDateList.add(logInfo.id);
+                      }
 
-                        bool showDate = LogPageController.to.showDateList
-                            .contains(logInfo.id);
+                      bool showDate = LogPageController.to.showDateList
+                          .contains(logInfo.id);
 
-                        return LogBubble(showDate: showDate, logInfo: logInfo);
-                      },
-                      separatorBuilder: (context, index) =>
-                          const SizedBox(height: 32),
-                    )),
+                      return LogBubble(showDate: showDate, logInfo: logInfo);
+                    },
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 32),
+                  );
+                }),
                 Positioned(
                   right: 16,
                   bottom: 16,
