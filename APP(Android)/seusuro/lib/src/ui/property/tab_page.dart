@@ -58,7 +58,7 @@ AppBar appBar(BuildContext context) {
       )
     ),
     actions: [
-      ToggleIconButton(true),
+      ToggleIconButton(false),
     ]
   );
 }
@@ -113,24 +113,28 @@ Widget body(BuildContext context, Map<String, dynamic> assetInfo, TabController 
   );
 }
 
-class ToggleIconButton extends StatelessWidget {
+class ToggleIconButton extends StatefulWidget {
   bool isBookmarked;
   ToggleIconButton(this.isBookmarked, {super.key});
   
   @override
+  State<ToggleIconButton> createState() => ToggleIconButtonState();
+
+}
+
+class ToggleIconButtonState extends State<ToggleIconButton> {
+  @override
   Widget build(BuildContext context) {
-    return Container(
-      child: IconButton(
-        iconSize: 20,
-        icon: isBookmarked == true ? Icon(Icons.star, color: AppColors().textBlack) : Icon(Icons.star_outline_rounded, color: AppColors().textBlack),
-        onPressed: () {
-          setState() {
-            () {
-              isBookmarked = !isBookmarked;
-            };
-          }
-        },
-      )
+    return IconButton(
+      iconSize: 20,
+      icon: widget.isBookmarked == true ? Icon(Icons.star, color: AppColors().textBlack) : Icon(Icons.star_outline_rounded, color: AppColors().textBlack),
+      onPressed: () {
+        setState() {
+          () {
+            widget.isBookmarked = !widget.isBookmarked;
+          };
+        }
+      },
     );
   }
 
