@@ -21,26 +21,6 @@ class LogPageController extends GetxController {
 
   RxList logList = [].obs;
 
-  var detailTitleList = [
-    '품명',
-    '분류',
-    'NIIN',
-    '수량',
-    '유효기간',
-    '보관장소',
-    '수입시각',
-  ];
-
-  var detailContentList = [
-    '품명',
-    '분류',
-    'NIIN',
-    '수량',
-    '유효기간',
-    '보관장소',
-    '수입시각',
-  ];
-
   Future<bool> getLogs() async {
     var type = logTypeList.isEmpty ? null : logTypeList;
     var date = filterDate.value == DateTime(2000, 1, 1)

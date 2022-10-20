@@ -3,10 +3,10 @@ import 'package:get/get.dart';
 import 'package:image_network/image_network.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
-import 'package:seusuro/src/controller/ui/log_page_controller.dart';
 import 'package:seusuro/src/model/item_info.dart';
 import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/model/user_info.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class LogBubble extends StatelessWidget {
   const LogBubble({
@@ -104,7 +104,7 @@ class LogBubble extends StatelessWidget {
       children: [
         leftSide ? _confirmorImage(confirmor: logInfo.confirmor) : Container(),
         SizedBox(
-          width: 262,
+          width: 226,
           child: Stack(
             alignment: leftSide
                 ? AlignmentDirectional.topStart
@@ -132,7 +132,7 @@ class LogBubble extends StatelessWidget {
                   );
                 },
                 child: Container(
-                  width: 216,
+                  width: 180,
                   margin: EdgeInsets.only(
                     left: leftSide ? 16 : 0,
                     top: 20,
@@ -248,7 +248,7 @@ class LogBubble extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          '${itemInfo.amount.toString()}${itemInfo.unit}',
+          '${itemInfo.amount.toString()} ${itemInfo.unit}',
           style: TextStyle(
             color: AppColors().textBlack,
             fontSize: 14,
@@ -267,6 +267,9 @@ class LogBubble extends StatelessWidget {
 
     var mobileWidth = DataController.to.mobileWidth;
     var screenWidth = DataController.to.screenWidth.value;
+
+    var itemList = logInfo.items;
+    var pageController = PageController();
 
     return Dialog(
       elevation: 0,
@@ -358,22 +361,28 @@ class LogBubble extends StatelessWidget {
                       ],
                     ),
                   ),
-                  ListView.separated(
-                    shrinkWrap: true,
-                    itemCount: LogPageController.to.detailTitleList.length,
-                    itemBuilder: (context, index) {
-                      var detailTitleList =
-                          LogPageController.to.detailTitleList;
-                      var detailContentList =
-                          LogPageController.to.detailContentList;
-
-                      return _detailTile(
-                        title: detailTitleList[index],
-                        content: detailContentList[index],
-                      );
-                    },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 8),
+                  Container(
+                    height: 180,
+                    alignment: Alignment.center,
+                    child: PageView(
+                      controller: pageController,
+                      children: List.generate(
+                        itemList.length,
+                        (index) => _itemDetail(itemList[index], logInfo),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  SmoothPageIndicator(
+                    controller: pageController,
+                    count: itemList.length,
+                    effect: WormEffect(
+                      radius: 4,
+                      dotWidth: 8,
+                      dotHeight: 8,
+                      dotColor: AppColors().lineGrey,
+                      activeDotColor: keyColor,
+                    ),
                   ),
                   const SizedBox(height: 32),
                   InkWell(
@@ -395,6 +404,40 @@ class LogBubble extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _itemDetail(ItemInfo itemInfo, LogInfo logInfo) {
+    return Column(
+      children: [
+        _detailTile(title: '품명', content: itemInfo.name),
+        const SizedBox(height: 8),
+        _detailTile(title: '분류', content: itemInfo.category),
+        const SizedBox(height: 8),
+        _detailTile(title: 'NIIN', content: itemInfo.niin),
+        const SizedBox(height: 8),
+        _detailTile(
+          title: '수량',
+          content: '${itemInfo.amount.toString()} ${itemInfo.unit}',
+        ),
+        const SizedBox(height: 8),
+        _detailTile(
+          title: '유효기간',
+          content:
+              '${itemInfo.expirationDate.replaceRange(4, 5, '년 ').replaceRange(8, 9, '월 ')}일',
+        ),
+        const SizedBox(height: 8),
+        _detailTile(title: '보관장소', content: itemInfo.storagePlace),
+        const SizedBox(height: 8),
+        _detailTile(
+          title: '수입시각',
+          content: logInfo.createdAt
+              .substring(0, 16)
+              .replaceRange(4, 5, '년 ')
+              .replaceRange(8, 9, '월 ')
+              .replaceRange(12, 13, '일 '),
+        ),
+      ],
     );
   }
 
