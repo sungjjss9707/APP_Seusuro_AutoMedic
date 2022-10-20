@@ -243,16 +243,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textBlue,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeOrally.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeOrally.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -269,16 +260,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textPurple,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeVaccine.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeVaccine.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -295,16 +277,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textOrange,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeAerosol.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeAerosol.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -321,16 +294,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textGreen,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeGuard.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeGuard.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -347,16 +311,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textGrey,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeMask.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeMask.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -373,16 +328,7 @@ void openSortDialog(BuildContext context) {
                   color: AppColors().textBrown,
                 ),
               ),
-              Checkbox(
-                checkColor: AppColors().bgWhite,
-                fillColor: MaterialStateProperty.resolveWith(getColor),
-                value: PropertyPageController.to.includeConsumable.value,
-                onChanged: (bool? value) {
-                  () {
-                    PropertyPageController.to.includeConsumable.value = value!;
-                  };
-                }
-              )
+              _CheckBox(),
             ],
           ),
         ),
@@ -404,12 +350,53 @@ void openSortDialog(BuildContext context) {
   );
 }
 
-Color getColor(Set<MaterialState> states) {
-  const Set<MaterialState> interacitveStates = <MaterialState> {
-    MaterialState.pressed,
-  };
-  if (states.any(interacitveStates.contains)) {
-    return AppColors().bgBlack;
+void openDateDialog() {
+  Get.dialog(
+    SimpleDialog(
+      title: Text(
+        '유효기간',
+        style: TextStyle(
+          fontWeight: FontWeight.w900,
+          fontSize: 20,
+          color: AppColors().textBlack,
+        )
+      ),
+      children: [
+        
+      ],
+    )
+  );
+}
+
+class _CheckBox extends StatefulWidget {
+  @override
+  State<_CheckBox> createState() => _CheckBoxState();
+
+}
+
+class _CheckBoxState extends State<_CheckBox> {
+  @override
+  Widget build(BuildContext context) {
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interacitveStates = <MaterialState> {
+        MaterialState.pressed,
+      };
+
+      if (states.any(interacitveStates.contains)) {
+        return AppColors().bgBlack;
+      }
+      return AppColors().bgBlack;
+    }
+
+    return Checkbox(
+      checkColor: AppColors().bgWhite,
+      fillColor: MaterialStateProperty.resolveWith(getColor),
+      value: PropertyPageController.to.includeMask.value,
+      onChanged: (bool? value) {
+        setState(() {
+          PropertyPageController.to.includeMask.value = value!;
+        });
+      },
+    );
   }
-  return AppColors().bgBlack;
 }
