@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/component/bottom_button.dart';
 import 'package:seusuro/src/controller/ui/write_log_page_controller.dart';
@@ -43,9 +42,10 @@ class WriteLogPage extends StatelessWidget {
             ),
             BottomButton(
               content: '작성 완료',
-              onTap: () {
-                // 로그 작성 완료
-                Get.back();
+              onTap: () async {
+                if (await WriteLogPageController.to.writeLog(receiptPayment)) {
+                  Get.back();
+                }
               },
             ),
           ],
@@ -200,8 +200,8 @@ class WriteLogPage extends StatelessWidget {
           detailContentList.add(itemInfo.category);
           detailContentList
               .add('${itemInfo.amount.toString()} ${itemInfo.unit}');
-          detailContentList
-              .add(itemInfo.expirationDate);
+          detailContentList.add(
+              '${itemInfo.expirationDate.substring(0, 10).replaceRange(4, 5, '년 ').replaceRange(8, 9, '월 ')}일');
           detailContentList.add(itemInfo.storagePlace);
 
           return _propertyDetail(
