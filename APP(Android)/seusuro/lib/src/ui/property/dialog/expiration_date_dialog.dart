@@ -68,7 +68,7 @@ class ExpirationDateDialog extends StatelessWidget {
                       );
 
                       if (firstDate != null) {
-                        PropertyPageController.to.firstDate.value = firstDate;
+                        PropertyPageController.to.startDate.value = firstDate;
                       }
                     },
                     child: Container(
@@ -82,11 +82,11 @@ class ExpirationDateDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Obx(() => Text(
-                            PropertyPageController.to.firstDate.value ==
+                            PropertyPageController.to.startDate.value ==
                                     DateTime(2000, 1, 1)
                                 ? '날짜를 선택해주세요'
                                 : DateFormat('yyyy년 MM월 dd일').format(
-                                    PropertyPageController.to.firstDate.value),
+                                    PropertyPageController.to.startDate.value),
                             style: TextStyle(
                               color: AppColors().textBlack,
                               fontSize: 16,
@@ -118,7 +118,7 @@ class ExpirationDateDialog extends StatelessWidget {
                       );
 
                       if (lastDate != null) {
-                        PropertyPageController.to.lastDate.value = lastDate;
+                        PropertyPageController.to.endDate.value = lastDate;
                       }
                     },
                     child: Container(
@@ -132,11 +132,11 @@ class ExpirationDateDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: Obx(() => Text(
-                            PropertyPageController.to.lastDate.value ==
+                            PropertyPageController.to.endDate.value ==
                                     DateTime(2000, 1, 1)
                                 ? '날짜를 선택해주세요'
                                 : DateFormat('yyyy년 MM월 dd일').format(
-                                    PropertyPageController.to.lastDate.value),
+                                    PropertyPageController.to.endDate.value),
                             style: TextStyle(
                               color: AppColors().textBlack,
                               fontSize: 16,
@@ -146,19 +146,49 @@ class ExpirationDateDialog extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  InkWell(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Text(
-                      '확인',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: InkWell(
+                          onTap: () {
+                            PropertyPageController.to.startDate.value =
+                                DateTime(2000, 1, 1);
+                            PropertyPageController.to.endDate.value =
+                                DateTime(2000, 1, 1);
+                          },
+                          child: Center(
+                            child: Text(
+                              '초기화',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                      Flexible(
+                        child: InkWell(
+                          onTap: () async {
+                            if (await PropertyPageController.to
+                                .getProperties()) {
+                              Get.back();
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              '확인',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

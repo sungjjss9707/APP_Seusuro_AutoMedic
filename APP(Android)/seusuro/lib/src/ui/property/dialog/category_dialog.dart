@@ -59,18 +59,45 @@ class CategoryDialog extends StatelessWidget {
                         const SizedBox(height: 11),
                   ),
                   const SizedBox(height: 32),
-                  InkWell(
-                    onTap: () {
-                      Get.back();
-                    },
-                    child: Text(
-                      '확인',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: InkWell(
+                          onTap: PropertyPageController
+                              .to.selectedCategories.clear,
+                          child: Center(
+                            child: Text(
+                              '초기화',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      Flexible(
+                        child: InkWell(
+                          onTap: () async {
+                            if (await PropertyPageController.to
+                                .getProperties()) {
+                              Get.back();
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              '확인',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
