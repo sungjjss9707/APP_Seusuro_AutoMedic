@@ -82,7 +82,8 @@ class WriteLogDialog extends StatelessWidget {
                           unit,
                           category,
                           storagePlace,
-                          expirationDate,
+                          expirationDate.toString(),
+                          '',
                         );
 
                         WriteLogPageController.to.itemList.add(itemInfo);

@@ -8,8 +8,8 @@ import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/model/user_info.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class LogBubble extends StatelessWidget {
-  const LogBubble({
+class LogTile extends StatelessWidget {
+  const LogTile({
     Key? key,
     required this.showDate,
     required this.logInfo,
@@ -30,7 +30,7 @@ class LogBubble extends StatelessWidget {
                 ],
               )
             : Container(),
-        _bubbleForm(logInfo: logInfo),
+        _tileForm(logInfo: logInfo),
       ],
     );
   }
@@ -68,175 +68,153 @@ class LogBubble extends StatelessWidget {
     );
   }
 
-  Widget _bubbleForm({required LogInfo logInfo}) {
+  Widget _tileForm({required LogInfo logInfo}) {
     bool leftSide = logInfo.receiptPayment == '수입';
 
     Color keyColor;
-    String imagePath;
 
     switch (logInfo.receiptPayment) {
       case '수입':
         keyColor = AppColors().keyBlue;
-        imagePath = 'assets/triangle_left.png';
         break;
       case '불출':
         keyColor = AppColors().keyRed;
-        imagePath = 'assets/triangle_right_red.png';
         break;
       case '반납':
         keyColor = AppColors().keyGreen;
-        imagePath = 'assets/triangle_right_green.png';
         break;
       case '폐기':
         keyColor = AppColors().keyGrey;
-        imagePath = 'assets/triangle_right_grey.png';
         break;
       default:
         keyColor = AppColors().keyBlue;
-        imagePath = 'assets/triangle_left.png';
         break;
     }
 
-    return Row(
-      mainAxisAlignment:
-          leftSide ? MainAxisAlignment.start : MainAxisAlignment.end,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        leftSide ? _confirmorImage(confirmor: logInfo.confirmor) : Container(),
-        SizedBox(
-          width: 226,
-          child: Stack(
-            alignment: leftSide
-                ? AlignmentDirectional.topStart
-                : AlignmentDirectional.topEnd,
-            children: [
-              Positioned(
-                left: leftSide ? 16 : null,
-                right: leftSide ? null : 16,
-                child: Text(
-                  '${logInfo.confirmor.rank} ${logInfo.confirmor.name}',
-                  style: TextStyle(
-                    color: AppColors().textBlack,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Get.dialog(
-                    _logDetailDialog(
-                      logInfo: logInfo,
-                      keyColor: keyColor,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 180,
-                  margin: EdgeInsets.only(
-                    left: leftSide ? 16 : 0,
-                    top: 20,
-                    right: leftSide ? 0 : 16,
-                  ),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      width: 3,
-                      color: keyColor,
-                    ),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ListView.separated(
-                        shrinkWrap: true,
-                        itemCount: logInfo.items.length,
-                        itemBuilder: (context, index) {
-                          var itemInfo = logInfo.items[index];
+    var logDetailWidgets = [
+      const SizedBox(width: 8),
+      Text(
+        logInfo.target,
+        style: TextStyle(
+          color: AppColors().textBlack,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Icon(
+          Icons.arrow_forward_rounded,
+          size: 36,
+          color: keyColor,
+        ),
+      ),
+      Expanded(
+        child: ListView.separated(
+          shrinkWrap: true,
+          itemCount: logInfo.items.length,
+          itemBuilder: (context, index) {
+            var itemInfo = logInfo.items[index];
 
-                          return _itemTile(itemInfo);
-                        },
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 8),
-                      ),
-                      Container(
-                        height: 1,
-                        color: AppColors().lineGrey,
-                        margin: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      Row(
-                        children: [
-                          Text(
-                            leftSide ? 'From.' : 'To.',
-                            style: TextStyle(
-                              color: keyColor,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            logInfo.target,
-                            style: TextStyle(
-                              color: AppColors().textBlack,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Positioned(
-                left: leftSide ? 4 : null,
-                top: 14,
-                right: leftSide ? null : 4,
-                child: Image.asset(imagePath),
-              ),
-              Positioned(
-                left: leftSide ? null : 54,
-                top: 15,
-                right: leftSide ? 54 : null,
-                child: Container(
-                  color: AppColors().bgWhite,
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: Text(
-                    logInfo.receiptPayment,
-                    style: TextStyle(
-                      color: keyColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                left: leftSide ? null : 0,
-                right: leftSide ? 0 : null,
-                bottom: 4,
-                child: Text(
-                  logInfo.createdAt.substring(11, 16),
-                  style: TextStyle(
-                    color: AppColors().textBlack,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ),
-            ],
+            return _itemTile(itemInfo);
+          },
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
+        ),
+      ),
+    ];
+
+    var confirmorWidgets = [
+      _confirmorImage(confirmor: logInfo.confirmor),
+      const SizedBox(width: 4),
+      Center(
+        child: Text(
+          '${logInfo.confirmor.rank} ${logInfo.confirmor.name}',
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
           ),
         ),
-        leftSide ? Container() : _confirmorImage(confirmor: logInfo.confirmor),
+      ),
+      const Spacer(),
+      Text(
+        logInfo.createdAt.substring(11, 16),
+        style: TextStyle(
+          color: AppColors().textBlack,
+          fontSize: 10,
+          fontWeight: FontWeight.w400,
+        ),
+      ),
+      const SizedBox(width: 4),
+    ];
+
+    if (!leftSide) {
+      logDetailWidgets = List.from(logDetailWidgets.reversed);
+      confirmorWidgets = List.from(confirmorWidgets.reversed);
+    }
+
+    return Column(
+      children: [
+        Stack(
+          alignment: leftSide
+              ? AlignmentDirectional.topStart
+              : AlignmentDirectional.topEnd,
+          children: [
+            InkWell(
+              onTap: () {
+                Get.dialog(
+                  _logDetailDialog(
+                    logInfo: logInfo,
+                    keyColor: keyColor,
+                  ),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.only(top: 5.5),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    width: 3,
+                    color: keyColor,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(children: logDetailWidgets),
+              ),
+            ),
+            Positioned(
+              left: leftSide ? null : 24,
+              right: leftSide ? 24 : null,
+              child: Container(
+                color: AppColors().bgWhite,
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: Text(
+                  logInfo.receiptPayment,
+                  style: TextStyle(
+                    color: keyColor,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        SizedBox(
+          height: 32,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: confirmorWidgets,
+          ),
+        ),
       ],
     );
   }
 
   Widget _itemTile(ItemInfo itemInfo) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
           itemInfo.name,
@@ -246,7 +224,7 @@ class LogBubble extends StatelessWidget {
             fontWeight: FontWeight.w400,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(width: 8),
         Text(
           '${itemInfo.amount.toString()} ${itemInfo.unit}',
           style: TextStyle(

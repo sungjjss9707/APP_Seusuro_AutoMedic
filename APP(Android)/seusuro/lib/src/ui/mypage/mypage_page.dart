@@ -19,23 +19,45 @@ class MypagePage extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(MypagePageController());
 
-    return Container(
-      color: AppColors().bgWhite,
-      child: ListView(
-        shrinkWrap: true,
-        children: [
-          _userProfile(),
-          Container(
-            height: 4,
-            color: AppColors().lineGrey,
+    return Column(
+      children: [
+        _appBar(),
+        Expanded(
+          child: Container(
+            color: AppColors().bgWhite,
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                _userProfile(),
+                Container(
+                  height: 4,
+                  color: AppColors().lineGrey,
+                ),
+                _appSettings(),
+                Container(
+                  height: 4,
+                  color: AppColors().lineGrey,
+                ),
+                _appInformation(context),
+              ],
+            ),
           ),
-          _appSettings(),
-          Container(
-            height: 4,
-            color: AppColors().lineGrey,
-          ),
-          _appInformation(context),
-        ],
+        ),
+      ],
+    );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppColors().bgWhite,
+      title: Text(
+        '마이페이지',
+        style: TextStyle(
+          color: AppColors().textBlack,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

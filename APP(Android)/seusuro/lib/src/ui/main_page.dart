@@ -3,11 +3,9 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/main_page_controller.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
-import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/log/log_page.dart';
 import 'package:seusuro/src/ui/mypage/mypage_page.dart';
 import 'package:seusuro/src/ui/property/property_page.dart';
-import 'package:seusuro/src/ui/search/bookmark_page.dart';
 import 'package:seusuro/src/ui/search/search_page.dart';
 
 class MainPage extends StatelessWidget {
@@ -18,7 +16,6 @@ class MainPage extends StatelessWidget {
     Get.put(MainPageController());
 
     return rScaffold(
-      rAppBar: _appBar(),
       rBody: Obx(() {
         switch (MainPageController.to.currentIndex.value) {
           case 0:
@@ -34,76 +31,6 @@ class MainPage extends StatelessWidget {
         }
       }),
       rBottomNavigationBar: _bottomNavigationBar(),
-    );
-  }
-
-  AppBar _appBar() {
-    return AppBar(
-      elevation: 0,
-      backgroundColor: AppColors().bgWhite,
-      title: Obx(() {
-        var title = '수불 로그';
-
-        switch (MainPageController.to.currentIndex.value) {
-          case 0:
-            title = '수불 로그';
-            break;
-          case 1:
-            title = '재산 현황';
-            break;
-          case 2:
-            title = '약품 검색';
-            break;
-          case 3:
-            title = '마이페이지';
-            break;
-        }
-
-        return Text(
-          title,
-          style: TextStyle(
-            color: AppColors().textBlack,
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-          ),
-        );
-      }),
-      actions: [
-        Obx(() {
-          var actionList = <Widget>[];
-
-          switch (MainPageController.to.currentIndex.value) {
-            case 0:
-              // 수불 로그
-              break;
-            case 1:
-              // 재산 현황
-              break;
-            case 2:
-              // 약품 검색
-              actionList.add(
-                IconButton(
-                  onPressed: () {
-                    Get.to(() => const BookmarkPage(),
-                        transition: rTransition());
-                  },
-                  icon: Icon(
-                    Icons.bookmark_outline_rounded,
-                    color: AppColors().bgBlack,
-                  ),
-                ),
-              );
-              break;
-            case 3:
-              // 마이페이지
-              break;
-          }
-
-          actionList.add(const SizedBox(width: 8));
-
-          return Row(children: actionList);
-        }),
-      ],
     );
   }
 
