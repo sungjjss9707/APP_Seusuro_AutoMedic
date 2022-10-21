@@ -2,401 +2,254 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/property_page_controller.dart';
-import 'package:seusuro/src/ui/property/property_list.dart';
-import 'package:seusuro/src/repository/property_repository.dart';
 
-class PropertyPage extends StatefulWidget {
+class PropertyPage extends StatelessWidget {
   const PropertyPage({super.key});
-
-  @override
-  State<PropertyPage> createState() => PropertyPageState();
-}
-
-class PropertyPageState extends State<PropertyPage> {
-  
-  final _orderList = const ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
-
-  static final _propertyList = PropertyList();
-
-  int index = 0;
-  late int? totalNum = _propertyList.totalNum;
-
-  valueChanged(int i) {
-    setState(() {
-      index = i;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     Get.put(PropertyPageController());
 
-    return Column(
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              RichText(
-                text: TextSpan(
-                  style: TextStyle(
-                    color: AppColors().textBlack,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                  ),
+    return Container(
+      color: AppColors().bgWhite,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
                   children: [
-                    const TextSpan(text: '총 '),
-                    TextSpan(
-                      text: totalNum.toString(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w700,
-                      )
+                    _totalNumber(),
+                    const Spacer(),
+                    _orderButton(),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Flexible(
+                      child: _filterButton(
+                        content: '분류',
+                        onTap: () {},
+                      ),
                     ),
-                    const TextSpan(text: '개'),
-                  ]
-                )
-              ),
-              TextButton(
-                onPressed: openBottomSheet,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.black
+                    const SizedBox(width: 32),
+                    Flexible(
+                      child: _filterButton(
+                        content: '유효기간',
+                        onTap: () {},
+                      ),
+                    ),
+                    const SizedBox(width: 32),
+                    Flexible(
+                      child: _filterButton(
+                        content: '보관장소',
+                        onTap: () {},
+                      ),
+                    ),
+                  ],
                 ),
-                child: Row(
-                  children: [
-                    Text(_orderList[PropertyPageController.to.orderIndex.value]),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 24
-                    )
-                  ]
-                ),
-              )
-            ],
+              ],
+            ),
           ),
-        ),      
-        Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 88,
-                height: 36,
-                child: OutlinedButton(
-                  onPressed: () {
-                    openSortDialog(context);
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
-                    ),
-                  ),
-                  child: const Text('분류'),
-                ),
-              ),
-              SizedBox(
-                width: 88,
-                height: 36,
-                child: OutlinedButton(
-                  onPressed: () {
-  
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
-                    ),
-                  ),
-                  child: const Text('유효기간'),
-                ),
-              ),
-              SizedBox(
-                width: 88,
-                height: 36,
-                child: OutlinedButton(
-                  onPressed: () {
-  
-                  },
-                  style: ButtonStyle(
-                    side: MaterialStateProperty.all(const BorderSide(color: Colors.black)),
-                    foregroundColor: MaterialStateProperty.all(Colors.black),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0))
-                    ),
-                  ),
-                  child: const Text('보관장소'),
-                ),
-              )
-            ],
-          )
+          Expanded(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                _propertyTile(),
+                _propertyTile(),
+                _propertyTile(),
+                _propertyTile(),
+                _propertyTile(),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _totalNumber() {
+    return Row(
+      children: [
+        Text(
+          '총',
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
         ),
-        _propertyList,
+        const SizedBox(width: 4),
+        Text(
+          '120',
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Text(
+          '개',
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ],
     );
   }
 
-  void openBottomSheet() {
-    Get.bottomSheet(
-      SizedBox(
-        height: MediaQuery.of(context).size.height * 0.30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-              height: 48,
-              alignment: Alignment.center,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(328, 48),
-                  backgroundColor: PropertyPageController.to.orderIndex.value == 0 ? AppColors().bgGrey : Colors.transparent,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
+  Widget _orderButton() {
+    return InkWell(
+      onTap: () {
+        // 정렬 순서
+      },
+      child: Row(
+        children: [
+          Obx(() => Text(
+                PropertyPageController.to.selectedOrder.value,
+                style: TextStyle(
+                  color: AppColors().textBlack,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
                 ),
-                onPressed: () {
-                  setState(() {
-                    PropertyPageController.to.changeOrderIndex(0);
-                  });
-                  Navigator.pop(context);
-                },
-                child: const Text('가나다 순'),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-              height: 48,
-              alignment: Alignment.center,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(328, 48),
-                  backgroundColor: PropertyPageController.to.orderIndex.value == 1 ? AppColors().bgGrey : Colors.transparent,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
-                ),
-                onPressed: () {
-                  setState(() {
-                    PropertyPageController.to.changeOrderIndex(1);
-                  });
-                  Navigator.pop(context);
-                },
-                child: const Text('최신 등록 순'),
-              ),
-            ),
-            Container(
-              margin: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 0),
-              height: 48,
-              alignment: Alignment.center,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  minimumSize: const Size(328, 48),
-                  backgroundColor: PropertyPageController.to.orderIndex.value == 2 ? AppColors().bgGrey : Colors.transparent,
-                  foregroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.0)),
-                ),
-                onPressed: () {
-                  setState(() {
-                    PropertyPageController.to.changeOrderIndex(2);
-                  });
-                  Navigator.pop(context);
-                },
-                child: const Text('유효기간 짧은 순'),
-              ),
-            ),
-          ]
-        ),
-      ),
-      backgroundColor: Colors.white,
-      elevation: 0,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(10)),
+              )),
+          const Icon(Icons.expand_more_rounded),
+        ],
       ),
     );
   }
-}
 
-void openSortDialog(BuildContext context) {
-  Get.dialog(
-    SimpleDialog(
-      title: Text(
-        '분류',
-        style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 20,
-          color: AppColors().textBlack,
-        )
+  Widget _filterButton({required String content, required Function()? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 36,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border.all(
+            width: 1,
+            color: AppColors().lineBlack,
+          ),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(
+          content,
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
+    );
+  }
+
+  Widget _propertyTile() {
+    return Column(
       children: [
-        Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '경구약',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors().textBlue,
+        InkWell(
+          onTap: () {
+            // 재산 상세 정보
+          },
+          child: Container(
+            height: 96,
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: AppColors().bgGrey,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              _CheckBox(),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '백신류',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors().textPurple,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '경구약',
+                        style: TextStyle(
+                          color: AppColors().textBlue,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      Text(
+                        '아세트아미노펜',
+                        style: TextStyle(
+                          color: AppColors().textBlack,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            '유효기간',
+                            style: TextStyle(
+                              color: AppColors().textGrey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              color: AppColors().statusRed,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              _CheckBox(),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '분무약',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors().textOrange,
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      '총 보유량',
+                      style: TextStyle(
+                        color: AppColors().textBlack,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    Text(
+                      '2500 EA',
+                      style: TextStyle(
+                        color: AppColors().textBlack,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              _CheckBox(),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '보호대',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors().textGreen,
-                ),
-              ),
-              _CheckBox(),
-            ],
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '마스크',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+                const SizedBox(width: 32),
+                Icon(
+                  Icons.chevron_right_rounded,
                   color: AppColors().textGrey,
                 ),
-              ),
-              _CheckBox(),
-            ],
+              ],
+            ),
           ),
         ),
         Container(
-          padding: const EdgeInsets.fromLTRB(32, 8, 32, 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '소모품',
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
-                  color: AppColors().textBrown,
-                ),
-              ),
-              _CheckBox(),
-            ],
-          ),
+          height: 1,
+          color: AppColors().lineGrey,
         ),
-        TextButton(
-          child: Text(
-            '확인',
-            style: TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 16,
-              color: AppColors().textBlack,
-            ),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        )
       ],
-    )
-  );
-}
-
-void openDateDialog() {
-  Get.dialog(
-    SimpleDialog(
-      title: Text(
-        '유효기간',
-        style: TextStyle(
-          fontWeight: FontWeight.w900,
-          fontSize: 20,
-          color: AppColors().textBlack,
-        )
-      ),
-      children: [
-        
-      ],
-    )
-  );
-}
-
-class _CheckBox extends StatefulWidget {
-  @override
-  State<_CheckBox> createState() => _CheckBoxState();
-
-}
-
-class _CheckBoxState extends State<_CheckBox> {
-  @override
-  Widget build(BuildContext context) {
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interacitveStates = <MaterialState> {
-        MaterialState.pressed,
-      };
-
-      if (states.any(interacitveStates.contains)) {
-        return AppColors().bgBlack;
-      }
-      return AppColors().bgBlack;
-    }
-
-    return Checkbox(
-      checkColor: AppColors().bgWhite,
-      fillColor: MaterialStateProperty.resolveWith(getColor),
-      value: PropertyPageController.to.includeMask.value,
-      onChanged: (bool? value) {
-        setState(() {
-          PropertyPageController.to.includeMask.value = value!;
-        });
-      },
     );
   }
 }

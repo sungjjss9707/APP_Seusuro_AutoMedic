@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 class PropertyPageController extends GetxController {
   static PropertyPageController get to => Get.find();
 
+  RxString selectedOrder = '가나다 순'.obs;
+
+  var orderList = ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
+
   RxInt orderIndex = 0.obs;
   RxInt sortIndex = 0.obs;
   RxInt dateIndex = 0.obs;

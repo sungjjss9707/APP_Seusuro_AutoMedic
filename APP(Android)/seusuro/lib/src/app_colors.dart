@@ -9,7 +9,7 @@ class AppColors {
 
   // Background
   Color bgWhite = const Color(0xFFFFFFFF);
-  Color bgGrey = const Color(0xD9D9D9D9);
+  Color bgGrey = const Color(0xFFD9D9D9);
   Color bgRed = const Color(0xFFFF5050);
   Color bgBlack = const Color(0xFF000000);
   Color bgLightRed = const Color(0xFFFF5050);
@@ -22,7 +22,7 @@ class AppColors {
   Color textRed = const Color(0xFFFF0000);
   Color textGrey = const Color(0xFF808080);
   Color textLightGrey = const Color(0xFFABABAB);
-  Color textBlue = const Color(0xFF808080);
+  Color textBlue = const Color(0xFF0000FF);
   Color textGreen = const Color(0xFF04B900);
   Color textPurple = const Color(0xFFAD00FF);
   Color textOrange = const Color(0xFFFF7A00);
@@ -32,11 +32,11 @@ class AppColors {
   Color lineBlack = const Color(0xFF000000);
   Color lineGrey = const Color(0xFFD9D9D9);
 
-  //Status
+  // Status
+  Color statusRed = const Color(0xFFFF0000);
   Color statusGreen = const Color(0xFF04B900);
   Color statusYellow = const Color(0xFFE8D000);
-  Color statusRed = const Color(0xFFFF0000);
 
-  //Chart
+  // Chart
   Color chartGrey = const Color(0xFF808080);
 }
