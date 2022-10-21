@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/property_page_controller.dart';
+import 'package:seusuro/src/model/property_info.dart';
+import 'package:seusuro/src/responsive_bottom_sheet.dart';
+import 'package:seusuro/src/ui/property/dialog/category_dialog.dart';
+import 'package:seusuro/src/ui/property/dialog/expiration_date_dialog.dart';
+import 'package:seusuro/src/ui/property/dialog/storage_place_dialog.dart';
+import 'package:seusuro/src/ui/property/property_tile.dart';
 
 class PropertyPage extends StatelessWidget {
   const PropertyPage({super.key});
@@ -35,21 +41,27 @@ class PropertyPage extends StatelessWidget {
                           Flexible(
                             child: _filterButton(
                               content: '분류',
-                              onTap: () {},
+                              onTap: () {
+                                Get.dialog(const CategoryDialog());
+                              },
                             ),
                           ),
                           const SizedBox(width: 32),
                           Flexible(
                             child: _filterButton(
                               content: '유효기간',
-                              onTap: () {},
+                              onTap: () {
+                                Get.dialog(const ExpirationDateDialog());
+                              },
                             ),
                           ),
                           const SizedBox(width: 32),
                           Flexible(
                             child: _filterButton(
                               content: '보관장소',
-                              onTap: () {},
+                              onTap: () {
+                                Get.dialog(const StoragePlaceDialog());
+                              },
                             ),
                           ),
                         ],
@@ -58,15 +70,15 @@ class PropertyPage extends StatelessWidget {
                   ),
                 ),
                 Expanded(
-                  child: ListView(
+                  child: ListView.builder(
                     shrinkWrap: true,
-                    children: [
-                      _propertyTile(),
-                      _propertyTile(),
-                      _propertyTile(),
-                      _propertyTile(),
-                      _propertyTile(),
-                    ],
+                    itemCount: PropertyPageController.to.propertyList.length,
+                    itemBuilder: (context, index) {
+                      PropertyInfo propertyInfo =
+                          PropertyPageController.to.propertyList[index];
+
+                      return PropertyTile(propertyInfo: propertyInfo);
+                    },
                   ),
                 ),
               ],
@@ -127,7 +139,7 @@ class PropertyPage extends StatelessWidget {
   Widget _orderButton() {
     return InkWell(
       onTap: () {
-        // 정렬 순서
+        Get.bottomSheet(_orderBottomSheet());
       },
       child: Row(
         children: [
@@ -141,6 +153,55 @@ class PropertyPage extends StatelessWidget {
               )),
           const Icon(Icons.expand_more_rounded),
         ],
+      ),
+    );
+  }
+
+  Widget _orderBottomSheet() {
+    var orderList = PropertyPageController.to.orderList;
+
+    return rBottomSheet(
+      height: 244,
+      color: AppColors().bgWhite,
+      padding: const EdgeInsets.only(left: 16, top: 8, right: 16, bottom: 16),
+      child: Column(
+        children: [
+          Container(
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors().lineGrey,
+              borderRadius: BorderRadius.circular(2.0),
+            ),
+          ),
+          const SizedBox(height: 16),
+          _orderTile(orderList[0]),
+          const SizedBox(height: 16),
+          _orderTile(orderList[1]),
+          const SizedBox(height: 16),
+          _orderTile(orderList[2]),
+        ],
+      ),
+    );
+  }
+
+  Widget _orderTile(String orderBy) {
+    return InkWell(
+      onTap: () {
+        PropertyPageController.to.selectedOrder.value = orderBy;
+        Get.back();
+      },
+      child: Container(
+        height: 56,
+        alignment: Alignment.center,
+        child: Text(
+          orderBy,
+          style: TextStyle(
+            color: AppColors().textBlack,
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ),
     );
   }
@@ -167,111 +228,6 @@ class PropertyPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _propertyTile() {
-    return Column(
-      children: [
-        InkWell(
-          onTap: () {
-            // 재산 상세 정보
-          },
-          child: Container(
-            height: 96,
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Container(
-                  width: 64,
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: AppColors().bgGrey,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        '경구약',
-                        style: TextStyle(
-                          color: AppColors().textBlue,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      Text(
-                        '아세트아미노펜',
-                        style: TextStyle(
-                          color: AppColors().textBlack,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          Text(
-                            '유효기간',
-                            style: TextStyle(
-                              color: AppColors().textGrey,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              color: AppColors().statusRed,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '총 보유량',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    Text(
-                      '2500 EA',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(width: 32),
-                Icon(
-                  Icons.chevron_right_rounded,
-                  color: AppColors().textGrey,
-                ),
-              ],
-            ),
-          ),
-        ),
-        Container(
-          height: 1,
-          color: AppColors().lineGrey,
-        ),
-      ],
     );
   }
 }

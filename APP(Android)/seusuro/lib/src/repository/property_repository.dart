@@ -1,37 +1,41 @@
 import 'dart:convert';
 
-import 'package:seusuro/src/model/dto/response_dto.dart';
+import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/repository/base_url.dart';
 
 import 'package:http/http.dart' as http;
 
 class PropertyRepository {
-  Future<ResponseDto> viewIndividualProperty(String inherentID) async {
-    var url = Uri.parse('$baseUrl/property/$inherentID');
+  Future<http.Response> getAllStoragePlaces() async {
+    var url = Uri.parse('$baseUrl/property/storagePlace');
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(
+      url,
+      headers: DataController.to.tokenInfo.toJson(),
+    );
 
-    return ResponseDto.fromJson(jsonDecode(response.body));
+    return response;
   }
 
-  Future<ResponseDto> viewBookmarkedProperty() async {
-    var url = Uri.parse('$baseUrl/property/favorite');
-
-    http.Response response = await http.get(url);
-
-    return ResponseDto.fromJson(jsonDecode(response.body));
-  }
-
-  Future<ResponseDto> addBookmarkedProperty(String inherentID) async {
-    var url = Uri.parse('$baseUrl/property/favorite');
+  Future<http.Response> getProperties(
+    List<String>? category,
+    String? firstDate,
+    String? lastDate,
+    List? storagePlace,
+  ) async {
+    var url = Uri.parse('$baseUrl/property');
 
     http.Response response = await http.post(
       url,
-      body: {
-        'id': inherentID
-      },
+      headers: DataController.to.tokenInfo.toJson(),
+      body: jsonEncode({
+        'category': category,
+        'firstDate': firstDate,
+        'lastDate': lastDate,
+        'storagePlace': storagePlace,
+      }),
     );
 
-    return ResponseDto.fromJson(jsonDecode(response.body));
+    return response;
   }
 }
