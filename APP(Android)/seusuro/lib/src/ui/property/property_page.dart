@@ -10,62 +10,84 @@ class PropertyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Get.put(PropertyPageController());
 
-    return Container(
-      color: AppColors().bgWhite,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
+    return Column(
+      children: [
+        _appBar(),
+        Expanded(
+          child: Container(
+            color: AppColors().bgWhite,
             child: Column(
               children: [
-                Row(
-                  children: [
-                    _totalNumber(),
-                    const Spacer(),
-                    _orderButton(),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          _totalNumber(),
+                          const Spacer(),
+                          _orderButton(),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: _filterButton(
+                              content: '분류',
+                              onTap: () {},
+                            ),
+                          ),
+                          const SizedBox(width: 32),
+                          Flexible(
+                            child: _filterButton(
+                              content: '유효기간',
+                              onTap: () {},
+                            ),
+                          ),
+                          const SizedBox(width: 32),
+                          Flexible(
+                            child: _filterButton(
+                              content: '보관장소',
+                              onTap: () {},
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Flexible(
-                      child: _filterButton(
-                        content: '분류',
-                        onTap: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 32),
-                    Flexible(
-                      child: _filterButton(
-                        content: '유효기간',
-                        onTap: () {},
-                      ),
-                    ),
-                    const SizedBox(width: 32),
-                    Flexible(
-                      child: _filterButton(
-                        content: '보관장소',
-                        onTap: () {},
-                      ),
-                    ),
-                  ],
+                Expanded(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      _propertyTile(),
+                      _propertyTile(),
+                      _propertyTile(),
+                      _propertyTile(),
+                      _propertyTile(),
+                    ],
+                  ),
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: ListView(
-              shrinkWrap: true,
-              children: [
-                _propertyTile(),
-                _propertyTile(),
-                _propertyTile(),
-                _propertyTile(),
-                _propertyTile(),
-              ],
-            ),
-          ),
-        ],
+        ),
+      ],
+    );
+  }
+
+  AppBar _appBar() {
+    return AppBar(
+      elevation: 0,
+      backgroundColor: AppColors().bgWhite,
+      title: Text(
+        '재산 현황',
+        style: TextStyle(
+          color: AppColors().textBlack,
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }

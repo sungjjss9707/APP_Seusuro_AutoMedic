@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:seusuro/src/model/dto/register_request_dto.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
 import 'package:seusuro/src/repository/base_url.dart';
 

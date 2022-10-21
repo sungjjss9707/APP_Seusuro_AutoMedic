@@ -6,7 +6,7 @@ import 'package:seusuro/src/ui/property/tabbarpage/log_info_page.dart';
 
 class TabPage extends StatefulWidget {
   final Map<String, dynamic> assetInfo;
-  const TabPage(Map<String, dynamic> this.assetInfo, {super.key});
+  const TabPage(this.assetInfo, {super.key});
 
   @override
   _TabPageState createState() => _TabPageState();
