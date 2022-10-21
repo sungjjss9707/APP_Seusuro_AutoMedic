@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/repository/base_url.dart';
@@ -21,13 +22,16 @@ class PropertyRepository {
     List<String>? category,
     String? firstDate,
     String? lastDate,
-    List? storagePlace,
+    String? storagePlace,
   ) async {
     var url = Uri.parse('$baseUrl/property');
 
+    var headers = DataController.to.tokenInfo.toJson();
+    headers[HttpHeaders.contentTypeHeader] = 'application/json';
+
     http.Response response = await http.post(
       url,
-      headers: DataController.to.tokenInfo.toJson(),
+      headers: headers,
       body: jsonEncode({
         'category': category,
         'firstDate': firstDate,
