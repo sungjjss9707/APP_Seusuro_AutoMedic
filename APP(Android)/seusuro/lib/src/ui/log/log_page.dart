@@ -254,8 +254,10 @@ class LogPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 32),
                   InkWell(
-                    onTap: () {
-                      Get.back();
+                    onTap: () async {
+                      if (await LogPageController.to.getLogs()) {
+                        Get.back();
+                      }
                     },
                     child: Text(
                       '확인',
