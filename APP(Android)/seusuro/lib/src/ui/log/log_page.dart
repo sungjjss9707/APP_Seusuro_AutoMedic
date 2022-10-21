@@ -7,6 +7,7 @@ import 'package:seusuro/src/controller/ui/log_page_controller.dart';
 import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/log/log_bubble.dart';
+import 'package:seusuro/src/ui/log/log_tile.dart';
 import 'package:seusuro/src/ui/log/write_log_page.dart';
 
 class LogPage extends StatelessWidget {
@@ -25,6 +26,7 @@ class LogPage extends StatelessWidget {
             child: Stack(
               children: [
                 Obx(() {
+                  var logForm = LogPageController.to.logForm.value;
                   var logList = LogPageController.to.logList;
 
                   return ListView.separated(
@@ -54,10 +56,15 @@ class LogPage extends StatelessWidget {
                       bool showDate = LogPageController.to.showDateList
                           .contains(logInfo.id);
 
-                      return LogBubble(showDate: showDate, logInfo: logInfo);
+                      if (logForm == 'bubble') {
+                        return LogBubble(showDate: showDate, logInfo: logInfo);
+                      } else {
+                        return LogTile(showDate: showDate, logInfo: logInfo);
+                      }
                     },
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 32),
+                    separatorBuilder: (context, index) => SizedBox(
+                      height: logForm == 'bubble' ? 32 : 16,
+                    ),
                   );
                 }),
                 Positioned(
@@ -86,6 +93,21 @@ class LogPage extends StatelessWidget {
         ),
       ),
       actions: [
+        IconButton(
+          onPressed: () {
+            if (LogPageController.to.logForm.value == 'bubble') {
+              LogPageController.to.logForm.value = 'tile';
+            } else {
+              LogPageController.to.logForm.value = 'bubble';
+            }
+          },
+          icon: Obx(() => Icon(
+                LogPageController.to.logForm.value == 'bubble'
+                    ? Icons.view_agenda_rounded
+                    : Icons.forum_outlined,
+                color: AppColors().bgBlack,
+              )),
+        ),
         IconButton(
           onPressed: () {
             Get.dialog(_logFilterDialog());

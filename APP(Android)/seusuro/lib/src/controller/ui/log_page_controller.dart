@@ -13,6 +13,8 @@ class LogPageController extends GetxController {
 
   final _logRepository = LogRepository();
 
+  RxString logForm = 'bubble'.obs;
+
   RxList dateList = [].obs;
   RxList showDateList = [].obs;
 
