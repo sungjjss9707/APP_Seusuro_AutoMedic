@@ -19,6 +19,128 @@ async function myQuery(sql, param){
     }
 }
 
+async function getLogInform(log_id_arr, militaryUnit){
+    try{
+		var string_id_arr = "(";
+		for(let i=0; i<log_id_arr.length; ++i){
+			string_id_arr+="'";
+			string_id_arr+=log_id_arr[i];
+			string_id_arr+="'";
+			if(i!=log_id_arr.length-1){
+				string_id_arr+=",";
+			}
+		}
+		string_id_arr+=")"
+		//console.log(string_id_arr);
+		var select_log_sql = "select * from paymentLog_"+militaryUnit+" where id in "
+		select_log_sql+=string_id_arr;
+		select_log_sql+=" order by createdAt;";
+        var select_log_param = string_id_arr;
+        var [select_log_result] = await con.query(select_log_sql, select_log_param);
+		var data = [];
+        for(let i=0; i<select_log_result.length; ++i){
+            var id = select_log_result[i].id;
+            var receiptPayment = select_log_result[i].receiptPayment;
+            var confirmor_id = select_log_result[i].confirmor_id;
+            var target = select_log_result[i].target;
+            var YearMonthDate = select_log_result[i].YearMonthDate;
+            var log_num = select_log_result[i].log_num;
+            var property_id_arr = select_log_result[i].property_id_arr;
+            var storagePlace_arr = select_log_result[i].storagePlace_arr;
+            var amount_arr = select_log_result[i].amount_arr;
+            var unit_arr = select_log_result[i].unit_arr;
+            var createdAt = select_log_result[i].createdAt;
+            var updatedAt = select_log_result[i].updatedAt;
+            //console.log(property_id_arr);
+            //console.log(storagePlace_arr);
+            //console.log(amount_arr);
+            //console.log(unit_arr);
+            var arr_property_id = property_id_arr.split('/');   ////////////////
+            var arr_storagePlace = storagePlace_arr.split('/'); ////////////////
+            var str_arr_amount = amount_arr.split('/');
+            var arr_unit = unit_arr.split('/');//////////////////
+            var arr_amount = [];    ////////////////////
+            var arr_name = [];  ///////////////////
+            var arr_expirationDate = [];    ///////////
+            var len = arr_property_id.length;
+            var getsu;
+            for(let i=0; i<str_arr_amount.length; ++i){
+                getsu = parseInt(str_arr_amount[i]);
+                arr_amount.push(getsu);
+            }
+            var p_id;
+            for(let k=0; k<arr_property_id.length; ++k){
+                p_id = arr_property_id[k];
+                var id_split = p_id.split('-');
+                arr_name.push(id_split[0]);
+                var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
+                arr_expirationDate.push(myexpirationDate);
+            }
+    ///////////////////////////////////////////////////////
+            var niin_arr = [];
+            var niin, category;
+            var category_arr = [];
+            var select_medicInform_sql = "select * from medicInform where name = ?;";
+            var select_medicInform_param;
+            for(let k=0; k<len; ++k){
+                select_medicInform_param = arr_name[k];
+                var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+                if(select_medicInform_result.length==0){
+                    //res.send({status:500, message:'Internal Server Error', data:null});
+    //                res.send({status:400, message:"Bad Request", data:null});
+                    return {status:500, message:'Internal Server Error', data:null};
+                }
+                else{
+                    niin = select_medicInform_result[0].niin;
+                    category = select_medicInform_result[0].category;
+                }
+                niin_arr.push(niin);
+                category_arr.push(category);
+            }
+    ///////////////////////////////////////////////////////
+            var items = [];
+            var individual_item;
+            for(let k=0; k<len; ++k){
+                ///////////////////////////////////////////////////////////////////////////////
+                individual_item = {name:arr_name[k], amount:arr_amount[k], unit:arr_unit[k],category:category_arr[k], niin:niin_arr[k] , storagePlace:arr_storagePlace[k], expirationDate:arr_expirationDate[k]};
+                items.push(individual_item);
+            }
+            var select_user_sql = "select * from user where id = ?;";
+            var select_user_param = confirmor_id;
+            const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
+            if(select_user_result.length==0){
+                //res.send({status:500, message:'Internal Server Error', data:null});
+                return {status:500, message:'Internal Server Error', data:null};
+    //            res.send({status:400, message:"Bad Request"});
+            }
+            else{
+                var user_name = select_user_result[0].name;
+                var email = select_user_result[0].email;
+                var phoneNumber = select_user_result[0].phoneNumber;
+                var serviceNumber = select_user_result[0].serviceNumber;
+                var rank = select_user_result[0].mil_rank;
+                var enlistmentDate = select_user_result[0].enlistmentDate;
+                var dischargeDate = select_user_result[0].dischargeDate;
+                militaryUnit = select_user_result[0].militaryUnit;
+                var pictureName = select_user_result[0].pictureName;
+                var user_createdAt = select_user_result[0].createdAt;
+                var user_updatedAt = select_user_result[0].updatedAt;
+                var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
+                var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+                var individual_data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
+                //return {success:true, data:data};
+                data.push(individual_data);
+            }
+        }
+        return {status:200, message:'Ok', data:data};
+    }catch(error){
+        console.log(error);
+        return {status:500, message:'Internal Server Error', data:null};
+        //return false;
+    }
+}
+
+
 router.get('/storagePlace', async function(req, res, next) {
 	res.setHeader("Access-Control-Expose-Headers","*");
     const accessToken = req.header('accessToken');
@@ -165,10 +287,18 @@ router.delete('/favorite', async function(req, res, next) {
         var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+id+"%";
         var [select_log_result] = await con.query(select_log_sql,select_log_param);
-        var log_arr = [];
+		var log_arr = [];
+        var log_id_arr = [];
         for(let k=0; k<select_log_result.length; ++k){
-            log_arr.push(select_log_result[k].id);
+                //////////////////////
+            log_id_arr.push(select_log_result[k].id);
         }
+        var logData = await getLogInform(log_id_arr,militaryUnit);
+        if(logData.status!=200){
+            res.send({status: logData.status, message:logData.message, data:null});
+            return;
+        }
+        log_arr = logData.data;
         var niin, category;
         var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
@@ -257,10 +387,18 @@ router.get('/favorite', async function(req, res, next) {
         var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+id+"%";
         var [select_log_result] = await con.query(select_log_sql,select_log_param);
-        var log_arr = [];
+		var log_arr = [];
+        var log_id_arr = [];
         for(let k=0; k<select_log_result.length; ++k){
-            log_arr.push(select_log_result[k].id);
+                //////////////////////
+            log_id_arr.push(select_log_result[k].id);
         }
+        var logData = await getLogInform(log_id_arr,militaryUnit);
+        if(logData.status!=200){
+            res.send({status: logData.status, message:logData.message, data:null});
+            return;
+        }
+        log_arr = logData.data;
         var niin, category;
         var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
@@ -367,10 +505,20 @@ router.post('/favorite', async function(req, res, next) {
         var select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
         var select_log_param = "%"+id+"%";
         var [select_log_result] = await con.query(select_log_sql,select_log_param);
-        var log_arr = [];
+
+		var log_arr = [];
+        var log_id_arr = [];
         for(let k=0; k<select_log_result.length; ++k){
-            log_arr.push(select_log_result[k].id);
+                //////////////////////
+            log_id_arr.push(select_log_result[k].id);
         }
+        var logData = await getLogInform(log_id_arr,militaryUnit);
+        if(logData.status!=200){
+        	res.send({status: logData.status, message:logData.message, data:null});
+            return;
+        }
+        log_arr = logData.data;
+
         var niin, category;
         var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param = name;
@@ -504,10 +652,23 @@ router.post('/', async function(req, res, next) {
             select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
             select_log_param = "%"+id+"%";
             [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
-            log_arr = [];
+			if(select_log_result.length==0){	//재산이 있는데 로그가 없을리가 없음
+				res.send({status: 500, message:"Internal Server Error", data:null});
+                return;
+			}
+			log_arr = [];
+			var log_id_arr = [];
             for(let k=0; k<select_log_result.length; ++k){
-                log_arr.push(select_log_result[k].id);
+				//////////////////////
+                log_id_arr.push(select_log_result[k].id);
             }
+			var logData = await getLogInform(log_id_arr,militaryUnit);
+			console.log(logData);
+            if(logData.status!=200){
+              res.send({status: logData.status, message:logData.message, data:null});
+              return;
+            }
+            log_arr = logData.data;
             var niin, category;
             var select_medicInform_sql = "select * from medicInform where name = ?;";
             var select_medicInform_param = name;
@@ -570,6 +731,7 @@ router.post('/', async function(req, res, next) {
                 return;
             }
             var log_arr = [];
+			var log_id_arr = [];
             var string_property_id_arr, string_storagePlace_arr;
             for(let j=0; j<select_log_result.length; ++j){
                 //log_arr.push(select_log_result[j].id);
@@ -581,25 +743,29 @@ router.post('/', async function(req, res, next) {
                 var storagePlace_arr = string_storagePlace_arr.split('/');
                 for(let k=0; k<property_id_arr.length; ++k){
                     if(storagePlace_arr[k]==storagePlace&&property_id_arr[k]==id){
-                        log_arr.push(select_log_result[j].id);
+                        log_id_arr.push(select_log_result[j].id);
                         break;
                     }
                 }
             }
             for(let j=0; j<select_log_by_target_result.length; ++j){
                 if(select_log_by_target_result[j].receiptPayment=="이동"){
-                    log_arr.push(select_log_by_target_result[j].id);
+                    log_id_arr.push(select_log_by_target_result[j].id);
                 }
             }
-/*
-            select_log_sql = "select id from paymentLog_"+militaryUnit+" where property_id_arr like ? order by createdAt, log_num;";
-            select_log_param = "%"+id+"%";
-            [select_log_result, select_log_field] = await con.query(select_log_sql,select_log_param);
-            log_arr = [];
-            for(let k=0; k<select_log_result.length; ++k){
-                log_arr.push(select_log_result[k].id);
+			if(log_id_arr.length==0){
+                res.send({status:500, message:"Internal Server Error", data:null});
+                return;
             }
-*/
+            var logData = await getLogInform(log_id_arr,militaryUnit);
+            //console.log(logData);
+            if(logData.status!=200){
+              	res.send({status: logData.status, message:logData.message, data:null});
+              	return;
+            }
+            log_arr = logData.data;
+//////////////////////////////////////////////////////////////////
+
             var niin, category;
             var select_medicInform_sql = "select * from medicInform where name = ?;";
             var select_medicInform_param = name;
@@ -854,10 +1020,19 @@ router.get('/:id', async function(req, res, next) {
     	}
 		else{
 			var log_arr = [];
-			//console.log(select_log_result);
-			for(let i=0; i<select_log_result.length; ++i){
-				log_arr.push(select_log_result[i].id);
-			}
+            var log_id_arr = [];
+            for(let k=0; k<select_log_result.length; ++k){
+                //////////////////////
+                log_id_arr.push(select_log_result[k].id);
+            }
+            var logData = await getLogInform(log_id_arr,militaryUnit);
+            console.log(logData);
+            if(logData.status!=200){
+              res.send({status: logData.status, message:logData.message, data:null});
+              return;
+            }
+            log_arr = logData.data;
+
         	var niin, category;
         	var select_medicInform_sql = "select * from medicInform where name = ?;";
         	var select_medicInform_param = name;

@@ -1617,7 +1617,7 @@ router.post('/', async function(req, res, next) {
 	res.setHeader("Access-Control-Expose-Headers","*");
 
 	con = await db.createConnection(inform);
-	await con.beginTransaction();
+	//await con.beginTransaction();
 
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
@@ -1689,7 +1689,13 @@ router.post('/', async function(req, res, next) {
 	const receiptPayment = req.body.receiptPayment;
 	const target = req.body.target;
 	const items = req.body.items;
+	if(items.length==0){
+		res.send({status:400, message:'항목을 입력해야 합니다', data:null});
+        //await con.rollback();
+        return;
+	}
 	console.log(items);
+	await con.beginTransaction();
 	const curr = new Date();
 	const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000);
 	const KR_TIME_DIFF = 9*60*60*1000;
