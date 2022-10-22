@@ -163,7 +163,7 @@ router.post('/reduplication', async function(req, res, next) {
 		res.send({status:200, message:"Ok", data:true});
 	}
 	else{
-		res.send({status:200, message:"이미 존재하는 이메일입니다.", data:false});
+		res.send({status:400, message:"이미 존재하는 이메일입니다.", data:false});
 	}
 });
 
@@ -187,14 +187,14 @@ router.post('/belong', async function(req, res, next) {
     const [row1, field1] = await con.query(select_sql, select_param);
     if(row1.length==0){
         console.log("없는 부대입니다.");
-        res.send({status:200, message:"없는 부대입니다.",data:false});
+        res.send({status:400, message:"없는 부대입니다.",data:false});
     }
     else{
         if(row1[0].accessCode==accessCode){
             res.send({status:200, message:"Ok", data:true});
         }
         else{
-            res.send({status:200, message:"접속코드가 일치하지 않습니다.", data:false});
+            res.send({status:400, message:"접속코드가 일치하지 않습니다.", data:false});
         }
     }
 });
@@ -379,6 +379,7 @@ router.delete('/', async function(req, res, next) {
     var new_refresh_token = verify_success.refreshToken;
 */
     con = await db.createConnection(inform);
+	await con.beginTransaction();
     var select_user_inform_sql = "select email, name from user where id = ?;";
     var select_user_inform_param = id;
     var select_token_sql = "select token from refresh_token where id = ?;";
@@ -393,8 +394,13 @@ router.delete('/', async function(req, res, next) {
     const [check_user_inform_result] = await con.query(select_user_inform_sql ,select_user_inform_param);
     if(check_token_result.length==0&&check_user_inform_result.length==0){
         res.send({status:200, message:"Ok", data:true});
+		await con.commit();
     }
-    else res.send({status:500, message:"Internal Server Error", data:null});
+    else{
+		//res.setHeader({accessToken:new_access_token,refreshToken:new_refresh_token}).send({status:500, message:"Internal Server Error", data:null});
+    	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:500, message:"Internal Server Error", data:null});
+		await con.rollback();
+	}
 });
 
 

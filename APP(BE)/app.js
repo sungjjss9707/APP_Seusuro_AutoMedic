@@ -5,6 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var userRouter = require('./routes/user');
 var loginRouter = require('./routes/login');
+var logoutRouter = require('./routes/logout');
 var deleteRouter = require('./routes/delete');
 var checkbelongRouter = require('./routes/check_belong');
 var propertyRouter = require('./routes/property');
@@ -24,7 +25,8 @@ var favoriteRouter = require('./routes/favorite');
 //var test = require('./routes/test');
 //var login = require('./routes/jwt_test');
 var app = express();
-
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -43,6 +45,7 @@ app.use(cors());
 //app.use('/users', usersRouter);
 //app.use('/test', test);
 app.use('/login', loginRouter);
+app.use('/logout', logoutRouter);
 app.use('/user', userRouter);
 //app.use('/delete', deleteRouter);
 //app.use('/checkbelong', checkbelongRouter);

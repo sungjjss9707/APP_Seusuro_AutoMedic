@@ -49,6 +49,13 @@ var verifyFunction = async function(accessToken,refreshToken) {
 		return {success:false, message:"토큰없음"};
 		//res.status(403).json({status:400, message:'Bad Request', data:null});
 	} else{
+		con = await db.createConnection(inform);
+		var select_refresh_token_sql = "select * from refresh_token where token = ?;";
+		var select_refresh_token_param = refreshToken;
+		var [select_refresh_token_result] = await con.query(select_refresh_token_sql,select_refresh_token_param);
+		if(select_refresh_token_result.length==0){ //리프래쉬 토큰이 삭제 상태면 바로 로그아웃 
+			return {success:false, message:"토큰 만료"};
+		}
 		var access = await verify_token(accessToken);
 		if(access.success){
 			console.log(access.decoded);
@@ -57,7 +64,7 @@ var verifyFunction = async function(accessToken,refreshToken) {
         }
         else{
 			if(access.message=="jwt expired"){
-				con = await db.createConnection(inform);
+		//		con = await db.createConnection(inform);
 /*
             	var select_user_inform_sql = "select email, name from user where id = ?;";
             	var select_user_inform_param = id;

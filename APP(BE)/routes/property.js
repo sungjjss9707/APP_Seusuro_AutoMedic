@@ -397,7 +397,7 @@ router.post('/favorite', async function(req, res, next) {
 
 
 
-router.post('/filter', async function(req, res, next) {
+router.post('/', async function(req, res, next) {
 /*
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -429,7 +429,7 @@ router.post('/filter', async function(req, res, next) {
     const check_militaryUnit_param = user_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+		res.send({status:500, message:'Internal Sever Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
@@ -472,7 +472,7 @@ router.post('/filter', async function(req, res, next) {
 	console.log(select_property_param);
 	var [select_property_result] = await con.query(select_property_sql, select_property_param);
 	if(select_property_result.length==0){
-		res.send({status:200, message:"검색결과가 없습니다.", data:null});
+		res.send({status:200, message:"검색결과가 없습니다", data:null});
         return;
 	}
 	if(storagePlace==null){
@@ -513,7 +513,7 @@ router.post('/filter', async function(req, res, next) {
             var select_medicInform_param = name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status: 500, message:"Internal Server Error", data:null});
                 return;
             }
             else{

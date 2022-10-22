@@ -9,6 +9,13 @@ var inform = mysql.inform;
 var verify = require('../routes/verify');
 var table = require('../routes/table');
 var deleteLog = require('../routes/deleteLog');
+var app = express();
+var cors = require('cors');
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+//app.use(express.json());
+
 async function myQuery(sql, param){
     try{
         const [row, field] = await con.query(sql,param);
@@ -27,7 +34,8 @@ router.post('/filter', async function(req, res, next) {
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
 */
     res.setHeader("Access-Control-Expose-Headers","*");
-
+	//res.setHeader("Accept","application/json");
+	//res.setHeader("content-type", "application/json");
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -54,8 +62,18 @@ router.post('/filter', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+	//var body = JSON.parse(req.body);
+	//var type = body.type;
+    //var date = body.date;
+
 	var type = req.body.type;
 	var date = req.body.date;
+
+	console.log("이제 프린트 한다");
+	//console.log(body);
+	console.log(req.body);
+	//console.log(type);
+	//console.log(date);
 	//var select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in (?,?,?,?,?) and DATE(createdAt) between ? and ? order by createdAt, log_num;";
 	var select_log_sql = "";
 	var select_log_param = [];
@@ -880,7 +898,13 @@ res.setHeader("Access-Control-Allow-Origin", "*");
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                var new_niin = Math.random().toString(36).substring(2, 12);
+				var frontNum = Math.floor(Math.random()*90)+10;
+                var strFrontNum = String(frontNum);
+                var randomAlpha = String.fromCharCode(Math.floor(Math.random()*26)+65);
+                var backNum = Math.floor(Math.random()*900000)+100000;
+                var strBackNum = String(backNum);
+                var new_niin = strFrontNum+randomAlpha+strBackNum;
+                //var new_niin = Math.random().toString(36).substring(2, 12);
                 niin = new_niin;
                 var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
                 var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
@@ -1597,6 +1621,9 @@ router.post('/', async function(req, res, next) {
 
 	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
+	console.log("토큰 : ");
+	console.log(accessToken);
+	console.log(refreshToken);
     if (accessToken == null || refreshToken==null) {
         res.send({status:400, message:"토큰 없음", data:null});
         return;
@@ -1613,6 +1640,10 @@ router.post('/', async function(req, res, next) {
     res.setHeader("refreshToken", new_refresh_token);
 	var user_id = verify_success.id;
 	var confirmor_id = req.body.confirmor;
+	console.log(user_id+"  "+confirmor_id+"     ssibal");
+	console.log(req.body.receiptPayment);
+	console.log(req.body.target);
+	console.log(req.body.items);
 	if(user_id!=confirmor_id){
 		res.send({status:200, message:'본인 계정의 로그만 입력 가능합니다', data:null});
         return;
@@ -1803,7 +1834,14 @@ router.post('/', async function(req, res, next) {
 			select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
 			if(select_medicInform_result.length==0){
-				var new_niin = Math.random().toString(36).substring(2, 12); 
+				var frontNum = Math.floor(Math.random()*90)+10;
+				var strFrontNum = String(frontNum);
+				var randomAlpha = String.fromCharCode(Math.floor(Math.random()*26)+65);
+				var backNum = Math.floor(Math.random()*900000)+100000;
+                var strBackNum = String(backNum);
+				var new_niin = strFrontNum+randomAlpha+strBackNum;
+                
+//				var new_niin = Math.random().toString(36).substring(2, 12); 
 				niin = new_niin;
 				var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
         		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];

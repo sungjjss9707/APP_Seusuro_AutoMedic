@@ -50,7 +50,8 @@ router.delete('/', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
-    var medicine_name = req.body.id;
+    var medicine_name = req.body.itemName;
+	console.log(medicine_name);
 	var select_bookmark_sql = "select * from bookmark_"+militaryUnit+" where user_id = ? and name = ?;";
     var select_bookmark_param = [user_id, medicine_name];
     var [select_bookmark_result] = await con.query(select_bookmark_sql, select_bookmark_param);
@@ -69,19 +70,30 @@ router.delete('/', async function(req, res, next) {
         await con.commit();
         return;
     }
-
+	console.log(medicine_name+" 삭제 성공");
     var select_bookmark_sql2 = "select * from bookmark_"+militaryUnit+" where user_id = ?;";
     var select_bookmark_param2 = user_id;
     var [select_bookmark_result2] = await con.query(select_bookmark_sql2, select_bookmark_param2);
-    var data = [];
+	console.log("길이: "+select_bookmark_result2.length);
+	var data = [];
+    var individual_data;
+    var bookmark_name;
     for(let i=0; i<select_bookmark_result2.length; ++i){
-        data.push(select_bookmark_result2[i].name);
+        bookmark_name = select_bookmark_result2[i].name;
+		console.log(bookmark_name);
+        var select_medicine_sql = "select * from medicine where itemName = ?;";
+        var select_medicine_param = bookmark_name;
+        var [result] = await con.query(select_medicine_sql, select_medicine_param);
+        if(result.length==0){
+            res.send({status:500, message:"Internal Server Error", data:null});
+            await con.rollback();
+			return;
+        }
+        individual_data = {entpName:result[0].entpName, itemName:result[0].itemName, efcyQesitm:result[0].efcyQesitm, useMethodQesitm:result[0].useMethodQesitm, atpnWarnQesitm:result[0].atpnWarnQesitm, atpnQesitm:result[0].atpnQesitm, intrcQesitm:result[0].intrcQesitm, seQesitm:result[0].seQesitm, depositMethodQesitm:result[0].depositMethodQesitm, itemImage:result[0].itemImage};
+        data.push(individual_data);
     }
     res.send({status:200, message:"Ok", data:data});
-    await con.commit();
-    ////////////////
-//////내용
-    ///////////////
+	await con.commit();
 });
 
 router.get('/', async function(req, res, next) {
@@ -121,11 +133,21 @@ router.get('/', async function(req, res, next) {
 		return;
     }
     var data = [];
+	var individual_data;
+	var bookmark_name;
     for(let i=0; i<select_bookmark_result.length; ++i){
-        data.push(select_bookmark_result[i].name);
+		bookmark_name = select_bookmark_result[i].name;
+		var select_medicine_sql = "select * from medicine where itemName = ?;";
+        var select_medicine_param = bookmark_name;
+        var [result] = await con.query(select_medicine_sql, select_medicine_param);
+        if(result.length==0){
+            res.send({status:500, message:"Internal Server Error", data:null});
+            return;
+        }
+		individual_data = {entpName:result[0].entpName, itemName:result[0].itemName, efcyQesitm:result[0].efcyQesitm, useMethodQesitm:result[0].useMethodQesitm, atpnWarnQesitm:result[0].atpnWarnQesitm, atpnQesitm:result[0].atpnQesitm, intrcQesitm:result[0].intrcQesitm, seQesitm:result[0].seQesitm, depositMethodQesitm:result[0].depositMethodQesitm, itemImage:result[0].itemImage};
+        data.push(individual_data);
     }
     res.send({status:200, message:"Ok", data:data});
-    await con.commit();
     ////////////////
 //////내용
     ///////////////
@@ -162,7 +184,7 @@ router.post('/', async function(req, res, next) {
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
-	var medicine_name = req.body.id;
+	var medicine_name = req.body.itemName;
 	var entpName = req.body.entpName;
 	var efcyQesitm = req.body.efcyQesitm;
 	var useMethodQesitm = req.body.useMethodQesitm;
