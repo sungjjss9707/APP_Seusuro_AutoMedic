@@ -1,7 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
 import 'package:seusuro/src/model/property_info.dart';
@@ -9,7 +9,7 @@ import 'package:seusuro/src/model/token_info.dart';
 import 'package:seusuro/src/repository/property_repository.dart';
 import 'package:seusuro/src/responsive_snackbar.dart';
 
-class PropertyPageController extends GetxController {
+class PropertyPageController extends GetxController with StateMixin {
   static PropertyPageController get to => Get.find();
 
   final _propertyRepository = PropertyRepository();
@@ -17,19 +17,25 @@ class PropertyPageController extends GetxController {
   RxString selectedOrder = '가나다 순'.obs;
   RxString selectedStoragePlace = ''.obs;
 
-  RxList selectedCategories = [].obs;
+  RxList<String> selectedCategories = <String>[].obs;
 
-  Rx<DateTime> firstDate = DateTime(2000, 1, 1).obs;
-  Rx<DateTime> lastDate = DateTime(2000, 1, 1).obs;
+  Rx<DateTime> startDate = DateTime(2000, 1, 1).obs;
+  Rx<DateTime> endDate = DateTime(2000, 1, 1).obs;
 
   var orderList = ['가나다 순', '최신 등록 순', '유효기간 짧은 순'];
   var categoryMap = {
-    '경구약': AppColors().textBlue,
-    '백신류': AppColors().textPurple,
-    '분무약': AppColors().textOrange,
-    '보호대': AppColors().textGreen,
-    '마스크': AppColors().textGrey,
-    '소모품': AppColors().textBrown,
+    '경구약': Colors.blueAccent,
+    '백신류': Colors.deepPurple,
+    '분무약': Colors.green,
+    '수액류': Colors.teal,
+    '시럽류': Colors.deepOrange,
+    '안약류': Colors.amber,
+    '액체류': Colors.lightBlue,
+    '연고류': Colors.lightGreen,
+    '주사제': Colors.purple,
+    '파스류': Colors.indigo,
+    '의약외품': Colors.pink,
+    '소모품': Colors.grey,
   };
   var storagePlaceList = [].obs;
 
@@ -55,10 +61,16 @@ class PropertyPageController extends GetxController {
   }
 
   Future<bool> getProperties() async {
-    var category = null;
-    var firstDate = null;
-    var lastDate = null;
-    var storagePlace = null;
+    change(null, status: RxStatus.loading());
+
+    var category = selectedCategories.isEmpty ? null : selectedCategories;
+    var firstDate = startDate.value == DateTime(2000, 1, 1)
+        ? null
+        : startDate.value.toString();
+    var lastDate =
+        endDate.value == DateTime(2000, 1, 1) ? null : endDate.value.toString();
+    var storagePlace =
+        selectedStoragePlace.isEmpty ? null : selectedStoragePlace.value;
 
     var response = await _propertyRepository.getProperties(
       category,
@@ -72,14 +84,20 @@ class PropertyPageController extends GetxController {
     if (responseDto.status == 200) {
       DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
 
+      propertyList.clear();
+
       if (responseDto.data != null) {
-        propertyList.addAll(
-            responseDto.data.map((element) => PropertyInfo.fromJson(element)));
+        propertyList.addAll(responseDto.data
+            .map((element) => PropertyInfo.fromJson(element))
+            .toList());
       }
 
+      change(null, status: RxStatus.success());
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
+
+      change(null, status: RxStatus.success());
       return false;
     }
   }
@@ -88,7 +106,7 @@ class PropertyPageController extends GetxController {
   void onInit() async {
     super.onInit();
 
-    // await getProperties();
+    await getProperties();
     await getAllStoragePlaces();
   }
 }

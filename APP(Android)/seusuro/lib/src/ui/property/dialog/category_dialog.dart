@@ -56,7 +56,7 @@ class CategoryDialog extends StatelessWidget {
                       );
                     },
                     separatorBuilder: (context, index) =>
-                        const SizedBox(height: 11),
+                        const SizedBox(height: 3),
                   ),
                   const SizedBox(height: 32),
                   Row(
