@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:seusuro/src/app_colors.dart';
+import 'package:seusuro/src/controller/ui/property_page_controller.dart';
 import 'package:seusuro/src/model/property_info.dart';
+import 'package:seusuro/src/responsive_transition.dart';
+import 'package:seusuro/src/ui/property/info/property_info_page.dart';
 
 class PropertyTile extends StatelessWidget {
-  const PropertyTile({Key? key, required this.propertyInfo}) : super(key: key);
+  const PropertyTile({
+    Key? key,
+    required this.propertyInfo,
+  }) : super(key: key);
 
   final PropertyInfo propertyInfo;
 
@@ -13,7 +21,8 @@ class PropertyTile extends StatelessWidget {
       children: [
         InkWell(
           onTap: () {
-            // 재산 상세 정보
+            Get.to(() => PropertyInfoPage(propertyInfo: propertyInfo),
+                transition: rTransition());
           },
           child: Container(
             height: 96,
@@ -42,7 +51,7 @@ class PropertyTile extends StatelessWidget {
                       Text(
                         propertyInfo.category,
                         style: TextStyle(
-                          color: AppColors().textBlue,
+                          color: PropertyPageController.to.categoryMap[propertyInfo.category],
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),
@@ -71,7 +80,7 @@ class PropertyTile extends StatelessWidget {
                             width: 12,
                             height: 12,
                             decoration: BoxDecoration(
-                              color: AppColors().statusRed,
+                              color: _statusColor(),
                               borderRadius: BorderRadius.circular(6),
                             ),
                           ),
@@ -116,5 +125,23 @@ class PropertyTile extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Color _statusColor() {
+    var statusColor = AppColors().statusGreen;
+
+    DateTime expirationDate =
+        DateFormat('yyyy-MM-dd hh:mm:ss').parse(propertyInfo.expirationDate);
+
+    if (expirationDate.difference(DateTime.now()) > const Duration(days: 365)) {
+      statusColor = AppColors().statusGreen;
+    } else if (expirationDate.difference(DateTime.now()) >
+        const Duration(days: 180)) {
+      statusColor = AppColors().statusYellow;
+    } else {
+      statusColor = AppColors().statusRed;
+    }
+
+    return statusColor;
   }
 }

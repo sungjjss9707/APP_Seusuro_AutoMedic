@@ -7,7 +7,7 @@ class PropertyInfo {
   final String niin;
   final List amountByPlace;
   final String expirationDate;
-  final String logRecord;
+  final List logRecord;
   final String createdAt;
   final String updatedAt;
 

@@ -36,49 +36,81 @@ class PropertyPage extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Flexible(
-                            child: _filterButton(
-                              content: '분류',
-                              onTap: () {
-                                Get.dialog(const CategoryDialog());
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 32),
-                          Flexible(
-                            child: _filterButton(
-                              content: '유효기간',
-                              onTap: () {
-                                Get.dialog(const ExpirationDateDialog());
-                              },
-                            ),
-                          ),
-                          const SizedBox(width: 32),
-                          Flexible(
-                            child: _filterButton(
-                              content: '보관장소',
-                              onTap: () {
-                                Get.dialog(const StoragePlaceDialog());
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                      Obx(() => Row(
+                            children: [
+                              Flexible(
+                                child: _filterButton(
+                                  content: '분류',
+                                  isActive: PropertyPageController
+                                      .to.selectedCategories.isNotEmpty,
+                                  onTap: () {
+                                    Get.dialog(const CategoryDialog());
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 32),
+                              Flexible(
+                                child: _filterButton(
+                                  content: '유효기간',
+                                  isActive: PropertyPageController
+                                              .to.startDate.value !=
+                                          DateTime(2000, 1, 1) ||
+                                      PropertyPageController.to.endDate.value !=
+                                          DateTime(2000, 1, 1),
+                                  onTap: () {
+                                    Get.dialog(const ExpirationDateDialog());
+                                  },
+                                ),
+                              ),
+                              const SizedBox(width: 32),
+                              Flexible(
+                                child: _filterButton(
+                                  content: '보관장소',
+                                  isActive: PropertyPageController
+                                      .to.selectedStoragePlace.isNotEmpty,
+                                  onTap: () {
+                                    Get.dialog(const StoragePlaceDialog());
+                                  },
+                                ),
+                              ),
+                            ],
+                          )),
                     ],
                   ),
                 ),
                 Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: PropertyPageController.to.propertyList.length,
-                    itemBuilder: (context, index) {
-                      PropertyInfo propertyInfo =
-                          PropertyPageController.to.propertyList[index];
+                  child: PropertyPageController.to.obx(
+                    (state) {
+                      if (PropertyPageController.to.propertyList.isEmpty) {
+                        return Center(
+                          child: Text(
+                            '해당하는 재산이 없습니다',
+                            style: TextStyle(
+                              color: AppColors().bgBlack,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        );
+                      } else {
+                        return ListView.builder(
+                          shrinkWrap: true,
+                          itemCount:
+                              PropertyPageController.to.propertyList.length,
+                          itemBuilder: (context, index) {
+                            PropertyInfo propertyInfo =
+                                PropertyPageController.to.propertyList[index];
 
-                      return PropertyTile(propertyInfo: propertyInfo);
+                            return PropertyTile(propertyInfo: propertyInfo);
+                          },
+                        );
+                      }
                     },
+                    onLoading: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors().keyBlue,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -116,14 +148,14 @@ class PropertyPage extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 4),
-        Text(
-          '120',
-          style: TextStyle(
-            color: AppColors().textBlack,
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
+        Obx(() => Text(
+              PropertyPageController.to.propertyList.length.toString(),
+              style: TextStyle(
+                color: AppColors().textBlack,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+              ),
+            )),
         Text(
           '개',
           style: TextStyle(
@@ -206,23 +238,30 @@ class PropertyPage extends StatelessWidget {
     );
   }
 
-  Widget _filterButton({required String content, required Function()? onTap}) {
+  Widget _filterButton({
+    required String content,
+    required bool isActive,
+    required Function()? onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       child: Container(
         height: 36,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(
-            width: 1,
-            color: AppColors().lineBlack,
-          ),
+          color: isActive ? AppColors().keyBlue : AppColors().bgWhite,
+          border: isActive
+              ? null
+              : Border.all(
+                  width: 1,
+                  color: AppColors().lineBlack,
+                ),
           borderRadius: BorderRadius.circular(18),
         ),
         child: Text(
           content,
           style: TextStyle(
-            color: AppColors().textBlack,
+            color: isActive ? AppColors().textWhite : AppColors().textBlack,
             fontSize: 14,
             fontWeight: FontWeight.w400,
           ),
