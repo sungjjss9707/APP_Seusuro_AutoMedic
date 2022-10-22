@@ -20,7 +20,10 @@ class PropertyTile extends StatelessWidget {
     return Column(
       children: [
         InkWell(
-          onTap: () {
+          onTap: () async {
+            await PropertyPageController.to
+                .getLogRecord(propertyInfo.logRecord);
+
             Get.to(() => PropertyInfoPage(propertyInfo: propertyInfo),
                 transition: rTransition());
           },
@@ -51,7 +54,8 @@ class PropertyTile extends StatelessWidget {
                       Text(
                         propertyInfo.category,
                         style: TextStyle(
-                          color: PropertyPageController.to.categoryMap[propertyInfo.category],
+                          color: PropertyPageController
+                              .to.categoryMap[propertyInfo.category],
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                         ),

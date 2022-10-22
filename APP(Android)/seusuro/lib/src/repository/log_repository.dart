@@ -26,6 +26,17 @@ class LogRepository {
     return response;
   }
 
+  Future<http.Response> getLog(String logId) async {
+    var url = Uri.parse('$baseUrl/paymentLog/$logId');
+
+    http.Response response = await http.get(
+      url,
+      headers: DataController.to.tokenInfo.toJson(),
+    );
+
+    return response;
+  }
+
   Future<http.Response> writeLog(
     String receiptPayment,
     String target,
