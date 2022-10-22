@@ -46,6 +46,8 @@ class PropertyPageController extends GetxController with StateMixin {
 
   RxList logList = [].obs;
 
+  RxList favoriteList = [].obs;
+
   Future<void> getLogRecord(List logRecord) async {
     logList.clear();
 
@@ -77,6 +79,74 @@ class PropertyPageController extends GetxController with StateMixin {
         storagePlaceList.addAll(responseDto.data);
       }
 
+      return true;
+    } else {
+      rSnackbar(title: '알림', message: responseDto.message);
+      return false;
+    }
+  }
+
+  Future<bool> getAllFavorites() async {
+    var response = await _propertyRepository.getAllFavorites();
+
+    ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
+
+    if (responseDto.status == 200) {
+      DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
+
+      favoriteList.clear();
+
+      if (responseDto.data != null) {
+        favoriteList.addAll(
+            responseDto.data.map((element) => PropertyInfo.fromJson(element)));
+      }
+      
+      return true;
+    } else {
+      rSnackbar(title: '알림', message: responseDto.message);
+      return false;
+    }
+  }
+
+  Future<bool> addFavorite(String propertyId) async {
+    var response = await _propertyRepository.addFavorite(propertyId);
+
+    ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
+
+    if (responseDto.status == 200) {
+      DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
+
+      favoriteList.clear();
+
+      if (responseDto.data != null) {
+        favoriteList.addAll(
+            responseDto.data.map((element) => PropertyInfo.fromJson(element)));
+      }
+
+      rSnackbar(title: '알림', message: '즐겨찾기에 추가하였습니다!');
+      return true;
+    } else {
+      rSnackbar(title: '알림', message: responseDto.message);
+      return false;
+    }
+  }
+
+  Future<bool> delFavorite(String propertyId) async {
+    var response = await _propertyRepository.delFavorite(propertyId);
+
+    ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
+
+    if (responseDto.status == 200) {
+      DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
+
+      favoriteList.clear();
+
+      if (responseDto.data != null) {
+        favoriteList.addAll(
+            responseDto.data.map((element) => PropertyInfo.fromJson(element)));
+      }
+
+      rSnackbar(title: '알림', message: '즐겨찾기에서 삭제하였습니다!');
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
@@ -130,7 +200,9 @@ class PropertyPageController extends GetxController with StateMixin {
   void onInit() async {
     super.onInit();
 
-    await getProperties();
+    await getAllFavorites();
     await getAllStoragePlaces();
+
+    await getProperties();
   }
 }

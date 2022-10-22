@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
+import 'package:seusuro/src/controller/ui/property_page_controller.dart';
 import 'package:seusuro/src/model/property_info.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
 import 'package:seusuro/src/ui/property/info/property_detail.dart';
@@ -103,6 +104,8 @@ class _PropertyInfoPageState extends State<PropertyInfoPage>
   }
 
   AppBar _appBar() {
+    var propertyId = widget.propertyInfo.id;
+
     return AppBar(
       elevation: 0,
       backgroundColor: AppColors().bgWhite,
@@ -124,16 +127,35 @@ class _PropertyInfoPageState extends State<PropertyInfoPage>
       ),
       actions: [
         IconButton(
-          onPressed: () {
-            // 즐겨찾기 추가/삭제하기
+          onPressed: () async {
+            if (!isFavorite(propertyId)) {
+              await PropertyPageController.to.addFavorite(propertyId);
+            } else {
+              await PropertyPageController.to.delFavorite(propertyId);
+            }
           },
-          icon: Icon(
-            Icons.star_outline_rounded,
-            color: AppColors().bgBlack,
-          ),
+          icon: Obx(() => Icon(
+                isFavorite(propertyId)
+                    ? Icons.star_rounded
+                    : Icons.star_outline_rounded,
+                color: AppColors().bgBlack,
+              )),
         ),
         const SizedBox(width: 8),
       ],
     );
+  }
+
+  bool isFavorite(String propertyId) {
+    bool isFavorite = false;
+
+    for (PropertyInfo propertyInfo in PropertyPageController.to.favoriteList) {
+      if (propertyInfo.id == propertyId) {
+        isFavorite = true;
+        break;
+      }
+    }
+
+    return isFavorite;
   }
 }

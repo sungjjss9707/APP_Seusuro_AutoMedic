@@ -42,4 +42,49 @@ class PropertyRepository {
 
     return response;
   }
+
+  Future<http.Response> getAllFavorites() async {
+    var url = Uri.parse('$baseUrl/property/favorite');
+
+    http.Response response = await http.get(
+      url,
+      headers: DataController.to.tokenInfo.toJson(),
+    );
+
+    return response;
+  }
+
+  Future<http.Response> addFavorite(String propertyId) async {
+    var url = Uri.parse('$baseUrl/property/favorite');
+
+    var headers = DataController.to.tokenInfo.toJson();
+    headers[HttpHeaders.contentTypeHeader] = 'application/json';
+
+    http.Response response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        'id': propertyId,
+      }),
+    );
+
+    return response;
+  }
+
+  Future<http.Response> delFavorite(String propertyId) async {
+    var url = Uri.parse('$baseUrl/property/favorite');
+
+    var headers = DataController.to.tokenInfo.toJson();
+    headers[HttpHeaders.contentTypeHeader] = 'application/json';
+
+    http.Response response = await http.delete(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        'id': propertyId,
+      }),
+    );
+
+    return response;
+  }
 }

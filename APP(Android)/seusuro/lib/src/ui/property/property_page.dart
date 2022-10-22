@@ -4,9 +4,11 @@ import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/ui/property_page_controller.dart';
 import 'package:seusuro/src/model/property_info.dart';
 import 'package:seusuro/src/responsive_bottom_sheet.dart';
+import 'package:seusuro/src/responsive_transition.dart';
 import 'package:seusuro/src/ui/property/dialog/category_dialog.dart';
 import 'package:seusuro/src/ui/property/dialog/expiration_date_dialog.dart';
 import 'package:seusuro/src/ui/property/dialog/storage_place_dialog.dart';
+import 'package:seusuro/src/ui/property/favorite_page.dart';
 import 'package:seusuro/src/ui/property/property_tile.dart';
 
 class PropertyPage extends StatelessWidget {
@@ -133,6 +135,18 @@ class PropertyPage extends StatelessWidget {
           fontWeight: FontWeight.w700,
         ),
       ),
+      actions: [
+        IconButton(
+          onPressed: () {
+            Get.to(const FavoritePage(), transition: rTransition());
+          },
+          icon: Icon(
+            Icons.star_outline_rounded,
+            color: AppColors().bgBlack,
+          ),
+        ),
+        const SizedBox(width: 8),
+      ],
     );
   }
 
