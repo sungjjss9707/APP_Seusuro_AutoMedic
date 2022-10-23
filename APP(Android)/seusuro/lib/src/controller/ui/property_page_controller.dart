@@ -43,6 +43,9 @@ class PropertyPageController extends GetxController with StateMixin {
 
   RxList favoriteList = [].obs;
 
+  RxString pdfStoragePlace = ''.obs;
+  RxList pdfPropertyList = [].obs;
+
   Future<bool> getAllStoragePlaces() async {
     var response = await _propertyRepository.getAllStoragePlaces();
 
@@ -76,7 +79,7 @@ class PropertyPageController extends GetxController with StateMixin {
         favoriteList.addAll(
             responseDto.data.map((element) => PropertyInfo.fromJson(element)));
       }
-      
+
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
@@ -130,8 +133,8 @@ class PropertyPageController extends GetxController with StateMixin {
     }
   }
 
-  Future<bool> getProperties() async {
-    change(null, status: RxStatus.loading());
+  Future<bool> getProperties({bool exportAsPdf = false}) async {
+    if (!exportAsPdf) change(null, status: RxStatus.loading());
 
     var category = selectedCategories.isEmpty ? null : selectedCategories;
     var firstDate = startDate.value == DateTime(2000, 1, 1)
@@ -142,32 +145,49 @@ class PropertyPageController extends GetxController with StateMixin {
     var storagePlace =
         selectedStoragePlace.isEmpty ? null : selectedStoragePlace.value;
 
-    var response = await _propertyRepository.getProperties(
-      category,
-      firstDate,
-      lastDate,
-      storagePlace,
-    );
+    var response = !exportAsPdf
+        ? await _propertyRepository.getProperties(
+            category,
+            firstDate,
+            lastDate,
+            storagePlace,
+          )
+        : await _propertyRepository.getProperties(
+            null,
+            null,
+            null,
+            pdfStoragePlace.isEmpty ? null : pdfStoragePlace.value,
+          );
 
     ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
 
     if (responseDto.status == 200) {
       DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
 
-      propertyList.clear();
+      if (!exportAsPdf) {
+        propertyList.clear();
 
-      if (responseDto.data != null) {
-        propertyList.addAll(responseDto.data
-            .map((element) => PropertyInfo.fromJson(element))
-            .toList());
+        if (responseDto.data != null) {
+          propertyList.addAll(responseDto.data
+              .map((element) => PropertyInfo.fromJson(element))
+              .toList());
+        }
+      } else {
+        pdfPropertyList.clear();
+
+        if (responseDto.data != null) {
+          pdfPropertyList.addAll(responseDto.data
+              .map((element) => PropertyInfo.fromJson(element))
+              .toList());
+        }
       }
 
-      change(null, status: RxStatus.success());
+      if (!exportAsPdf) change(null, status: RxStatus.success());
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
 
-      change(null, status: RxStatus.success());
+      if (!exportAsPdf) change(null, status: RxStatus.success());
       return false;
     }
   }

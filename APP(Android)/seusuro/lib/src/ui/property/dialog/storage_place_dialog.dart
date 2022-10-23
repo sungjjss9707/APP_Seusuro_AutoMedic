@@ -3,9 +3,16 @@ import 'package:get/get.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/controller/ui/property_page_controller.dart';
+import 'package:seusuro/src/responsive_transition.dart';
+import 'package:seusuro/src/ui/property/pdf/pdf_preview_page.dart';
 
 class StoragePlaceDialog extends StatelessWidget {
-  const StoragePlaceDialog({super.key});
+  const StoragePlaceDialog({
+    Key? key,
+    this.exportAsPdf = false,
+  }) : super(key: key);
+
+  final bool exportAsPdf;
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +42,10 @@ class StoragePlaceDialog extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '보관장소',
+                    !exportAsPdf ? '보관장소' : '인쇄할 보관장소를 고르세요',
                     style: TextStyle(
                       color: AppColors().textBlack,
-                      fontSize: 20,
+                      fontSize: !exportAsPdf ? 20 : 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -59,30 +66,37 @@ class StoragePlaceDialog extends StatelessWidget {
                   const SizedBox(height: 32),
                   Row(
                     children: [
-                      Flexible(
-                        child: InkWell(
-                          onTap: () {
-                            PropertyPageController
-                                .to.selectedStoragePlace.value = '';
-                          },
-                          child: Center(
-                            child: Text(
-                              '초기화',
-                              style: TextStyle(
-                                color: AppColors().textBlack,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
+                      !exportAsPdf
+                          ? Flexible(
+                              child: InkWell(
+                                onTap: () {
+                                  PropertyPageController
+                                      .to.selectedStoragePlace.value = '';
+                                },
+                                child: Center(
+                                  child: Text(
+                                    '초기화',
+                                    style: TextStyle(
+                                      color: AppColors().textBlack,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                        ),
-                      ),
+                            )
+                          : Container(),
                       Flexible(
                         child: InkWell(
                           onTap: () async {
                             if (await PropertyPageController.to
-                                .getProperties()) {
+                                .getProperties(exportAsPdf: exportAsPdf)) {
                               Get.back();
+
+                              if (exportAsPdf) {
+                                Get.to(() => const PdfPreviewPage(),
+                                    transition: rTransition());
+                              }
                             }
                           },
                           child: Center(
@@ -122,10 +136,15 @@ class StoragePlaceDialog extends StatelessWidget {
         const Spacer(),
         Obx(() => Radio(
               value: storagePlace,
-              groupValue: PropertyPageController.to.selectedStoragePlace.value,
+              groupValue: !exportAsPdf
+                  ? PropertyPageController.to.selectedStoragePlace.value
+                  : PropertyPageController.to.pdfStoragePlace.value,
               onChanged: (value) {
-                PropertyPageController.to.selectedStoragePlace.value =
-                    storagePlace;
+                !exportAsPdf
+                    ? PropertyPageController.to.selectedStoragePlace.value =
+                        storagePlace
+                    : PropertyPageController.to.pdfStoragePlace.value =
+                        storagePlace;
               },
               activeColor: AppColors().bgBlack,
             )),

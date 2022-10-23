@@ -138,6 +138,15 @@ class PropertyPage extends StatelessWidget {
       actions: [
         IconButton(
           onPressed: () {
+            Get.dialog(const StoragePlaceDialog(exportAsPdf: true));
+          },
+          icon: Icon(
+            Icons.picture_as_pdf_rounded,
+            color: AppColors().bgBlack,
+          ),
+        ),
+        IconButton(
+          onPressed: () {
             Get.to(const FavoritePage(), transition: rTransition());
           },
           icon: Icon(
