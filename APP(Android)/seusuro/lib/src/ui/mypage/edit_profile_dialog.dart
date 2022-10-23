@@ -402,12 +402,7 @@ class EditProfileDialog extends StatelessWidget {
         Expanded(
           child: InkWell(
             onTap: () async {
-              var enlistmentDate = await showDatePicker(
-                context: Get.overlayContext!,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2022, 3, 21),
-                lastDate: DateTime(2030, 12, 31),
-              );
+              var enlistmentDate = await _showDatePicker(Get.overlayContext!);
 
               if (enlistmentDate != null) {
                 MypagePageController.to.enlistmentDate.value = enlistmentDate;
@@ -451,12 +446,7 @@ class EditProfileDialog extends StatelessWidget {
         Expanded(
           child: InkWell(
             onTap: () async {
-              var dischargeDate = await showDatePicker(
-                context: Get.overlayContext!,
-                initialDate: DateTime.now(),
-                firstDate: DateTime(2022, 3, 21),
-                lastDate: DateTime(2030, 12, 31),
-              );
+              var dischargeDate = await _showDatePicker(Get.overlayContext!);
 
               if (dischargeDate != null) {
                 MypagePageController.to.dischargeDate.value = dischargeDate;
@@ -480,6 +470,27 @@ class EditProfileDialog extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Future<DateTime?> _showDatePicker(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022, 3, 21),
+      lastDate: DateTime(2030, 12, 31),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors().keyBlue,
+              onPrimary: AppColors().textWhite,
+              onSurface: AppColors().textBlack,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }

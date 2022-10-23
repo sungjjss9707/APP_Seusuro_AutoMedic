@@ -244,6 +244,18 @@ class LogPage extends StatelessWidget {
                         initialDate: DateTime.now(),
                         firstDate: DateTime(2022, 3, 21),
                         lastDate: DateTime(2030, 12, 31),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: AppColors().keyBlue,
+                                onPrimary: AppColors().textWhite,
+                                onSurface: AppColors().textBlack,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
                       );
 
                       if (filterDate != null) {

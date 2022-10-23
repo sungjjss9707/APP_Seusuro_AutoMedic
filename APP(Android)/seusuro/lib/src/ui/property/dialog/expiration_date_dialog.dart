@@ -60,12 +60,7 @@ class ExpirationDateDialog extends StatelessWidget {
                   const SizedBox(height: 8),
                   InkWell(
                     onTap: () async {
-                      var firstDate = await showDatePicker(
-                        context: Get.overlayContext!,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2022, 3, 21),
-                        lastDate: DateTime(2030, 12, 31),
-                      );
+                      var firstDate = await _showDatePicker(Get.overlayContext!);
 
                       if (firstDate != null) {
                         PropertyPageController.to.startDate.value = firstDate;
@@ -110,12 +105,7 @@ class ExpirationDateDialog extends StatelessWidget {
                   const SizedBox(height: 8),
                   InkWell(
                     onTap: () async {
-                      var lastDate = await showDatePicker(
-                        context: Get.overlayContext!,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2022, 3, 21),
-                        lastDate: DateTime(2030, 12, 31),
-                      );
+                      var lastDate = await _showDatePicker(Get.overlayContext!);
 
                       if (lastDate != null) {
                         PropertyPageController.to.endDate.value = lastDate;
@@ -196,6 +186,27 @@ class ExpirationDateDialog extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Future<DateTime?> _showDatePicker(BuildContext context) {
+    return showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2022, 3, 21),
+      lastDate: DateTime(2030, 12, 31),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppColors().keyBlue,
+              onPrimary: AppColors().textWhite,
+              onSurface: AppColors().textBlack,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
   }
 }
