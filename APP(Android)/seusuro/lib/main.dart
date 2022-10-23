@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: '스수로',
       theme: ThemeData(
         fontFamily: 'Pretendard',
-        primaryColor: AppColors().keyRed,
+        primaryColor: AppColors().keyBlue,
       ),
       home: const SplashPage(),
       scrollBehavior: AppScrollBehavior(),
