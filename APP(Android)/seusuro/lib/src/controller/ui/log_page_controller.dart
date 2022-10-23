@@ -36,6 +36,10 @@ class LogPageController extends GetxController {
     if (responseDto.status == 200) {
       DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
 
+      logList.clear();
+      dateList.clear();
+      showDateList.clear();
+
       if (responseDto.data != null) {
         logList.addAll(
             responseDto.data.map((element) => LogInfo.fromJson(element)));

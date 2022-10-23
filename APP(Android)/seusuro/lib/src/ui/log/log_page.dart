@@ -275,21 +275,47 @@ class LogPage extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 32),
-                  InkWell(
-                    onTap: () async {
-                      if (await LogPageController.to.getLogs()) {
-                        Get.back();
-                      }
-                    },
-                    child: Text(
-                      '확인',
-                      style: TextStyle(
-                        color: AppColors().textBlack,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                  Row(
+                    children: [
+                      Flexible(
+                        child: InkWell(
+                          onTap: () {
+                            LogPageController.to.logTypeList.clear();
+                            LogPageController.to.filterDate.value =
+                                DateTime(2000, 1, 1);
+                          },
+                          child: Center(
+                            child: Text(
+                              '초기화',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      textAlign: TextAlign.center,
-                    ),
+                      Flexible(
+                        child: InkWell(
+                          onTap: () async {
+                            if (await LogPageController.to.getLogs()) {
+                              Get.back();
+                            }
+                          },
+                          child: Center(
+                            child: Text(
+                              '확인',
+                              style: TextStyle(
+                                color: AppColors().textBlack,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
