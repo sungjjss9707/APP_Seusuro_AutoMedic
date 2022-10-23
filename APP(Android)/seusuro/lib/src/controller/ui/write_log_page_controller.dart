@@ -35,14 +35,20 @@ class WriteLogPageController extends GetxController {
     '보관장소',
   ];
 
-  var categoryList = [
-    '경구약',
-    '백신류',
-    '분무약',
-    '보호대',
-    '마스크',
-    '소모품',
-  ];
+  var categoryMap = {
+    '경구약': Colors.blueAccent,
+    '백신류': Colors.deepPurple,
+    '분무약': Colors.green,
+    '수액류': Colors.teal,
+    '시럽류': Colors.deepOrange,
+    '안약류': Colors.amber,
+    '액체류': Colors.lightBlue,
+    '연고류': Colors.lightGreen,
+    '주사제': Colors.purple,
+    '파스류': Colors.indigo,
+    '의약외품': Colors.pink,
+    '소모품': Colors.grey,
+  };
 
   var unitList = [
     'EA',

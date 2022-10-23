@@ -187,7 +187,7 @@ class WriteLogDialog extends StatelessWidget {
   }
 
   Widget _categoryBottomSheet() {
-    var categoryList = WriteLogPageController.to.categoryList;
+    var categoryList = WriteLogPageController.to.categoryMap.keys.toList();
 
     return rBottomSheet(
       height: 240,
