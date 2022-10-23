@@ -170,11 +170,13 @@ class MypagePage extends StatelessWidget {
             Get.dialog(
               CustomAlertDialog(
                 message: '정말 로그아웃 하시겠습니까?',
-                onConfirm: () {
-                  DataController.to.logout();
+                onConfirm: () async {
+                  if (await MypagePageController.to.logout()) {
+                    DataController.to.logout();
 
-                  Get.offAll(() => const LoginPage(),
-                      transition: rTransition());
+                    Get.offAll(() => const LoginPage(),
+                        transition: rTransition());
+                  }
                 },
               ),
             );
