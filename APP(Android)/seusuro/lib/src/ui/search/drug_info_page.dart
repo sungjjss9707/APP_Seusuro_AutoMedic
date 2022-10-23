@@ -4,6 +4,7 @@ import 'package:html/parser.dart';
 import 'package:image_network/image_network.dart';
 import 'package:seusuro/src/app_colors.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
+import 'package:seusuro/src/controller/ui/search_page_controller.dart';
 import 'package:seusuro/src/model/drug_info.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
 
@@ -80,6 +81,8 @@ class DrugInfoPage extends StatelessWidget {
   }
 
   AppBar _appBar() {
+    var itemName = drugInfo.itemName!;
+
     return AppBar(
       elevation: 0,
       backgroundColor: AppColors().bgWhite,
@@ -101,17 +104,36 @@ class DrugInfoPage extends StatelessWidget {
       ),
       actions: [
         IconButton(
-          onPressed: () {
-            // 북마크 추가/삭제하기
+          onPressed: () async {
+            if (!isBookmarked(itemName)) {
+              await SearchPageController.to.addBookmark(drugInfo);
+            } else {
+              await SearchPageController.to.delBookmark(drugInfo);
+            }
           },
-          icon: Icon(
-            Icons.bookmark_outline_rounded,
-            color: AppColors().bgBlack,
-          ),
+          icon: Obx(() => Icon(
+                isBookmarked(itemName)
+                    ? Icons.bookmark_rounded
+                    : Icons.bookmark_outline_rounded,
+                color: AppColors().bgBlack,
+              )),
         ),
         const SizedBox(width: 8),
       ],
     );
+  }
+
+  bool isBookmarked(String itemName) {
+    bool isBookmarked = false;
+
+    for (DrugInfo drugInfo in SearchPageController.to.bookmarkList) {
+      if (drugInfo.itemName == itemName) {
+        isBookmarked = true;
+        break;
+      }
+    }
+
+    return isBookmarked;
   }
 
   Widget _drugImage() {

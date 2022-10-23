@@ -395,12 +395,15 @@ class SearchPage extends StatelessWidget {
                             ),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                    const Padding(
-                      padding: EdgeInsets.all(4.0),
-                      child: Icon(
-                        Icons.bookmark_outline_rounded,
-                        size: 20,
-                      ),
+                    Padding(
+                      padding: const EdgeInsets.all(4.0),
+                      child: Obx(() => Icon(
+                            isBookmarked(drugInfo.itemName!)
+                                ? Icons.bookmark_rounded
+                                : Icons.bookmark_outline_rounded,
+                            color: AppColors().bgBlack,
+                            size: 20,
+                          )),
                     ),
                   ],
                 ),
@@ -445,5 +448,18 @@ class SearchPage extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  bool isBookmarked(String itemName) {
+    bool isBookmarked = false;
+
+    for (DrugInfo drugInfo in SearchPageController.to.bookmarkList) {
+      if (drugInfo.itemName == itemName) {
+        isBookmarked = true;
+        break;
+      }
+    }
+
+    return isBookmarked;
   }
 }

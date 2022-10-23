@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_network/image_network.dart';
 import 'package:seusuro/src/app_colors.dart';
-import 'package:seusuro/src/controller/ui/bookmark_page_controller.dart';
+import 'package:seusuro/src/controller/ui/search_page_controller.dart';
 import 'package:seusuro/src/model/drug_info.dart';
 import 'package:seusuro/src/responsive_scaffold.dart';
 import 'package:seusuro/src/responsive_transition.dart';
@@ -13,42 +13,38 @@ class BookmarkPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Get.put(BookmarkPageController());
-
     return rScaffold(
       rAppBar: _appBar(),
       rBody: Container(
         color: AppColors().bgWhite,
-        child: Expanded(
-          child: BookmarkPageController.to.obx(
-            (state) {
-              if (BookmarkPageController.to.bookmarkList.isEmpty) {
-                return Center(
-                  child: Text(
-                    '북마크한 약품이 없습니다',
-                    style: TextStyle(
-                      color: AppColors().bgBlack,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
+        child: SearchPageController.to.obx(
+          (state) {
+            if (SearchPageController.to.bookmarkList.isEmpty) {
+              return Center(
+                child: Text(
+                  '북마크한 약품이 없습니다',
+                  style: TextStyle(
+                    color: AppColors().bgBlack,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                   ),
-                );
-              } else {
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: BookmarkPageController.to.bookmarkList.length,
-                  itemBuilder: (context, index) {
-                    var bookmarkList = BookmarkPageController.to.bookmarkList;
+                ),
+              );
+            } else {
+              return ListView.builder(
+                shrinkWrap: true,
+                itemCount: SearchPageController.to.bookmarkList.length,
+                itemBuilder: (context, index) {
+                  var bookmarkList = SearchPageController.to.bookmarkList;
 
-                    return _drugTile(drugInfo: bookmarkList[index]);
-                  },
-                );
-              }
-            },
-            onLoading: Center(
-              child: CircularProgressIndicator(
-                color: AppColors().keyBlue,
-              ),
+                  return _drugTile(drugInfo: bookmarkList[index]);
+                },
+              );
+            }
+          },
+          onLoading: Center(
+            child: CircularProgressIndicator(
+              color: AppColors().keyBlue,
             ),
           ),
         ),
