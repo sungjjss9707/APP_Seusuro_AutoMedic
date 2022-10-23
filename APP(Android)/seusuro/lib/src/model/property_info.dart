@@ -1,3 +1,5 @@
+import 'package:seusuro/src/model/log_info.dart';
+
 class PropertyInfo {
   final String id;
   final String name;
@@ -34,7 +36,7 @@ class PropertyInfo {
         niin = json['niin'],
         amountByPlace = json['amountByPlace'],
         expirationDate = json['expirationDate'],
-        logRecord = json['logRecord'],
+        logRecord = json['logRecord'].map((element) => LogInfo.fromJson(element)).toList(),
         createdAt = json['createdAt'],
         updatedAt = json['updatedAt'];
 

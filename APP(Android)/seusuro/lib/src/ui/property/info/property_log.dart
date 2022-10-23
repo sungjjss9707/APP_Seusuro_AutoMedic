@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:seusuro/src/app_colors.dart';
-import 'package:seusuro/src/controller/ui/property_page_controller.dart';
 import 'package:seusuro/src/model/item_info.dart';
 import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/model/property_info.dart';
@@ -15,7 +14,7 @@ class PropertyLog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var logList = PropertyPageController.to.logList;
+    var logList = propertyInfo.logRecord;
 
     return ListView.builder(
       shrinkWrap: true,

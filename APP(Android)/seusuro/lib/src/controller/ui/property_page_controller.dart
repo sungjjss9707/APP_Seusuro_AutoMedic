@@ -4,17 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
-import 'package:seusuro/src/model/log_info.dart';
 import 'package:seusuro/src/model/property_info.dart';
 import 'package:seusuro/src/model/token_info.dart';
-import 'package:seusuro/src/repository/log_repository.dart';
 import 'package:seusuro/src/repository/property_repository.dart';
 import 'package:seusuro/src/responsive_snackbar.dart';
 
 class PropertyPageController extends GetxController with StateMixin {
   static PropertyPageController get to => Get.find();
 
-  final _logRepository = LogRepository();
   final _propertyRepository = PropertyRepository();
 
   RxString selectedOrder = '가나다 순'.obs;
@@ -44,28 +41,7 @@ class PropertyPageController extends GetxController with StateMixin {
 
   RxList propertyList = [].obs;
 
-  RxList logList = [].obs;
-
   RxList favoriteList = [].obs;
-
-  Future<void> getLogRecord(List logRecord) async {
-    logList.clear();
-
-    for (String logId in logRecord) {
-      var response = await _logRepository.getLog(logId);
-
-      ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
-
-      if (responseDto.status == 200) {
-        DataController.to.tokenInfo.value =
-            TokenInfo.fromJson(response.headers);
-
-        logList.add(LogInfo.fromJson(responseDto.data));
-      } else {
-        rSnackbar(title: '알림', message: responseDto.message);
-      }
-    }
-  }
 
   Future<bool> getAllStoragePlaces() async {
     var response = await _propertyRepository.getAllStoragePlaces();
