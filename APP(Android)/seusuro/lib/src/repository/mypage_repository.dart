@@ -49,6 +49,17 @@ class MypageRepository {
     return ResponseDto.fromJson(jsonDecode(response.body));
   }
 
+  Future<http.Response> logout() async {
+    var url = Uri.parse('$baseUrl/logout');
+
+    http.Response response = await http.post(
+      url,
+      headers: DataController.to.tokenInfo.toJson(),
+    );
+
+    return response;
+  }
+
   Future<ResponseDto> withdrawal() async {
     var url = Uri.parse('$baseUrl/user');
 

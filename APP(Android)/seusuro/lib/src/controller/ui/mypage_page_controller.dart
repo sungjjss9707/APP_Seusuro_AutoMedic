@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:seusuro/src/controller/data_controller.dart';
 import 'package:seusuro/src/model/dto/response_dto.dart';
+import 'package:seusuro/src/model/token_info.dart';
 import 'package:seusuro/src/model/user_info.dart';
 import 'package:seusuro/src/repository/base_url.dart';
 import 'package:seusuro/src/repository/mypage_repository.dart';
@@ -83,6 +85,22 @@ class MypagePageController extends GetxController {
       rSnackbar(title: '알림', message: '회원 정보가 수정되었습니다!');
       return true;
     } else {
+      rSnackbar(title: '알림', message: responseDto.message);
+      return false;
+    }
+  }
+
+  Future<bool> logout() async {
+    var response = await _mypageRepository.logout();
+    
+    ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
+
+    if (responseDto.status == 200) {
+      rSnackbar(title: '알림', message: '로그아웃이 완료되었습니다!');
+      return true;
+    } else {
+      DataController.to.tokenInfo.value = TokenInfo.fromJson(response.headers);
+      
       rSnackbar(title: '알림', message: responseDto.message);
       return false;
     }

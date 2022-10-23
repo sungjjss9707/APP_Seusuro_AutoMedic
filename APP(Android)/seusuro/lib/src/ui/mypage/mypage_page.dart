@@ -170,11 +170,13 @@ class MypagePage extends StatelessWidget {
             Get.dialog(
               CustomAlertDialog(
                 message: '정말 로그아웃 하시겠습니까?',
-                onConfirm: () {
-                  DataController.to.logout();
+                onConfirm: () async {
+                  if (await MypagePageController.to.logout()) {
+                    DataController.to.logout();
 
-                  Get.offAll(() => const LoginPage(),
-                      transition: rTransition());
+                    Get.offAll(() => const LoginPage(),
+                        transition: rTransition());
+                  }
                 },
               ),
             );
@@ -222,8 +224,14 @@ class MypagePage extends StatelessWidget {
         ),
         ListTileButton(
           content: 'Team AutoMedic',
-          onTap: () {
-            rSnackbar(title: '알림', message: '아직 준비 중인 기능입니다 :)');
+          onTap: () async {
+            final Uri url = Uri.parse(
+              'https://medtopublic.notion.site/161a28cb07eb46a8bdc8905f782b2283?v=0c8ebe0f8c3845e7bf862aa4676decaa',
+            );
+
+            if (!await launchUrl(url)) {
+              throw 'Could not launch $url';
+            }
           },
         ),
         ListTileButton(
