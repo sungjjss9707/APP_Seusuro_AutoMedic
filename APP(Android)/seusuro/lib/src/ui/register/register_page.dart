@@ -33,23 +33,18 @@ class RegisterPage extends StatelessWidget {
                   backgroundColor: AppColors().lineGrey,
                 )),
             Expanded(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  Obx(() {
-                    switch (RegisterPageController.to.registerStep.value) {
-                      case 1:
-                        return RegisterStep1(formkey: formKey1);
-                      case 2:
-                        return RegisterStep2(formkey: formKey2);
-                      case 3:
-                        return RegisterStep3(formkey: formKey3);
-                      default:
-                        return Container();
-                    }
-                  }),
-                ],
-              ),
+              child: Obx(() {
+                switch (RegisterPageController.to.registerStep.value) {
+                  case 1:
+                    return RegisterStep1(formkey: formKey1);
+                  case 2:
+                    return RegisterStep2(formkey: formKey2);
+                  case 3:
+                    return RegisterStep3(formkey: formKey3);
+                  default:
+                    return Container();
+                }
+              }),
             ),
             Obx(() => BottomButton(
                   content: RegisterPageController.to.registerStep.value < 3

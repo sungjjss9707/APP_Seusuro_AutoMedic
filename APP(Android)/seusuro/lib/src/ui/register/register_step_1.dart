@@ -83,6 +83,7 @@ class RegisterStep1 extends StatelessWidget {
             ],
           ),
         ),
+        const SizedBox(height: 32),
       ],
     );
   }
