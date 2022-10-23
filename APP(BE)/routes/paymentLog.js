@@ -2181,7 +2181,7 @@ router.post('/', async function(req, res, next) {
 		return;
 	}
 	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");	
-	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
 	var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
