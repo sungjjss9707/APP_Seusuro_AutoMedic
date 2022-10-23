@@ -193,7 +193,7 @@ class ExpirationDateDialog extends StatelessWidget {
     return showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2022, 3, 21),
+      firstDate: DateTime(2010, 1, 1),
       lastDate: DateTime(2030, 12, 31),
       builder: (context, child) {
         return Theme(
