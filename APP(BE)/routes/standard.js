@@ -21,24 +21,23 @@ async function myQuery(sql, param){
 
 
 router.post('/', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-	const user_id = req.body.id;		///////////////////////////////////////////////////////	//무슨 id인지 고치기
-    const accessToken = req.header('accessToken');
+	res.setHeader("Access-Control-Expose-Headers","*");
+	const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
         res.send({status:400, message:"토큰없음", data:null});
         return;
     }
-    var verify_success = await verify.verifyFunction(accessToken,refreshToken,user_id);
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
     if(!verify_success.success){
         res.send({status:400, message:verify_success.message, data:null});
         return;
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+
     con = await db.createConnection(inform);
 	const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = user_id;

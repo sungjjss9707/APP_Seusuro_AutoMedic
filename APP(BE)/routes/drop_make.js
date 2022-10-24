@@ -21,33 +21,37 @@ async function myQuery(sql, param){
 
 router.post('/', async function(req, res, next) {
 	con = await db.createConnection(inform);
-	const militaryUnit = req.body.militaryUnit;
+	var militaryUnit = req.body.militaryUnit;
 	const code = req.body.code;
 	var delete_mil_and_code = myQuery("delete from mil_and_code where militaryUnit = ?;", militaryUnit);
     if(!delete_mil_and_code){
         res.send("Fail");
-        return;
     }
 	var insert_mil_and_code = myQuery("insert into mil_and_code values (?,?);", [militaryUnit, code]);
 	if(!insert_mil_and_code){
 		res.send("Fail");
 		return;
 	}
+	militaryUnit = militaryUnit.replace(/ /g, "_");
 	var property_drop_success = await table.propertyDrop(militaryUnit);
     var log_drop_success = await table.paymentLogDrop(militaryUnit);
     var storagePlace_drop_success = await table.storagePlaceDrop(militaryUnit);
-	var medicInform_drop_success = await table.medicInformDrop(militaryUnit);
-    if(property_drop_success.success&&log_drop_success.success&&storagePlace_drop_success&&medicInform_drop_success){
-		var property_make_success = await table.propertyMake(militaryUnit);
-    	var log_make_success = await table.paymentLogMake(militaryUnit);
-    	var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
-		var medicInform_make_success = await table.medicInformMake(militaryUnit);
-    	if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success){
-			res.send("success");
-    	}
-    	else res.send({status:400, message:"Bad Request"});
-    }
-    else res.send({status:400, message:"Bad Request"});
+	//var medicInform_drop_success = await table.medicInformDrop(militaryUnit);
+	var favorite_drop_success = await table.favoriteDrop(militaryUnit);
+	var bookmark_drop_success = await table.bookmarkDrop(militaryUnit);
+    //if(property_drop_success.success&&log_drop_success.success&&storagePlace_drop_success&&medicInform_drop_success){
+	var property_make_success = await table.propertyMake(militaryUnit);
+    var log_make_success = await table.paymentLogMake(militaryUnit);
+    var storagePlace_make_success = await table.storagePlaceMake(militaryUnit);
+	//var medicInform_make_success = await table.medicInformMake(militaryUnit);
+	var favorite_make_success = await table.favoriteMake(militaryUnit);
+    var bookmark_make_success = await table.bookmarkMake(militaryUnit);
+    	//if(property_make_success.success&&log_make_success.success&&storagePlace_make_success&&medicInform_make_success){
+	res.send("success");
+    	//}
+    	//else res.send({status:400, message:"Bad Request"});
+    //}
+   // else res.send({status:400, message:"Bad Request"});
 
 });
 

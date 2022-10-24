@@ -9,6 +9,13 @@ var inform = mysql.inform;
 var verify = require('../routes/verify');
 var table = require('../routes/table');
 var deleteLog = require('../routes/deleteLog');
+var app = express();
+var cors = require('cors');
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+//app.use(express.json());
+
 async function myQuery(sql, param){
     try{
         const [row, field] = await con.query(sql,param);
@@ -19,14 +26,213 @@ async function myQuery(sql, param){
     }
 }
 
-router.put('/', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+router.post('/filter', async function(req, res, next) {
+/*
+    res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+    res.setHeader("Access-Control-Expose-Headers","*");
+	//res.setHeader("Accept","application/json");
+	//res.setHeader("content-type", "application/json");
+    const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰 없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+	res.setHeader("accessToken", new_access_token);
+	res.setHeader("refreshToken", new_refresh_token);
     con = await db.createConnection(inform);
+    const check_militaryUnit = "select militaryUnit from user where id = ?;";
+    const check_militaryUnit_param = user_id;
+    const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
+    if(check_militaryUnit_result.length==0){
+        res.send({status:500, message:'Internal Sever Error', data:null});
+        return;
+    }
+    var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+	//var body = JSON.parse(req.body);
+	//var type = body.type;
+    //var date = body.date;
+
+	var type = req.body.type;
+	var date = req.body.date;
+
+	console.log("이제 프린트 한다");
+	//console.log(body);
+	console.log(req.body);
+	//console.log(type);
+	//console.log(date);
+	//var select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in (?,?,?,?,?) and DATE(createdAt) between ? and ? order by createdAt, log_num;";
+	var select_log_sql = "";
+	var select_log_param = [];
+	var str_type_arr;
+	if(type==null){
+		select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in ('수입', '불출', '폐기', '반납', '이동') and DATE(createdAt) between ? and ? order by createdAt, log_num;";
+	}
+	else{
+		select_log_sql = "select * from paymentLog_"+militaryUnit+" where receiptPayment in ";
+		var param = "(";
+		for(let i=0; i<type.length; ++i){
+			param+="'";
+			param+=type[i];
+			param+="'";
+			if(i!=type.length-1) param+=",";
+		}
+		select_log_sql+=param;
+		select_log_sql+=") and DATE(createdAt) between ? and ? order by createdAt, log_num;";
+		//console.log(str_type_arr);
+	}
+	if(date==null){
+		select_log_param.push("1000-01-01");
+		select_log_param.push("9999-12-31");
+	}
+	else{
+		select_log_param.push(date);
+        select_log_param.push(date);
+	}
+	console.log(select_log_sql);
+	//var select_log_sql = "select * from paymentLog where receiptPayment in ? and DATE(createdAt) between ? and ? order by createdAt;";
+	var [select_log_result] = await con.query(select_log_sql, select_log_param);
+	if(select_log_result.length==0){
+		res.send({status:200, message:"검색결과가 없습니다", data:null});
+		return;
+	}
+	var data = [];
+    for(let i=0; i<select_log_result.length; ++i){
+    	var id = select_log_result[i].id;
+    	var receiptPayment = select_log_result[i].receiptPayment;
+    	var confirmor_id = select_log_result[i].confirmor_id;
+    	var target = select_log_result[i].target;
+    	var YearMonthDate = select_log_result[i].YearMonthDate;
+    	var log_num = select_log_result[i].log_num;
+    	var property_id_arr = select_log_result[i].property_id_arr;
+    	var storagePlace_arr = select_log_result[i].storagePlace_arr;
+    	var amount_arr = select_log_result[i].amount_arr;
+    	var unit_arr = select_log_result[i].unit_arr;
+    	var createdAt = select_log_result[i].createdAt;
+    	var updatedAt = select_log_result[i].updatedAt;
+    	var arr_property_id = property_id_arr.split('/');   ////////////////
+    	var arr_storagePlace = storagePlace_arr.split('/'); ////////////////
+    	var str_arr_amount = amount_arr.split('/');
+    	var arr_unit = unit_arr.split('/');//////////////////
+    	var arr_amount = [];    ////////////////////
+    	var arr_name = [];  ///////////////////
+    	var arr_expirationDate = [];    ///////////
+    	var len = arr_property_id.length;
+    	var getsu;
+    	for(let k=0; k<str_arr_amount.length; ++k){
+        	getsu = parseInt(str_arr_amount[k]);
+        	arr_amount.push(getsu);
+    	}
+    	var p_id;
+    	for(let k=0; k<arr_property_id.length; ++k){
+        	p_id = arr_property_id[k];
+        	var id_split = p_id.split('-');
+        	arr_name.push(id_split[0]);
+        	var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
+        	arr_expirationDate.push(myexpirationDate);
+    	}
+    	var niin_arr = [];
+    	var niin, category;
+    	var category_arr = [];
+    	var select_medicInform_sql = "select * from medicInform where name = ?;";
+    	var select_medicInform_param;
+        for(let k=0; k<arr_property_id.length; ++k){
+            select_medicInform_param = arr_name[k];
+            var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
+            if(select_medicInform_result.length==0){
+                res.send({status:500, message:"Internal Server Error", data:null});
+                return;
+            }
+            else{
+                niin = select_medicInform_result[0].niin;
+                category = select_medicInform_result[0].category;
+            }
+        	niin_arr.push(niin);
+        	category_arr.push(category);
+        }
+        var items = [];
+        var individual_item;
+        for(let k=0; k<len; ++k){
+            individual_item = {name:arr_name[k], amount:arr_amount[k], unit:arr_unit[k],category:category_arr[k],niin:niin_arr[k], storagePlace:arr_storagePlace[k], expirationDate:arr_expirationDate[k]};
+            items.push(individual_item);
+        }
+        var select_user_sql = "select * from user where id = ?;";
+        var select_user_param = confirmor_id;
+        const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
+        if(select_user_result.length==0){
+			res.send({status:500, message:"Internal Server Error", data:null});
+            return;
+        }
+        var user_name = select_user_result[0].name;
+        var email = select_user_result[0].email;
+        var phoneNumber = select_user_result[0].phoneNumber;
+        var serviceNumber = select_user_result[0].serviceNumber;
+        var rank = select_user_result[0].mil_rank;
+        var enlistmentDate = select_user_result[0].enlistmentDate;
+        var dischargeDate = select_user_result[0].dischargeDate;
+        var militaryUnit = select_user_result[0].militaryUnit;
+        var pictureName = select_user_result[0].pictureName;
+        var user_createdAt = select_user_result[0].createdAt;
+        var user_updatedAt = select_user_result[0].updatedAt;
+		var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
+        var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+        var individual_data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
+            //res.send({status:200, message:"Ok", data:data});
+        data.push(individual_data);
+    }
+    //res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+	res.send({status:200, message:"Ok", data:data});
+});
+
+
+router.put('/', async function(req, res, next) {
+/*	
+res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
+    con = await db.createConnection(inform);
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰 없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+    var user_id = verify_success.id;
+	var confirmor_id = req.body.confirmor;
+	res.setHeader("accessToken", new_access_token);
+    res.setHeader("refreshToken", new_refresh_token);
+	if(user_id!=confirmor_id){
+        res.send({status:400, message:'본인 계정의 로그만 변경 가능합니다', data:null});
+        return;
+    }
 	await con.beginTransaction();
-    var confirmor_id = req.body.confirmor;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -41,6 +247,7 @@ router.put('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -57,7 +264,7 @@ router.put('/', async function(req, res, next) {
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
 
@@ -133,6 +340,7 @@ router.put('/', async function(req, res, next) {
         arr_amount.push(getsu);
     }
     var p_id;
+	//var category_arr = [];
     for(let i=0; i<arr_property_id.length; ++i){
         p_id = arr_property_id[i];
         var id_split = p_id.split('-');
@@ -140,6 +348,18 @@ router.put('/', async function(req, res, next) {
         var myexpirationDate = id_split[1]+"-"+id_split[2]+"-"+id_split[3];
         arr_expirationDate.push(myexpirationDate);
     }
+	var category_arr = [];
+	for(let i=0; i<arr_name.length; ++i){
+		var select_category_sql = "select category from medicInform where name = ?;";
+		var select_category_param = arr_name[i];
+		var [select_category_result] = await con.query(select_category_sql, select_category_param);
+		if(select_category_result.length==0){
+//			res.send({status:400, message:"Bad Request", data:null});
+			res.send({status:500, message:'Internal Server Error', data:null});
+            return;
+		}
+		category_arr.push(select_category_result[i].category);
+	}
     var select_property_sql, select_property_param, select_property_result;
     var modify_amount;
     var update_property_sql, update_property_param, update_property_result;
@@ -156,12 +376,13 @@ router.put('/', async function(req, res, next) {
             select_property_param = arr_property_id[i];
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result==0){  //없으면
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-                insert_property_param = [arr_property_id[i], arr_name[i], (-1)*arr_amount[i], arr_unit[i], arr_expirationDate[i]];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+                insert_property_param = [arr_property_id[i], arr_name[i], (-1)*arr_amount[i], arr_unit[i],category_arr[i] ,arr_expirationDate[i]];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
                     await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});	
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -175,7 +396,8 @@ router.put('/', async function(req, res, next) {
                     insert_storagePlace_result = await myQuery(insert_storagePlace_sql, insert_storagePlace_param);
                     if(!insert_storagePlace_result){
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                     }
                 }
@@ -187,7 +409,8 @@ router.put('/', async function(req, res, next) {
                         delete_storagePlace_param = [arr_property_id[i], arr_storagePlace[i]];
                         if(!delete_storagePlace_result){
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -200,7 +423,8 @@ router.put('/', async function(req, res, next) {
                         update_storagePlace_result = await myQuery(update_storagePlace_sql, update_storagePlace_param);
                         if(!update_storagePlace_result){
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                     //      await con.rollback();
                             //return false;
@@ -224,7 +448,8 @@ router.put('/', async function(req, res, next) {
                         console.log("열로옴");
                     //  await con.rollback();
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});	
+						//res.send({status:400, message:"Bad Request", data:null});		
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -240,7 +465,8 @@ router.put('/', async function(req, res, next) {
                     //  await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -256,7 +482,8 @@ router.put('/', async function(req, res, next) {
                     if(!insert_storagePlace_result){
                     //  await con.rollback();
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return false;
                         //return {success:false, message:"Bad Request"};
@@ -273,7 +500,8 @@ router.put('/', async function(req, res, next) {
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -286,7 +514,8 @@ router.put('/', async function(req, res, next) {
                     //      await con.rollback();
                             //return false;
 							await con.rollback();
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		return;
                             //return {success:false, message:"Bad Request"};
                         }
@@ -313,7 +542,8 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});	
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -330,7 +560,8 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -343,7 +574,8 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});	
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -361,7 +593,8 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -377,7 +610,8 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -399,14 +633,15 @@ router.put('/', async function(req, res, next) {
             var property_updatedAt = select_property_result[0].updatedAt;
 */
             if(select_property_result==0){  //오류가 아니라 그 빼기함으로써 다 써서 없는거임
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?, now(), now());";
-                insert_property_param = [arr_property_id[i], arr_name[i], arr_amount[i], arr_unit[i], arr_expirationDate[i]];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?, now(), now());";
+                insert_property_param = [arr_property_id[i], arr_name[i], arr_amount[i], arr_unit[i],category_arr[i], arr_expirationDate[i]];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(!insert_property_result){
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                 }
             //약장함에도 약 없음
@@ -420,7 +655,8 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -437,7 +673,8 @@ router.put('/', async function(req, res, next) {
         //          await con.rollback();
                     //return false;
 					await con.rollback();
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     return;
                     //return {success:false, message:"Bad Request"};
                 }
@@ -453,7 +690,8 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -468,7 +706,8 @@ router.put('/', async function(req, res, next) {
         //              await con.rollback();
                         //return false;
 						await con.rollback();
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	return;
                         //return {success:false, message:"Bad Request"};
                     }
@@ -544,6 +783,7 @@ router.put('/', async function(req, res, next) {
     len = items.length;
 	var property_id,niin;
 	var niin_arr = [];
+	var category;
     if(receiptPayment=="수입"){
         for(let i=0; i<items.length; ++i){
             console.log("--------------------------");
@@ -552,6 +792,8 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
+			category = items[i].category;
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             unit_arr.push(unit);
@@ -562,15 +804,16 @@ router.put('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){   //새로 재산에 넣고 storagePlace에도 넣기
-                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-                insert_property_param = [property_id,name,amount,unit,expirationDate];
+                insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+                insert_property_param = [property_id,name,amount,unit,category,expirationDate];
                 insert_property_result = await myQuery(insert_property_sql, insert_property_param);
                 if(insert_property_result){
                     console.log(property_id+" property 테이블 insert 성공");
                 }
                 else{
 					console.log(property_id+" property 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
 					await con.rollback();
 					return;
                 }
@@ -583,7 +826,8 @@ router.put('/', async function(req, res, next) {
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -600,7 +844,8 @@ router.put('/', async function(req, res, next) {
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -620,7 +865,8 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -638,26 +884,34 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                var new_niin = Math.random().toString(36).substring(2, 12);
+				var frontNum = Math.floor(Math.random()*90)+10;
+                var strFrontNum = String(frontNum);
+                var randomAlpha = String.fromCharCode(Math.floor(Math.random()*26)+65);
+                var backNum = Math.floor(Math.random()*900000)+100000;
+                var strBackNum = String(backNum);
+                var new_niin = strFrontNum+randomAlpha+strBackNum;
+                //var new_niin = Math.random().toString(36).substring(2, 12);
                 niin = new_niin;
-                var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+                var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
                 var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
                 var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
                 if(!insert_medicInform_success){
-                    res.send({status:400, message:"Bad Request", data:null});
+                    //res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:'Internal Server Error', data:null});
                     await con.rollback();
                     return;
                 }
@@ -676,6 +930,7 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -723,7 +978,8 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});	
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -738,7 +994,8 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -759,7 +1016,8 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -777,20 +1035,22 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
                 await con.rollback();
                 return;
             }
@@ -809,6 +1069,7 @@ router.put('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
             property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -842,7 +1103,8 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(property_id+" property 테이블 삭제 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -857,7 +1119,8 @@ router.put('/', async function(req, res, next) {
                     }
                     else{
                         console.log(property_id+" property 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:'Internal Server Error', data:null});
                     	await con.rollback();
                     	return;
                     }
@@ -891,7 +1154,8 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -906,7 +1170,8 @@ router.put('/', async function(req, res, next) {
                         }
                         else{
                             console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:'Internal Server Error', data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -914,13 +1179,14 @@ router.put('/', async function(req, res, next) {
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
                 await con.rollback();
                 return;
             }
@@ -960,7 +1226,8 @@ router.put('/', async function(req, res, next) {
 	var delete_paymentLog_param = log_id;
 	var delete_success = await myQuery(delete_paymentLog_sql, delete_paymentLog_param);
 	if(!delete_success){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
 	}
@@ -968,10 +1235,12 @@ router.put('/', async function(req, res, next) {
     var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,YearMonthDate, log_num, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr, createdAt];
     var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
     if(!insert_log_result){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
     }
+/*
     var select_user_sql = "select * from user where id = ?;";
     var select_user_param = confirmor_id;
     var [result] = await con.query(select_user_sql, select_user_param);
@@ -980,12 +1249,15 @@ router.put('/', async function(req, res, next) {
         await con.rollback();
         return;
     }
-    var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+*/
+	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");
+    var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
     var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
     if(time_result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+//		res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         await con.rollback();
         return;
     }
@@ -997,26 +1269,49 @@ router.put('/', async function(req, res, next) {
         console.log(items[i].niin);
     }
     var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
-    res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+    res.send({status:200, message:"Ok", data:data});
 	await con.commit()
 });
 
 
 router.get('/', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+/*	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
     con = await db.createConnection(inform); 
-    const my_id = req.body.id;
+    //const my_id = req.body.id;
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰 없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+	res.setHeader("accessToken", new_access_token);
+    res.setHeader("refreshToken", new_refresh_token);
+	var my_id = verify_success.id;
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        //res.send({status:400, message:'Bad Request', data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1031,6 +1326,7 @@ router.get('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
     /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1043,10 +1339,10 @@ router.get('/', async function(req, res, next) {
         return;
     }
 */
-    var select_log_sql = "select * from paymentLog_"+militaryUnit+" order by YearMonthDate, log_num;";
+    var select_log_sql = "select * from paymentLog_"+militaryUnit+" order by createdAt, log_num;";
     const [select_log_result, select_log_field] = await con.query(select_log_sql);
     if(select_log_result.length==0){
-        res.send({status:400, message:"Bad Request"});
+        res.send({status:200, message:"로그가 없습니다.", data:null});
     }
     else{
 		//var receiptPayment, confirmor_id, target, YearMonthDate, log_num, property_id_arr, storagePlace_arr, amount_arr, unit_arr, createdAt, updatedAt;
@@ -1090,21 +1386,21 @@ router.get('/', async function(req, res, next) {
 			var niin_arr = [];
         	var niin, category;
         	var category_arr = [];
-        	var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+        	var select_medicInform_sql = "select * from medicInform where name = ?;";
         	var select_medicInform_param;
         	for(let k=0; k<arr_property_id.length; ++k){
             	select_medicInform_param = arr_name[k];
             	var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             	if(select_medicInform_result.length==0){
-                	res.send({status:400, message:"Bad Request", data:null});
+                	res.send({status:500, message:"Internal Server Error", data:null});
                 	return;
             	}
             	else{
                 	niin = select_medicInform_result[0].niin;
                 	category = select_medicInform_result[0].category;
             	}
-				console.log(niin);
-				console.log(category);
+				//console.log(niin);
+				//console.log(category);
             	niin_arr.push(niin);
             	category_arr.push(category);
         	}
@@ -1118,7 +1414,8 @@ router.get('/', async function(req, res, next) {
         	var select_user_param = confirmor_id;
         	const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
 			if(select_user_result.length==0){
-         	   res.send({status:400, message:"Bad Request"});
+				res.send({status:500, message:'Internal Server Error', data:null});
+//         	   res.send({status:400, message:"Bad Request"});
 				return;
         	}
 			var user_name = select_user_result[0].name;
@@ -1132,33 +1429,56 @@ router.get('/', async function(req, res, next) {
 			var pictureName = select_user_result[0].pictureName;
             var user_createdAt = select_user_result[0].createdAt;
             var user_updatedAt = select_user_result[0].updatedAt;
-            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");	
+            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
             var individual_data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
             //res.send({status:200, message:"Ok", data:data});
 			data.push(individual_data);
 		}
-		res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+		res.send({status:200, message:"Ok", data:data});
 	}
 });
 
 
 
 router.get('/:id', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
+	/*res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
     con = await db.createConnection(inform);
-    const my_id = req.body.id;
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰 없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+	res.setHeader("accessToken", new_access_token);
+    res.setHeader("refreshToken", new_refresh_token);
+    var my_id = verify_success.id;
 	
     const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = my_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        //res.send({status:400, message:'Bad Request', data:null});
+		res.send({status:500, message:'Internal Server Error', data:null});
         return;
     }
     var militaryUnit = check_militaryUnit_result[0].militaryUnit;
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1173,6 +1493,7 @@ router.get('/:id', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 	/*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1190,7 +1511,7 @@ router.get('/:id', async function(req, res, next) {
     var select_log_param = id;
     const [select_log_result, select_log_field] = await con.query(select_log_sql, select_log_param);
     if(select_log_result.length==0){
-        res.send({status:400, message:"Bad Request"});
+        res.send({status:400, message:"해당 로그가 없습니다", data:null});
     }
     else{
         var receiptPayment = select_log_result[0].receiptPayment;
@@ -1204,10 +1525,10 @@ router.get('/:id', async function(req, res, next) {
 		var unit_arr = select_log_result[0].unit_arr;
 		var createdAt = select_log_result[0].createdAt;
 		var updatedAt = select_log_result[0].updatedAt;
-		console.log(property_id_arr);
-		console.log(storagePlace_arr);
-		console.log(amount_arr);
-		console.log(unit_arr);
+		//console.log(property_id_arr);
+		//console.log(storagePlace_arr);
+		//console.log(amount_arr);
+		//console.log(unit_arr);
 		var arr_property_id = property_id_arr.split('/');	////////////////
 		var arr_storagePlace = storagePlace_arr.split('/'); ////////////////
 		var str_arr_amount = amount_arr.split('/');
@@ -1233,13 +1554,14 @@ router.get('/:id', async function(req, res, next) {
 		var niin_arr = [];
 		var niin, category;
 		var category_arr = [];
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<len; ++i){
             select_medicInform_param = arr_name[i];
             var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:'Internal Server Error', data:null});
+//                res.send({status:400, message:"Bad Request", data:null});
                 return;
             }
             else{
@@ -1261,7 +1583,8 @@ router.get('/:id', async function(req, res, next) {
         var select_user_param = confirmor_id;
         const [select_user_result, select_user_field] = await con.query(select_user_sql, select_user_param);
         if(select_user_result.length==0){
-            res.send({status:400, message:"Bad Request"});
+			res.send({status:500, message:'Internal Server Error', data:null});
+//            res.send({status:400, message:"Bad Request"});
         }
         else{
             var user_name = select_user_result[0].name;
@@ -1275,22 +1598,57 @@ router.get('/:id', async function(req, res, next) {
 			var pictureName = select_user_result[0].pictureName;
             var user_createdAt = select_user_result[0].createdAt;
             var user_updatedAt = select_user_result[0].updatedAt;
-            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
+            var user_data = {id:confirmor_id, name:user_name, email:email, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:rank, enlistmentDate:enlistmentDate, dischargeDate:dischargeDate,militaryUnit:militaryUnit_blank,pictureName:pictureName, createdAt:user_createdAt, updatedAt:user_updatedAt };
             var data = {id:id, receiptPayment:receiptPayment, target:target,items:items, confirmor:user_data, createdAt:createdAt, updatedAt:updatedAt};
-            res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+            res.send({status:200, message:"Ok", data:data});
         }
     }
 });
 
 
 router.post('/', async function(req, res, next) {
+/*	
 	res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
     res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+*/
+	res.setHeader("Access-Control-Expose-Headers","*");
+
 	con = await db.createConnection(inform);
-	await con.beginTransaction();
-	const confirmor_id = req.body.confirmor;
+	//await con.beginTransaction();
+
+	const accessToken = req.header('accessToken');
+    const refreshToken = req.header('refreshToken');
+	console.log("토큰 : ");
+	console.log(accessToken);
+	console.log(refreshToken);
+    if (accessToken == null || refreshToken==null) {
+        res.send({status:400, message:"토큰 없음", data:null});
+        return;
+    }
+    //console.log(accessToken+"  "+id);
+    var verify_success = await verify.verifyFunction(accessToken,refreshToken);
+    if(!verify_success.success){
+        res.send({status:400, message:verify_success.message, data:null});
+        return;
+    }
+    var new_access_token = verify_success.accessToken;
+    var new_refresh_token = verify_success.refreshToken;
+	res.setHeader("accessToken", new_access_token);
+    res.setHeader("refreshToken", new_refresh_token);
+	var user_id = verify_success.id;
+	var confirmor_id = req.body.confirmor;
+	console.log(user_id+"  "+confirmor_id+"     ssibal");
+	console.log(req.body.receiptPayment);
+	console.log(req.body.target);
+	console.log(req.body.items);
+	if(user_id!=confirmor_id){
+		res.send({status:200, message:'본인 계정의 로그만 입력 가능합니다', data:null});
+        return;
+	}
+
 /*
     const accessToken = req.header('Authorization');
     if (accessToken == null) {
@@ -1303,6 +1661,7 @@ router.post('/', async function(req, res, next) {
         return;
     }
 */
+/*
     const accessToken = req.header('accessToken');
     const refreshToken = req.header('refreshToken');
     if (accessToken == null || refreshToken==null) {
@@ -1317,11 +1676,12 @@ router.post('/', async function(req, res, next) {
     }
     var new_access_token = verify_success.accessToken;
     var new_refresh_token = verify_success.refreshToken;
+*/
 	const check_militaryUnit = "select militaryUnit from user where id = ?;";
     const check_militaryUnit_param = confirmor_id;
     const [check_militaryUnit_result] = await con.query(check_militaryUnit, check_militaryUnit_param);
     if(check_militaryUnit_result.length==0){
-        res.send({status:400, message:'Bad Request', data:null});
+        res.send({status:500, message:'Internal Server Error', data:null});
 		//await con.rollback();
         return;
     }
@@ -1329,7 +1689,13 @@ router.post('/', async function(req, res, next) {
 	const receiptPayment = req.body.receiptPayment;
 	const target = req.body.target;
 	const items = req.body.items;
+	if(items.length==0){
+		res.send({status:400, message:'항목을 입력해야 합니다', data:null});
+        //await con.rollback();
+        return;
+	}
 	console.log(items);
+	await con.beginTransaction();
 	const curr = new Date();
 	const utc = curr.getTime() + (curr.getTimezoneOffset() * 60 * 1000);
 	const KR_TIME_DIFF = 9*60*60*1000;
@@ -1368,6 +1734,7 @@ router.post('/', async function(req, res, next) {
 			unit = items[i].unit;
 			storagePlace = items[i].storagePlace;
 			expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
 			category = items[i].category;
 			category_arr.push(category);
 			property_id = name+"-"+expirationDate;
@@ -1380,15 +1747,15 @@ router.post('/', async function(req, res, next) {
 			select_property_param = property_id;
 			[select_property_result] = await con.query(select_property_sql, select_property_param);
 			if(select_property_result.length==0){	//새로 재산에 넣고 storagePlace에도 넣기 
-				insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,now(), now());";
-				insert_property_param = [property_id,name,amount,unit,expirationDate];
+				insert_property_sql = "insert into property_"+militaryUnit+" values (?,?,?,?,?,?,now(), now());";
+				insert_property_param = [property_id,name,amount,unit,category,expirationDate];
 				insert_property_result = await myQuery(insert_property_sql, insert_property_param);
 				if(insert_property_result){
 					console.log(property_id+" property 테이블 insert 성공");
 				}
 				else{
 					console.log(property_id+" property 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
 					await con.rollback();
 					return;
 				}
@@ -1401,7 +1768,8 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
                 }
@@ -1418,7 +1786,8 @@ router.post('/', async function(req, res, next) {
                 }
                 else{
                     console.log(property_id+" property 테이블 update 실패");
-					res.send({status:400, message:"Bad Request", data:null});
+					//res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
                 }
@@ -1438,7 +1807,8 @@ router.post('/', async function(req, res, next) {
                 	}
                 	else{
                     	console.log(storagePlace_id+" storagePlace 테이블 insert 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                     	await con.rollback();
                     	return;
                 	}
@@ -1456,26 +1826,35 @@ router.post('/', async function(req, res, next) {
                     }
                     else{
                         console.log(storagePlace_id+" storagePlace 테이블 update 실패");
-						res.send({status:400, message:"Bad Request", data:null});
+//						res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                     	await con.rollback();
                     	return;
                     }
 				}
 			}
 		}
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
 		var select_medicInform_param; 
 		for(let i=0; i<items.length; ++i){
 			select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
 			if(select_medicInform_result.length==0){
-				var new_niin = Math.random().toString(36).substring(2, 12); 
+				var frontNum = Math.floor(Math.random()*90)+10;
+				var strFrontNum = String(frontNum);
+				var randomAlpha = String.fromCharCode(Math.floor(Math.random()*26)+65);
+				var backNum = Math.floor(Math.random()*900000)+100000;
+                var strBackNum = String(backNum);
+				var new_niin = strFrontNum+randomAlpha+strBackNum;
+                
+//				var new_niin = Math.random().toString(36).substring(2, 12); 
 				niin = new_niin;
-				var insert_medicInform_sql = "insert into medicInform_"+militaryUnit+" values (?,?,?);"
+				var insert_medicInform_sql = "insert into medicInform values (?,?,?);"
         		var insert_medicInform_param = [items[i].name, items[i].category, new_niin];
 				var insert_medicInform_success = await myQuery(insert_medicInform_sql, insert_medicInform_param);
 				if(!insert_medicInform_success){
-					res.send({status:400, message:"Bad Request", data:null});
+//					res.send({status:400, message:"Bad Request", data:null});
+					res.send({status:500, message:"Internal Server Error", data:null});
                     await con.rollback();
                     return;
 				}
@@ -1495,6 +1874,7 @@ router.post('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -1505,7 +1885,8 @@ router.post('/', async function(req, res, next) {
             select_property_param = property_id;
             [select_property_result] = await con.query(select_property_sql, select_property_param);
             if(select_property_result.length==0){
-				res.send({status:400, message:"Bad Request", data:null});
+//				res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:400, message:property_id+" 가 없습니다", data:null});
                 await con.rollback();
                 return;
             }
@@ -1539,7 +1920,7 @@ router.post('/', async function(req, res, next) {
                         }
                         else{
                             console.log(property_id+" storagePlace 테이블 삭제 실패");
-							res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                     		await con.rollback();
                     		return;
                         }
@@ -1553,7 +1934,8 @@ router.post('/', async function(req, res, next) {
                             console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                         }
                         else{
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
 							await con.rollback();
 							return;
                         }
@@ -1573,7 +1955,8 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 insert 성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+//							res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                         await con.rollback();
                         return;
                     }
@@ -1590,20 +1973,22 @@ router.post('/', async function(req, res, next) {
                         console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                         await con.rollback();
                         return;
                     }
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+                //res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:"Internal Server Error", data:null});
                 await con.rollback();
                 return;
             }
@@ -1622,6 +2007,7 @@ router.post('/', async function(req, res, next) {
             unit = items[i].unit;
             storagePlace = items[i].storagePlace;
             expirationDate = items[i].expirationDate;
+			expirationDate = expirationDate.substr(0,10);
             property_id = name+"-"+expirationDate;
 			property_id_arr.push(property_id);
             storagePlace_arr.push(storagePlace);
@@ -1652,7 +2038,7 @@ router.post('/', async function(req, res, next) {
                         console.log(property_id+" property 테이블 삭제  성공");
                     }
                     else{
-						res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                 		await con.rollback();
                 		return;
                     }	
@@ -1666,7 +2052,8 @@ router.post('/', async function(req, res, next) {
                     	console.log(property_id+" property 테이블 update 성공");
                 	}
                 	else{
-						res.send({status:400, message:"Bad Request", data:null});
+						//res.send({status:400, message:"Bad Request", data:null});
+						res.send({status:500, message:"Internal Server Error", data:null});
                 		await con.rollback();
                 		return;
                 	}
@@ -1700,7 +2087,7 @@ router.post('/', async function(req, res, next) {
                         	console.log(property_id+" storagePlace 테이블 삭제  성공");
                     	}
                     	else{
-							res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                     		await con.rollback();
                     		return;
                     	}
@@ -1714,7 +2101,8 @@ router.post('/', async function(req, res, next) {
                         	console.log(storagePlace_id+" storagePlace 테이블 update 성공");
                     	}
                     	else{
-							res.send({status:400, message:"Bad Request", data:null});
+							//res.send({status:400, message:"Bad Request", data:null});
+							res.send({status:500, message:"Internal Server Error", data:null});
                             await con.rollback();
                             return;
                     	}
@@ -1722,13 +2110,14 @@ router.post('/', async function(req, res, next) {
                 }
             }
         }
-		var select_medicInform_sql = "select * from medicInform_"+militaryUnit+" where name = ?;";
+		var select_medicInform_sql = "select * from medicInform where name = ?;";
         var select_medicInform_param;
         for(let i=0; i<items.length; ++i){
             select_medicInform_param = items[i].name;
 			var [select_medicInform_result] = await con.query(select_medicInform_sql, select_medicInform_param);
             if(select_medicInform_result.length==0){
-                res.send({status:400, message:"Bad Request", data:null});
+				res.send({status:500, message:"Internal Server Error", data:null});
+//                res.send({status:400, message:"Bad Request", data:null});
                 await con.rollback();
                 return;
             }
@@ -1761,7 +2150,7 @@ router.post('/', async function(req, res, next) {
 	console.log(str_amount_arr);
 	var now = year+"-"+month+"-"+date;
 	console.log(now);
-	var select_now_sql = "select * from paymentLog_"+militaryUnit+" where YearMonthDate = ?;";
+	var select_now_sql = "select * from paymentLog_"+militaryUnit+" where YearMonthDate = ? order by log_num asc;";
 	var select_now_param = now;
 	var[select_now_result, select_now_param] = await con.query(select_now_sql, select_now_param);
 	var log_id, nextnum;
@@ -1777,7 +2166,8 @@ router.post('/', async function(req, res, next) {
 	var insert_log_param = [log_id, receiptPayment, confirmor_id, target ,now, nextnum, str_property_id_arr, str_storagePlace_arr, str_amount_arr, str_unit_arr];
 	var insert_log_result = await myQuery(insert_log_sql, insert_log_param);
 	if(!insert_log_result){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
         return;
 	}
@@ -1785,16 +2175,19 @@ router.post('/', async function(req, res, next) {
 	var select_user_param = confirmor_id;
 	var [result] = await con.query(select_user_sql, select_user_param);
 	if(result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
 		return;
-	}	
-	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:result[0].militaryUnit,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
+	}
+	var militaryUnit_blank = result[0].militaryUnit.replace(/_/g, " ");	
+	var confirmor = {id:result[0].id, name:result[0].name, email:result[0].email, phoneNumber:result[0].phoneNumber, serviceNumber:result[0].serviceNumber, rank:result[0].mil_rank, enlistmentDate:result[0].enlistmentDate, dischargeDate:result[0].dischargeDate, militaryUnit:militaryUnit_blank,pictureName:result[0].pictureName, createdAt:result[0].createdAt, updatedAt:result[0].updatedAt};
 	var check_time_sql = "select createdAt, updatedAt from paymentLog_"+militaryUnit+" where id = ?;";
     var check_time_param = log_id;
     var [time_result] = await con.query(check_time_sql, check_time_param);
 	if(time_result.length==0){
-		res.send({status:400, message:"Bad Request", data:null});
+		//res.send({status:400, message:"Bad Request", data:null});
+		res.send({status:500, message:"Internal Server Error", data:null});
         await con.rollback();
         return;
     }
@@ -1806,7 +2199,7 @@ router.post('/', async function(req, res, next) {
 		console.log(items[i].niin);
 	}
 	var data = {id:log_id, receiptPayment:receiptPayment, target:target, items:items, confirmor:confirmor, createdAt:created_time, updatedAt:updated_time};
-	res.header({"accessToken":new_access_token, "refreshToken":new_refresh_token}).send({status:200, message:"Ok", data:data});
+	res.send({status:200, message:"Ok", data:data});
 	await con.commit();
 
 	//오늘날짜로 yearmonthdate 조회해서 없으면 1번부터, 있으면 마지막+1 로 아이디 만들고 나머지거 insert하기

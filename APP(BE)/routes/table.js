@@ -8,7 +8,7 @@ var inform = mysql.inform;
 var propertyMake = async function(militaryUnit){
     try{
 		var con = await db.createConnection(inform);
-		var sql = "create table property_"+militaryUnit+" ( id varchar(100) not null, name varchar(100) not null, totalAmount int not null, unit varchar(20) not null, expirationDate datetime not null, createdAt datetime, updatedAt datetime, primary key(id) );";
+		var sql = "create table property_"+militaryUnit+" ( id varchar(100) not null, name varchar(100) not null, totalAmount int not null, unit varchar(20) not null,category varchar(100) not null, expirationDate datetime not null, createdAt datetime, updatedAt datetime, primary key(id) );";
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
@@ -45,6 +45,31 @@ var medicInformMake = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
 		var sql = "create table medicInform_"+militaryUnit+" ( name varchar(100), category varchar(100), niin varchar(100), primary key (name) );"
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
+
+
+var bookmarkMake = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+        var sql = "create table bookmark_"+militaryUnit+" ( user_id varchar(100), name varchar(100), primary key (user_id, name) );"
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
+
+var favoriteMake = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+        var sql = "create table favorite_"+militaryUnit+" ( user_id varchar(100), property_id varchar(100), primary key (user_id, property_id) );"
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
@@ -92,7 +117,31 @@ var storagePlaceDrop = async function(militaryUnit){
 var medicInformDrop = async function(militaryUnit){
     try{
         var con = await db.createConnection(inform);
-        var sql = "drop table medicinform_"+militaryUnit+";";
+        var sql = "drop table medicInform_"+militaryUnit+";";
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
+
+var bookmarkDrop = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+        var sql = "drop table bookmark_"+militaryUnit+";";
+        const [row, field] = await con.query(sql);
+        return {success:true};
+    }catch(error){
+        console.log(error);
+        return {success:false, error:error};
+    }
+}
+
+var favoriteDrop = async function(militaryUnit){
+    try{
+        var con = await db.createConnection(inform);
+        var sql = "drop table favorite_"+militaryUnit+";";
         const [row, field] = await con.query(sql);
         return {success:true};
     }catch(error){
@@ -104,10 +153,13 @@ var medicInformDrop = async function(militaryUnit){
 exports.propertyMake = propertyMake;
 exports.paymentLogMake = paymentLogMake;
 exports.storagePlaceMake = storagePlaceMake;
-exports.medicInformMake = medicInformMake;
+//exports.medicInformMake = medicInformMake;
+exports.bookmarkMake = bookmarkMake;
+exports.favoriteMake = favoriteMake;
 exports.propertyDrop = propertyDrop;
 exports.paymentLogDrop = paymentLogDrop;
 exports.storagePlaceDrop = storagePlaceDrop;
-exports.medicInformDrop = medicInformDrop;
-
+//exports.medicInformDrop = medicInformDrop;
+exports.bookmarkDrop = bookmarkDrop;
+exports.favoriteDrop = favoriteDrop;
 

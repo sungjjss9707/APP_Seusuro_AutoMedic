@@ -21,10 +21,11 @@ async function myQuery(sql, param){
 }
 
 router.post('/', async function(req, res, next) {
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.setHeader("Access-Control-Allow-Credentials", "true");
-	res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-	res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	//res.setHeader("Access-Control-Allow-Origin", "*");
+	//res.setHeader("Access-Control-Allow-Credentials", "true");
+	//res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+	//res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+	res.setHeader("Access-Control-Expose-Headers","*");
     console.log("login page");
 	const email = req.body.email;
     const password = req.body.password;
@@ -35,7 +36,7 @@ router.post('/', async function(req, res, next) {
 	const [select_result1, select_field1] = await con.query(select_sql, select_param);
 	if(select_result1.length==0){
         //console.log("없는 계정입니다.");
-        res.send({status:400, message:"존재하지 않는 계정입니다"});
+        res.send({status:200, message:"존재하지 않는 email 입니다.", data:null});
     }
     else{
 		const real_my_encoded_pw = select_result1[0].password;
@@ -49,6 +50,7 @@ router.post('/', async function(req, res, next) {
 			const enlistmentDate = select_result1[0].enlistmentDate;
 			const dischargeDate = select_result1[0].dischargeDate;
 			const militaryUnit = select_result1[0].militaryUnit;
+			var militaryUnit_blank = militaryUnit.replace(/_/g, " ");
 			const pictureName = select_result1[0].pictureName;
 			const createdAt = select_result1[0].createdAt;
 			const updatedAt = select_result1[0].updatedAt;
@@ -64,8 +66,8 @@ router.post('/', async function(req, res, next) {
 
 			}
 			//console.log("내이름 : "+my_name);
-			var access_token_obj = await new_issue.issue_new_token(email, name, access_time);
-			var refresh_token_obj = await new_issue.issue_new_token(email, name, refresh_time);
+			var access_token_obj = await new_issue.issue_new_token(id, name, access_time);
+			var refresh_token_obj = await new_issue.issue_new_token(id, name, refresh_time);
 			var access_token = access_token_obj.Token;
 			var refresh_token = refresh_token_obj.Token;
 			//console.log("액세스토큰 : "+access_token);
@@ -77,16 +79,16 @@ router.post('/', async function(req, res, next) {
 			if(insert_success){
 				console.log(access_token);
 				console.log(refresh_token);
-				var data = {id :id, name : name, email : email, password : password, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit, pictureName:pictureName,createdAt:createdAt, updatedAt : updatedAt};
+				var data = {id :id, name : name, email : email, password : password, phoneNumber:phoneNumber, serviceNumber:serviceNumber, rank:mil_rank, enlistmentDate:enlistmentDate, dischargeDate : dischargeDate, militaryUnit : militaryUnit_blank, pictureName:pictureName,createdAt:createdAt, updatedAt : updatedAt};
 				//res.setHeader("Authorization", access_token);
 				res.header({"accessToken":access_token, "refreshToken":refresh_token}).send({status:200, message:"Ok", data:data});
 				//res.send({status:200, message:"Ok", data:data});
 			}
-    		else res.send({status:400, message:"Bad Request"});    	
+    		else res.send({status:500, message:"Internal Server Error", data:null});    	
 		}
 		else{
 			console.log("로그인 실패");
-			res.send({status:400, message:"비밀번호가 틀립니다", data:null});
+			res.send({status:200, message:"잘못된 비밀번호 입니다.", data:null});
 		}
     }
 });

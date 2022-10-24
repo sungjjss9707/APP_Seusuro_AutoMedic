@@ -10,7 +10,7 @@ var inform = {
 };
 
 exports.secret = 'sjh_secret';
-exports.access_time = "10m";
+exports.access_time = "30m";
 exports.refresh_time = "1d";
 exports.inform = inform;
 /*
