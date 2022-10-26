@@ -6,9 +6,13 @@
 <br>
 
 ---
-### <center>**대한민국의 모든 의무대**를 위한</center>
-### <center>빈틈없이 스마트한 수불 관리 앱</center>
-### [<center>웹 프로토타입 바로가기</center>](https://seusuro.web.app)
+
+<div align='center'>
+    <h3><b>대한민국의 모든 의무대</b>를 위한</h3>
+    <h3>빈틈없이 스마트한 수불 관리 앱</h3>
+    <a href='https://seusuro.web.app'><h3>웹 프로토타입 바로가기</h3></a>
+</div>
+
 ---
 
 <br>
@@ -37,10 +41,15 @@
 ## 📝 기능 설명
 - 추가 예정
 
+- 오픈 API 활용
+	- [식품의약품안전처_의약품개요정보(e약은요)](https://www.data.go.kr/data/15075057/openapi.do)
+
 <br>
 
 ## 💻 컴퓨터 구성 / 필수 조건 안내 (Prerequisites)
 - Android
+	- minSdkVersion: 16
+	- targetSdkVersion: 31
 - iOS
 - Web
 
@@ -48,18 +57,26 @@
 
 ## 📚 기술 스택 (Technique Used) 
 ### Front-end
-- Flutter
-- Dart
+- [Flutter](https://github.com/flutter/flutter.git) 3.3.4
+- Dart 2.18.2
+- DevTools 2.15.0
 - [오픈소스 라이브러리](APP(Android)/seusuro/pubspec.yaml)
+
+![Front-end Architecture](images/front-end_architecture.png)
 
 ### Back-end
 - Node.js
 - Express
 - MySQL
 
+![ERD](images/erd.png)
+
 ### Communication
-- [Figma](https://www.figma.com/file/iuCqYWsLW2q3KZpoLPWKjN/%EC%8A%A4%EC%88%98%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=152%3A265)
 - [Notion](https://medtopublic.notion.site/medtopublic/fd0ad5a638504e9c9cdabdb736e48a7e)
+- [Slack](https://seusuro.slack.com)
+![slack_snapshot](images/slack_snapshot.png)
+- [Figma](https://www.figma.com/file/iuCqYWsLW2q3KZpoLPWKjN/%EC%8A%A4%EC%88%98%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=152%3A265)
+![figma_snapshot](images/figma_snapshot.png)
 
 <br>
 
@@ -74,6 +91,8 @@ $ flutter run -d web-server --web-hostname=0.0.0.0
 
 ## 📖 프로젝트 사용법 (Getting Started)
 - 추가 예정
+
+- 회원가입 후 로그인
 
 <br>
  
@@ -93,25 +112,25 @@ $ flutter run -d web-server --web-hostname=0.0.0.0
 	<td>유병재</td>
 	<td>Front-end Developer, Team Leader</td>
 	<td>medtopublic@naver.com</td>
-	<td>MedtoPublic</td>
+	<td><a href='https://github.com/MedtoPublic'>MedtoPublic</a></td>
 </tr>
 <tr>
 	<td>신승원</td>
 	<td>Front-end Developer</td>
 	<td>axolotl625@gmail.com</td>
-	<td>mengchi501</td>
+	<td><a href='https://github.com/mengchi501'>mengchi501</a></td>
 </tr>
 <tr>
 	<td>성준혁</td>
 	<td>Back-end Developer</td>
 	<td>sungjjss9707@naver.com</td>
-	<td>sungjjss9707</td>
+	<td><a href='https://github.com/sungjjss9707'>sungjjss9707</a></td>
 </tr>
 <tr>
 	<td>천세진</td>
 	<td>Back-end Developer</td>
 	<td>sejinnnnnn@naver.com</td>
-	<td>sejinnnnnn</td>
+	<td><a href='https://github.com/sejinnnnnn'>sejinnnnnn</a></td>
 </tr>
 </table>
 
