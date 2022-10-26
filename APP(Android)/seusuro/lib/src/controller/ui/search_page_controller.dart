@@ -113,6 +113,8 @@ class SearchPageController extends GetxController with StateMixin {
   }
 
   Future<bool> delBookmark(DrugInfo drugInfo) async {
+    change(null, status: RxStatus.loading());
+
     var response = await _searchRepository.delBookmark(drugInfo);
 
     ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
@@ -128,9 +130,11 @@ class SearchPageController extends GetxController with StateMixin {
       }
 
       rSnackbar(title: '알림', message: '북마크에서 삭제하였습니다!');
+      change(null, status: RxStatus.success());
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
+      change(null, status: RxStatus.success());
       return false;
     }
   }
