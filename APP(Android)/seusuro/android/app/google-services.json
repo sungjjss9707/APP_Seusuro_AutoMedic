@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "27170234052",
+    "project_id": "seusuro",
+    "storage_bucket": "seusuro.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27170234052:android:48947a5cdf917ca524b391",
+        "android_client_info": {
+          "package_name": "com.medtopublic.seusuro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "27170234052-bk2k5tie816n7m3cn2pc5f92m3derdco.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBfb1pfOCsS-M1WGyR7Msg2NR-fWNAJbmQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "27170234052-bk2k5tie816n7m3cn2pc5f92m3derdco.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
