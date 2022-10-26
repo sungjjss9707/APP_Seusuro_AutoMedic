@@ -111,6 +111,8 @@ class PropertyPageController extends GetxController with StateMixin {
   }
 
   Future<bool> delFavorite(String propertyId) async {
+    change(null, status: RxStatus.loading());
+
     var response = await _propertyRepository.delFavorite(propertyId);
 
     ResponseDto responseDto = ResponseDto.fromJson(jsonDecode(response.body));
@@ -126,9 +128,11 @@ class PropertyPageController extends GetxController with StateMixin {
       }
 
       rSnackbar(title: '알림', message: '즐겨찾기에서 삭제하였습니다!');
+      change(null, status: RxStatus.success());
       return true;
     } else {
       rSnackbar(title: '알림', message: responseDto.message);
+      change(null, status: RxStatus.success());
       return false;
     }
   }

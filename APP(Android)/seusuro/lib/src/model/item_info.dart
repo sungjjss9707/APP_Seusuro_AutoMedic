@@ -23,7 +23,7 @@ class ItemInfo {
         unit = json['unit'],
         category = json['category'],
         storagePlace = json['storagePlace'],
-        expirationDate = json['expirationDate'],
+        expirationDate = json['expirationDate'].substring(0, 10),
         niin = json['niin'];
 
   Map<String, dynamic> toJson() => {
