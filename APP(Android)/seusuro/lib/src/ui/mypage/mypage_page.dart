@@ -238,7 +238,7 @@ class MypagePage extends StatelessWidget {
           content: 'GitHub 저장소',
           onTap: () async {
             final Uri url = Uri.parse(
-              'https://github.com/osamhack2022/APP_Seusuro_AutoMedic',
+              'https://github.com/osamhack2022-v2/APP_Seusuro_AutoMedic',
             );
 
             if (!await launchUrl(url)) {
