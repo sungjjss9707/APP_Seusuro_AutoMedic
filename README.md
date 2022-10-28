@@ -1,4 +1,7 @@
 # APP_Seusuro_AutoMedic
+
+<br>
+
 <div align='center'>
     <img src='images/seusuro_logo.svg' height='240'>
 </div>
@@ -8,11 +11,38 @@
 ---
 
 <div align='center'>
-    <h3><b>대한민국의 모든 의무대</b>를 위한<br>빈틈없이 스마트한 수불 관리 앱</h3>
-	<h3><a href='https://seusuro.web.app'>웹 프로토타입 바로가기</a></h3>
+    <h3><b>대한민국의 모든 의무대</b>를 위한</h3>
+	<h3>빈틈없이 스마트한 수불 관리 앱</h3>
 </div>
 
 ---
+
+<br>
+
+<div align='center'>
+	<a href='https://seusuro.web.app'>
+		<img src='images/demo_app.svg' height='48'/>
+	</a>
+	<br>테스트 계정 ID: <code>guest@seusuro.com</code>
+	<br>테스트 계정 비밀번호: <code>1q2w3e4r</code>
+</div>
+
+<br>
+
+<table>
+<tr>
+	<th>발표 자료</th>
+	<th>시연 영상</th>
+</tr>
+<tr>
+	<td>
+		<img src='images/front-end_architecture.png'/>
+	</td>
+	<td>
+		<img src='images/front-end_architecture.png'/>
+	</td>
+</tr>
+</table>
 
 <br>
 
@@ -84,6 +114,7 @@
 
 - [오픈소스 라이브러리](APP(Android)/seusuro/pubspec.yaml)
 
+- 소프트웨어 아키텍처
 ![Front-end Architecture](images/front-end_architecture.png)
 
 ### Back-end
@@ -120,28 +151,48 @@
 </tr>
 </table>
 
+- [API 명세서](https://medtopublic.notion.site/91b0fe80845747d492fe813085190dc7?v=7ef50f5866e942ca80554f17cdcbb4c4)
+
+- 개체-관계 다이어그램(ERD)
 ![ERD](images/erd.png)
 
 ## 🧱 협업 도구 (Collaboration Tools)
 <table>
 <tr>
 	<th style='text-align: center' scope='row'>
-		<svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" height='48'><title>Notion</title><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933zm14.337.745c.093.42 0 .84-.42.888l-.7.14v10.264c-.608.327-1.168.514-1.635.514-.748 0-.935-.234-1.495-.933l-4.577-7.186v6.952L12.21 19s0 .84-1.168.84l-3.222.186c-.093-.186 0-.653.327-.746l.84-.233V9.854L7.822 9.76c-.094-.42.14-1.026.793-1.073l3.456-.233 4.764 7.279v-6.44l-1.215-.139c-.093-.514.28-.887.747-.933zM1.936 1.035l13.31-.98c1.634-.14 2.055-.047 3.082.7l4.249 2.986c.7.513.934.653.934 1.213v16.378c0 1.026-.373 1.634-1.68 1.726l-15.458.934c-.98.047-1.448-.093-1.962-.747l-3.129-4.06c-.56-.747-.793-1.306-.793-1.96V2.667c0-.839.374-1.54 1.447-1.632z"/></svg>
-		Notion
+		<a href='https://medtopublic.notion.site/medtopublic/fd0ad5a638504e9c9cdabdb736e48a7e'>
+			<img src='images/notion_icon.svg' height='48'><br>Notion</img>
+		</a>
 	</th>
-	<td><img src='images/notion_snapshot.png'/></td>
+	<td>
+		<a href='https://medtopublic.notion.site/medtopublic/fd0ad5a638504e9c9cdabdb736e48a7e'>
+			<img src='images/notion_snapshot.png'/>
+		</a>
+	</td>
 </tr>
 <tr>
 	<th style='text-align: center' scope='row'>
-		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' height='48'>Figma</img>
+		<a href='https://www.figma.com/file/iuCqYWsLW2q3KZpoLPWKjN/%EC%8A%A4%EC%88%98%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=152%3A265'>
+			<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg' height='48'><br>Figma</img>
+		</a>
 	</th>
-	<td><img src='images/figma_snapshot.png'/></td>
+	<td>
+		<a href='https://www.figma.com/file/iuCqYWsLW2q3KZpoLPWKjN/%EC%8A%A4%EC%88%98%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8?node-id=152%3A265'>
+			<img src='images/figma_snapshot.png'/>
+		</a>
+	</td>
 </tr>
 <tr>
 	<th style='text-align: center' scope='row'>
-		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/slack/slack-original.svg' height='48''>Slack</img>
+		<a href='https://seusuro.slack.com'>
+			<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/slack/slack-original.svg' height='48''><br>Slack</img>
+		</a>
 	</th>
-	<td><img src='images/slack_snapshot.png'/></td>
+	<td>
+		<a href='https://seusuro.slack.com'>
+			<img src='images/slack_snapshot.png'/>
+		</a>
+	</td>
 </tr>
 </table>
 
