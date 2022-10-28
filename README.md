@@ -17,11 +17,9 @@
 
 ---
 
-<br>
-
 <div align='center'>
 	<a href='https://seusuro.web.app'>
-		<img src='images/demo_app.svg' height='48'/>
+		<img src='images/demo_app.svg' height='64'/>
 	</a>
 	<br>테스트 계정 ID: <code>guest@seusuro.com</code>
 	<br>테스트 계정 비밀번호: <code>1q2w3e4r</code>
@@ -47,15 +45,15 @@
 <br>
 
 # 📋 목차
-1. [프로젝트 소개](#🤔-프로젝트-소개)
-2. [기능 설명](#📝-기능-설명)
-3. [컴퓨터 구성/필수 조건 안내](#💻-컴퓨터-구성--필수-조건-안내-prerequisites)
-4. [기술 스택](#📚-기술-스택-technique-used)
-5. [협업 도구](#🧱-협업-도구-collaboration-tools)
-6. [설치 안내](#🔨-설치-안내-installation-process)
-7. [프로젝트 사용법](#📖-프로젝트-사용법-getting-started)
-8. [팀 정보](#🔥-팀-정보-team-information)
-9. [저작권 및 사용권 정보](#📜-저작권-및-사용권-정보-copyleft--end-user-license)
+1. [프로젝트 소개](#-프로젝트-소개)
+2. [기능 설명](#-기능-설명)
+3. [컴퓨터 구성/필수 조건 안내](#-컴퓨터-구성--필수-조건-안내-prerequisites)
+4. [기술 스택](#-기술-스택-technique-used)
+5. [협업 도구](#-협업-도구-collaboration-tools)
+6. [설치 안내](#-설치-안내-installation-process)
+7. [프로젝트 사용법](#-프로젝트-사용법-getting-started)
+8. [팀 정보](#-팀-정보-team-information)
+9. [저작권 및 사용권 정보](#-저작권-및-사용권-정보-copyleft--end-user-license)
 
 <br>
 
