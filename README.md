@@ -80,65 +80,67 @@
 	<th>Platform</th>
 	<th colspan='7'>Version</th>
 </tr>
-<tr>
+<tr align='center'>
 	<th scope='row'>Android</th>
 	<td>
-		<img src='images/platforms/android_marshmallow.svg' height='48'><br><center>6.0</img>
+		<img src='images/platforms/android_marshmallow.svg' height='48'><br>6.0</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_nougat.svg' height='48'><br><center>7.0</img>
+		<img src='images/platforms/android_nougat.svg' height='48'><br>7.0</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_oreo.svg' height='48'><br><center>8.0</img>
+		<img src='images/platforms/android_oreo.svg' height='48'><br>8.0</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_pie.svg' height='48'><br><center>9.0</img>
+		<img src='images/platforms/android_pie.svg' height='48'><br>9.0</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_quince_tart.svg' height='48'><br><center>10</img>
+		<img src='images/platforms/android_quince_tart.svg' height='48'><br>10</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_red_velvet_cake.svg' height='48'><br><center>11</img>
+		<img src='images/platforms/android_red_velvet_cake.svg' height='48'><br>11</img>
 	</td>
 	<td>
-		<img src='images/platforms/android_snow_cone.svg' height='48'><br><center>12</img>
+		<img src='images/platforms/android_snow_cone.svg' height='48'><br>12</img>
 	</td>
 </tr>
-<tr>
+<tr align='center'>
 	<th scope='row'>iOS</th>
 	<td>
-		<img src='images/platforms/ios_11.svg' height='48'><br><center>iOS 11</img>
+		<img src='images/platforms/ios_11.svg' height='48'><br>iOS 11</img>
 	</td>
 	<td>
-		<img src='images/platforms/ios_12.svg' height='48'><br><center>iOS 12</img>
+		<img src='images/platforms/ios_12.svg' height='48'><br>iOS 12</img>
 	</td>
 	<td>
-		<img src='images/platforms/ios_13.svg' height='48'><br><center>iOS 13</img>
+		<img src='images/platforms/ios_13.svg' height='48'><br>iOS 13</img>
 	</td>
 	<td>
-		<img src='images/platforms/ios_14.svg' height='48'><br><center>iOS 14</img>
+		<img src='images/platforms/ios_14.svg' height='48'><br>iOS 14</img>
 	</td>
 	<td>
-		<img src='images/platforms/ios_15.png' height='48'><br><center>iOS 15</img>
+		<img src='images/platforms/ios_15.png' height='48'><br>iOS 15</img>
 	</td>
 	<td>
-		<img src='images/platforms/ios_16.webp' height='48'><br><center>iOS 16</img>
+		<img src='images/platforms/ios_16.webp' height='48'><br>iOS 16</img>
 	</td>
+	<td></td>
 </tr>
-<tr>
+<tr align='center'>
 	<th scope='row'>Web</th>
 	<td>
-		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chrome/chrome-original.svg' height='48'><br><center>Chrome</img>
+		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chrome/chrome-original.svg' height='48'><br>Chrome</img>
 	</td>
 	<td>
-		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/safari/safari-original.svg' height='48'><br><center>Safari</img>
+		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/safari/safari-original.svg' height='48'><br>Safari</img>
 	</td>
 	<td>
-		<img src='images/platforms/microsoft_edge.png' height='48'><br><center>Edge</img>
+		<img src='images/platforms/microsoft_edge.png' height='48'><br>Edge</img>
 	</td>
 	<td>
-		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firefox/firefox-original.svg' height='48'><br><center>Firefox</img>
+		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firefox/firefox-original.svg' height='48'><br>Firefox</img>
 	</td>
+	<td colspan='3'></td>
 </tr>
 </table>
 
@@ -158,7 +160,7 @@
 		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg' height='48'/>
 	</td>
 	<td>Flutter</td>
-	<td><center>3.3.4</td>
+	<td align='center'>3.3.4</td>
 	<td><a href='https://flutter.dev/'>https://flutter.dev/</a></td>
 </tr>
 <tr>
@@ -166,7 +168,7 @@
 		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/dart/dart-original.svg' height='48'/>
 	</td>
 	<td>Dart</td>
-	<td><center>2.18.2</td>
+	<td align='center'>2.18.2</td>
 	<td><a href='https://dart.dev/'>https://dart.dev/</a></td>
 </tr>
 </table>
@@ -189,7 +191,7 @@
 		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg' height='48'/>
 	</td>
 	<td>Node.js</td>
-	<td><center>TBD</td>
+	<td align='center'>TBD</td>
 	<td><a href='https://nodejs.org/'>https://nodejs.org/</a></td>
 </tr>
 <tr>
@@ -197,7 +199,7 @@
 		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg' height='48'/>
 	</td>
 	<td>Express</td>
-	<td><center>TBD</td>
+	<td align='center'>TBD</td>
 	<td><a href='https://expressjs.com/'>https://expressjs.com/</a></td>
 </tr>
 <tr>
@@ -205,7 +207,7 @@
 		<img src='https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg' height='48'/>
 	</td>
 	<td>MySQL</td>
-	<td><center>TBD</td>
+	<td align='center'>TBD</td>
 	<td><a href='https://www.mysql.com/'>https://www.mysql.com/</a></td>
 </tr>
 </table>
