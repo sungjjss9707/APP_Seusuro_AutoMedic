@@ -156,7 +156,7 @@
 <br>
 
 ### 1. 수불 로그
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td colspan='2'><b>1-1. 수불 로그 작성</b></td>
 </tr>
@@ -178,7 +178,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>1-2. 로그 내역 확인</b></td>
 </tr>
@@ -198,7 +198,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>1-3. 보기 형식 전환</b></td>
 </tr>
@@ -218,7 +218,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>1-4. 수불 로그 필터링</b></td>
 </tr>
@@ -239,7 +239,7 @@
 <br>
 
 ### 2. 재산 현황
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>2-1. 재산 현황 필터링</b></td>
 </tr>
@@ -259,7 +259,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>2-2. 재산 상세 정보</b></td>
 </tr>
@@ -279,7 +279,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>2-3. 재산 즐겨찾기</b></td>
 </tr>
@@ -299,7 +299,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td colspan='2'><b>2-4. PDF 내보내기</b></td>
 </tr>
@@ -326,7 +326,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>3-1. 약품 검색 및 정보 확인</b></td>
 </tr>
@@ -346,7 +346,7 @@
 
 <br>
 
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td><b>3-2. 약품 북마크</b></td>
 </tr>
@@ -367,7 +367,7 @@
 <br>
 
 ### 4. 마이페이지
-<table width='800'>
+<table width='100%'>
 <tr>
 	<td colspan='2'><b>4. 사용자 정보 및 앱 정보 확인</b></td>
 </tr>
