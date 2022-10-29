@@ -597,9 +597,26 @@ $ flutter run -d web-server --web-hostname=0.0.0.0
 <br>
 
 ## 📖 프로젝트 사용법 (Getting Started)
-- 추가 예정
-
-- 회원가입 후 로그인
+<table>
+<tr>
+	<td colspan='3'><b>회원가입</b></td>
+</tr>
+<tr>
+	<td colspan='3'>
+		서비스를 처음 이용하는 사용자는 간단한 회원가입을 통해 바로 시작할 수 있습니다!
+	</td>
+</tr>
+<tr align='center'>
+	<td><img src='images/demo/register/register_page_1.gif' width='360'/></td>
+	<td><img src='images/demo/register/register_page_2.gif' width='360'/></td>
+	<td><img src='images/demo/register/register_page_3.gif' width='360'/></td>
+</tr>
+<tr align='center'>
+	<td>회원가입 1단계</td>
+	<td>회원가입 2단계</td>
+	<td>회원가입 3단계</td>
+</tr>
+</table>
 
 <br>
  
