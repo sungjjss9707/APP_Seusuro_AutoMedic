@@ -143,10 +143,238 @@
 <br>
 
 ## 📝 기능 설명
-- 추가 예정
+의무대를 위한 스마트한 수불 관리 앱, ‘스수로’의 핵심 기능은 크게 **4가지**입니다.<br>
+이해를 돕기 위해 실제 앱 구동 화면과 함께 각 기능에 대해 설명드리겠습니다.
 
-- 오픈 API 활용
-	- [식품의약품안전처_의약품개요정보(e약은요)](https://www.data.go.kr/data/15075057/openapi.do)
+<br>
+
+1. [수불 로그](#1-수불-로그)
+2. [재산 현황](#2-재산-현황)
+3. [약품 검색](#3-약품-검색)
+4. [마이페이지](#4-마이페이지)
+
+<br>
+
+### 1. 수불 로그
+<table>
+<tr>
+	<td colspan='2'>1-1. 수불 로그 작성</td>
+</tr>
+<tr>
+	<td colspan='2'>
+		사용자는 우측 하단의 펜 모양 버튼을 클릭하여 작성하고자 하는 로그 종류(수입/불출/반납/폐기)를 선택한 후, 대상과 항목들을 각각 기록할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/log/log_page_1.gif' width='360'/></td>
+	<td><img src='images/demo/log/log_page_2.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>로그 종류를 선택하는 모습</td>
+	<td>불출 로그를 작성하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>1-2. 로그 내역 확인</td>
+</tr>
+<tr>
+	<td>
+		사용자는 목록에 나열된 로그를 클릭하여 각 로그에 기록된 대상과 항목들의 상세 정보를 확인할 수 있습니다. 해당 로그를 기록한 사람의 프로필 사진을 클릭하면 확인자의 프로필 정보까지 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/log/log_page_3.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>로그 내역을 확인하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>1-3. 보기 형식 전환</td>
+</tr>
+<tr>
+	<td>
+		사용자는 로그 목록의 보기 형식을 개인의 선호도에 따라 익숙한 채팅 형식의 UI와 규칙적인 블록 형식의 UI 중에서 자유롭게 선택하여 전환할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/log/log_page_4.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>보기 형식을 전환하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>1-4. 수불 로그 필터링</td>
+</tr>
+<tr>
+	<td>
+		사용자는 우측 상단의 필터 모양 버튼을 클릭하여 로그의 종류와 로그가 기록된 날짜를 각각 선택한 후, 필터가 적용된 수불 로그 결과를 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/log/log_page_5.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>로그 필터를 적용하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+### 2. 재산 현황
+<table>
+<tr>
+	<td>2-1. 재산 현황 필터링</td>
+</tr>
+<tr>
+	<td>
+		사용자는 상단의 세 개의 필터 버튼(분류/유효기간/보관장소)을 클릭하여 원하는 옵션을 각각 선택한 후, 필터가 적용된 재산 현황 결과를 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/property/property_page_1.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>재산 필터를 적용하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>2-2. 재산 상세 정보</td>
+</tr>
+<tr>
+	<td>
+		사용자는 목록에 나열된 재산을 클릭하여 각 재산의 기본 정보와 장소별 보유량, 그리고 로그 정보를 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/property/property_page_2.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>재산 상세 정보를 확인하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>2-3. 재산 즐겨찾기</td>
+</tr>
+<tr>
+	<td>
+		사용자는 재산 상세 정보 화면에서 우측 상단의 별 모양 버튼을 클릭하여 해당 재산을 즐겨찾기에 추가할 수 있습니다. 즐겨찾기에 추가한 재산들은 재산 현황 메인 화면에서 우측 상단의 별 모양 버튼을 클릭하여 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/property/property_page_3.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>재산을 즐겨찾기에 추가하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td colspan='2'>2-4. PDF 내보내기</td>
+</tr>
+<tr>
+	<td colspan='2'>
+		사용자는 재산 상세 정보 화면에서 우측 상단의 별 모양 버튼을 클릭하여 해당 재산을 즐겨찾기에 추가할 수 있습니다. 즐겨찾기에 추가한 재산들은 재산 현황 메인 화면에서 우측 상단의 별 모양 버튼을 클릭하여 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/property/property_page_4.gif' width='360'/></td>
+	<td><img src='images/demo/property/pdf_example.png' width='360'/></td>
+</tr>
+<tr>
+	<td>특정 보관장소의 재산 현황을 PDF로 추출하는 모습</td>
+	<td>PDF 내보내기 예시</td>
+</tr>
+</table>
+
+<br>
+
+### 3. 약품 검색
+- 해당 기능에서는 식품의약품안전처에서 제공하는 [의약품개요정보 오픈 API](https://www.data.go.kr/data/15075057/openapi.do)를 활용하였습니다.
+
+<br>
+
+<table>
+<tr>
+	<td>3-1. 약품 검색 및 정보 확인</td>
+</tr>
+<tr>
+	<td>
+		사용자는 검색창에 잘 모르는 약품을 검색하고 원하는 검색 결과를 클릭하여 식품의약품안전처에서 제공하는 해당 약품의 정보를 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/search/search_page_1.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>약품을 검색하고 정보를 확인하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+<table>
+<tr>
+	<td>3-2. 약품 북마크</td>
+</tr>
+<tr>
+	<td>
+		사용자는 약품 정보 화면에서 우측 상단의 북마크 모양 버튼을 클릭하여 해당 약품을 북마크에 추가할 수 있습니다. 북마크에 추가한 약품들은 약품 검색 메인 화면에서 우측 상단의 북마크 모양 버튼을 클릭하여 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/search/search_page_2.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>약품을 북마크에 추가하는 모습</td>
+</tr>
+</table>
+
+<br>
+
+### 4. 마이페이지
+<table>
+<tr>
+	<td colspan='2'>4. 사용자 정보 및 앱 정보 확인</td>
+</tr>
+<tr>
+	<td colspan='2'>
+		사용자는 자신의 프로필 정보를 확인하고 필요에 따라 수정할 수 있습니다. 또한, 앱을 제작한 팀에 대한 정보와 사용된 오픈 소스 라이선스를 확인할 수 있습니다.
+	</td>
+</tr>
+<tr>
+	<td><img src='images/demo/mypage/mypage_page_1.gif' width='360'/></td>
+	<td><img src='images/demo/mypage/mypage_page_2.gif' width='360'/></td>
+</tr>
+<tr>
+	<td>사용자 정보를 수정하는 모습</td>
+	<td>오픈 소스 라이선스를 확인하는 모습</td>
+</tr>
+</table>
 
 <br>
 
