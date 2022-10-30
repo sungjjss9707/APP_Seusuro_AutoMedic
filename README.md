@@ -34,10 +34,14 @@
 </tr>
 <tr>
 	<td>
-		<img src='images/front-end_architecture.png'/>
+		<a href='https://github.com/osamhack2022-v2/APP_Seusuro_AutoMedic/blob/main/outputs/seusuro_presentation.pdf'>
+			<img src='outputs/thumbnail_presentation.png'/>
+		</a>
 	</td>
 	<td>
-		<img src='images/front-end_architecture.png'/>
+		<a href='https://github.com/osamhack2022-v2/APP_Seusuro_AutoMedic/blob/main/outputs/seusuro_demo_video.mp4'>
+			<img src='outputs/thumbnail_demo_video.jpg'/>
+		</a>
 	</td>
 </tr>
 </table>
