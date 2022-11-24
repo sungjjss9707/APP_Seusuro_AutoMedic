@@ -1,5 +1,7 @@
 # APP_Seusuro_AutoMedic
-<center><b>🏆 <u>정보통신산업진흥원장상(NIPA원장상) 수상작</u> 🏆</b></center>
+<div align='center'>
+	<b>🏆 <u>정보통신산업진흥원장상(NIPA원장상) 수상작</u> 🏆</b>
+</div>
 
 <br>
 
