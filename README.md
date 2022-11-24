@@ -1,4 +1,5 @@
 # APP_Seusuro_AutoMedic
+<center><b>🏆 <u>정보통신산업진흥원장상(NIPA원장상) 수상작</u> 🏆</b></center>
 
 <br>
 
@@ -93,16 +94,10 @@
 <br>
 
 ### 🤷‍♂️ 왜 이런 사고가 일어날까?
-<table>
-<tr>
-	<td colspan='3'><img src='images/handwritten.png'/></td>
-</tr>
-<tr>
-	<td><img src='images/cabinet_1.jpg'/></td>
-	<td><img src='images/cabinet_2.jpg'/></td>
-	<td><img src='images/cabinet_3.jpg'/></td>
-</tr>
-</table>
+<div align='center'>
+    <img src='images/handwritten.png'/>
+	<h5><i>*위 사진은 수기로 작성되는 의무대 재산 관리 실태를 재현한 예시입니다.</i></h5>
+</div>
 
 <br>
 
