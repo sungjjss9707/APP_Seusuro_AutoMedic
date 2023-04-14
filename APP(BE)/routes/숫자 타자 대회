@@ -1,0 +1,133 @@
+#include <string>
+#include <vector>
+#include<iostream>
+#include<math.h>
+
+using namespace std;
+vector<pair<int, int>> pos;
+int dp[6][6][6][6][100001];
+int get_score(int ly, int lx, int ry, int rx, int getsu){
+    if(getsu>=pos.size()){
+        return 0;
+    }
+    int ret = dp[ly][lx][ry][rx][getsu];
+    if(ret!=-1){
+        return ret;
+    }
+    //cout<<ly<<" "<<lx<<" "<<ry<<" "<<rx<<endl;
+    int nexty= pos[getsu].first, nextx = pos[getsu].second;
+    int leftgo, rightgo, left_y_cha, left_x_cha, right_y_cha, right_x_cha;
+    if(ly==nexty&&lx==nextx){
+        leftgo = 1;
+    }
+    else{
+        left_y_cha = abs(nexty-ly);
+        left_x_cha = abs(nextx-lx);
+        if(left_y_cha==0){
+            leftgo = 2*left_x_cha;
+        }
+        else if(left_x_cha==0){
+            leftgo = 2*left_y_cha;
+        }
+        else{
+            if(left_y_cha==left_x_cha){
+                leftgo = 3*left_y_cha;
+            }
+            else{
+                leftgo = min(left_y_cha, left_x_cha)*3+abs(left_y_cha-left_x_cha)*2;
+            }
+        }
+    }
+    if(ry==nexty&&rx==nextx){
+        rightgo = 1;
+    }
+    else{
+        right_y_cha = abs(nexty-ry);
+        right_x_cha = abs(nextx-rx);
+        if(right_y_cha==0){
+            rightgo = 2*right_x_cha;
+        }
+        else if(right_x_cha==0){
+            rightgo = 2*right_y_cha;
+        }
+        else{
+            if(right_y_cha==right_x_cha){
+                rightgo = 3*right_y_cha;
+            }
+            else{
+                rightgo = min(right_y_cha, right_x_cha)*3+abs(right_y_cha-right_x_cha)*2;
+            }
+        }
+    }
+    //cout<<leftgo<<" "<<rightgo<<endl;
+    if(ly==nexty&&lx==nextx){
+        ret = get_score(nexty, nextx, ry, rx, getsu+1)+leftgo;
+    }
+    else if(ry==nexty&&rx==nextx){
+        ret = get_score(ly, lx, nexty, nextx, getsu+1)+rightgo;
+    }
+    else{
+        int left_dap = get_score(nexty, nextx, ry, rx, getsu+1)+leftgo;
+        int right_dap = get_score(ly, lx, nexty, nextx, getsu+1)+rightgo;
+        ret = min(left_dap, right_dap);
+    }
+    
+    dp[ly][lx][ry][rx][getsu] = ret;
+    return ret;
+    
+    //else if()
+}
+
+void dp_clear(){
+    int a,b,c,d,i;
+    
+    for(a=0; a<=5; ++a){
+       for(b=0; b<=5; ++b){
+           for(c=0; c<=5; ++c){
+               for(d=0; d<=5; ++d){
+                   for(i=0; i<=pos.size(); ++i){
+                       dp[a][b][c][d][i] = -1;
+                   }
+                }
+            }
+        }
+    }
+    
+}
+
+int get_dap(){
+    int i;
+    /*
+    for(i=0; i<pos.size(); ++i){
+        cout<<pos[i].first<<" "<<pos[i].second<<endl;
+    }
+    */
+    dp_clear();
+    int dap = get_score(2,1, 2,3, 0);
+    return dap;
+}
+
+int solution(string numbers) {
+    int answer = 0;
+    int i, num,y,x;
+    for(i=0; i<numbers.length(); ++i){
+        if(numbers[i]>='1'&&numbers[i]<='9'){
+            num = (int)(numbers[i]-'0');
+            num--;
+            y = (num/3)+1;
+            x = (num%3)+1;
+            pos.push_back({y,x});
+        }
+        else if(numbers[i]=='0'){
+            pos.push_back({4,2});
+        }
+        else if(numbers[i]=='*'){
+            pos.push_back({4,1});
+        }
+        else{
+            pos.push_back({4,3});
+        }
+    }
+    answer = get_dap();
+    return answer;
+}
